@@ -1674,39 +1674,307 @@
       <!-- ===================================================================== -->
       <!-- TAB 5: DISPATCHED ADVISORY ALERTS                                     -->
       <!-- ===================================================================== -->
+      <!-- ===================================================================== -->
+      <!-- TAB 5: ACTIVE QUARANTINE ADVISORIES & DISPATCH COMMAND HUB             -->
+      <!-- ===================================================================== -->
       <section id="tab-alerts" class="space-y-4 hidden tab-pane">
-        <div class="flex items-center justify-between">
+        <!-- Header & Action Row -->
+        <div class="bg-white p-4 rounded-xl border border-black/10 shadow-sm flex flex-wrap items-center justify-between gap-4">
           <div>
-            <h1 class="text-2xl font-bold text-ink">Active Quarantine Advisories</h1>
-            <p class="text-sm text-ink-secondary font-inter">Live SMS and push alerts dispatched across target districts in Maharashtra</p>
+            <div class="flex items-center gap-2">
+              <div class="p-1.5 rounded-lg bg-red-100 text-[#C62828]">
+                <i data-lucide="alert-octagon" class="w-5 h-5"></i>
+              </div>
+              <h2 class="text-lg font-bold text-[#141414] font-figtree">
+                Quarantine Advisories & Biosecurity Broadcast Command
+              </h2>
+              <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-red-50 text-[#C62828] border border-red-200 font-bold uppercase tracking-wider">
+                Live Gateway Connected
+              </span>
+            </div>
+            <p class="text-xs text-zinc-500 font-inter mt-1">
+              Multi-channel emergency broadcast network &bull; SMS Gateway (CDAC) &bull; WhatsApp Farmer Alert &bull; Gram Panchayat Loudspeaker IVR
+            </p>
           </div>
-          <button onclick="openModal()" class="btn-primary text-xs h-10 px-4">
-            <i data-lucide="send" class="w-3.5 h-3.5"></i> Broadcast Alert
-          </button>
+
+          <div class="flex items-center gap-2">
+            <button onclick="openModal()" class="aero-btn aero-btn-red text-xs px-4 py-2 font-bold flex items-center gap-1.5 cursor-pointer shadow-sm">
+              <i data-lucide="send" class="w-3.5 h-3.5 text-red-100"></i> Broadcast Emergency Alert
+            </button>
+            <button onclick="exportData()" class="aero-btn aero-btn-excel text-xs px-3 py-2 flex items-center gap-1.5 cursor-pointer shadow-sm">
+              <i data-lucide="download" class="w-3.5 h-3.5 text-emerald-200"></i> Export Dispatch Logs
+            </button>
+          </div>
         </div>
 
-        <div class="space-y-3" id="alerts-list">
-          <div class="vetra-card border-l-4 border-l-[#C62828]">
-            <div class="flex items-center justify-between pb-2 border-b border-black/5">
-              <span class="chip-critical text-[10px]">CRITICAL SEVERITY</span>
-              <span class="text-xs text-ink-metadata font-inter">Dispatched: Nov 2, 2026 Ã¢â‚¬Â¢ Pune District</span>
+        <!-- 4-Card Alert Operations Telemetry Strip -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div class="vetra-card p-4">
+            <div class="flex items-center justify-between text-xs text-ink-metadata font-inter">
+              <span class="font-bold uppercase tracking-wider">Active Ring Perimeters</span>
+              <i data-lucide="disc" class="w-4 h-4 text-[#C62828]"></i>
             </div>
-            <h3 class="font-bold text-base text-ink mt-2">Urgent Quarantine Order: Foot & Mouth Disease Cluster in Haveli</h3>
-            <p class="text-xs text-ink-secondary font-inter mt-1 leading-relaxed">
-              Immediate prohibition of animal transport. Mandatory ring vaccination protocol initiated in a 10km radius around infected gram panchayats.
-            </p>
+            <div class="mt-2 flex items-baseline justify-between">
+              <span class="text-2xl font-extrabold font-figtree text-[#C62828]">3 Rings Active</span>
+              <span class="text-[10px] font-semibold text-red-800 bg-red-100 px-1.5 py-0.5 rounded">10km / 15km</span>
+            </div>
+            <p class="text-[11px] text-zinc-500 font-inter mt-1">Haveli, Shrirampur, Karad corridors</p>
           </div>
 
-          <div class="vetra-card border-l-4 border-l-[#F2994A]">
-            <div class="flex items-center justify-between pb-2 border-b border-black/5">
-              <span class="chip-caution text-[10px]">HIGH SEVERITY</span>
-              <span class="text-xs text-ink-metadata font-inter">Dispatched: Nov 1, 2026 Ã¢â‚¬Â¢ Ahmednagar District</span>
+          <div class="vetra-card p-4">
+            <div class="flex items-center justify-between text-xs text-ink-metadata font-inter">
+              <span class="font-bold uppercase tracking-wider">Farmers Dispatched</span>
+              <i data-lucide="users" class="w-4 h-4 text-[#16a34a]"></i>
             </div>
-            <h3 class="font-bold text-base text-ink mt-2">Vector Control Warning: Lumpy Skin Disease Surge in Ahmednagar</h3>
-            <p class="text-xs text-ink-secondary font-inter mt-1 leading-relaxed">
-              Elevated biting fly activity. Farmers advised to spray neem vector repellents and report cutaneous nodules to nearest dispensary.
-            </p>
+            <div class="mt-2 flex items-baseline justify-between">
+              <span class="text-2xl font-extrabold font-figtree text-ink">128,450</span>
+              <span class="text-[10px] font-semibold text-[#16a34a] bg-green-100 px-1.5 py-0.5 rounded">98.7% Recvd</span>
+            </div>
+            <p class="text-[11px] text-zinc-500 font-inter mt-1">SMS, WhatsApp & voice messages</p>
           </div>
+
+          <div class="vetra-card p-4">
+            <div class="flex items-center justify-between text-xs text-ink-metadata font-inter">
+              <span class="font-bold uppercase tracking-wider">Farmer Acknowledgment</span>
+              <i data-lucide="check-check" class="w-4 h-4 text-blue-600"></i>
+            </div>
+            <div class="mt-2 flex items-baseline justify-between">
+              <span class="text-2xl font-extrabold font-figtree text-blue-800">84.2%</span>
+              <span class="text-[10px] font-semibold text-blue-800 bg-blue-100 px-1.5 py-0.5 rounded">108,154 Ack</span>
+            </div>
+            <p class="text-[11px] text-zinc-500 font-inter mt-1">Interactive IVR reply & WhatsApp reads</p>
+          </div>
+
+          <div class="vetra-card p-4">
+            <div class="flex items-center justify-between text-xs text-ink-metadata font-inter">
+              <span class="font-bold uppercase tracking-wider">Market Transport Holds</span>
+              <i data-lucide="shield-alert" class="w-4 h-4 text-[#F2994A]"></i>
+            </div>
+            <div class="mt-2 flex items-baseline justify-between">
+              <span class="text-2xl font-extrabold font-figtree text-ink">6 APMC Mandis</span>
+              <span class="text-[10px] font-semibold text-amber-800 bg-amber-100 px-1.5 py-0.5 rounded">Hold Active</span>
+            </div>
+            <p class="text-[11px] text-zinc-500 font-inter mt-1">Wagholi, Loni Kalbhor, Shrirampur</p>
+          </div>
+        </div>
+
+        <!-- Filter & Search Toolbar -->
+        <div class="bg-white p-3 rounded-xl border border-black/10 flex flex-wrap items-center justify-between gap-3 text-xs font-inter shadow-2xs">
+          <div class="flex flex-wrap items-center gap-1.5">
+            <button onclick="filterAlertsTab('all')" id="alert-pill-all" class="px-3 py-1.5 rounded-lg font-bold text-xs bg-slate-900 text-white shadow-xs cursor-pointer transition-all">All Dispatches (4)</button>
+            <button onclick="filterAlertsTab('critical')" id="alert-pill-critical" class="px-3 py-1.5 rounded-lg font-bold text-xs bg-stone-100 text-stone-700 hover:bg-stone-200 cursor-pointer transition-all">Critical Quarantine (2)</button>
+            <button onclick="filterAlertsTab('high')" id="alert-pill-high" class="px-3 py-1.5 rounded-lg font-bold text-xs bg-stone-100 text-stone-700 hover:bg-stone-200 cursor-pointer transition-all">Vector Surge (1)</button>
+            <button onclick="filterAlertsTab('zoonotic')" id="alert-pill-zoonotic" class="px-3 py-1.5 rounded-lg font-bold text-xs bg-stone-100 text-stone-700 hover:bg-stone-200 cursor-pointer transition-all">Zoonotic Warning (1)</button>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <div class="relative">
+              <i data-lucide="search" class="w-3.5 h-3.5 text-zinc-400 absolute left-2.5 top-2.5"></i>
+              <input type="text" id="alert-search-input" oninput="searchAlerts()" placeholder="Search advisory text, taluka, disease..." class="pl-8 pr-3 py-1.5 rounded-lg border border-black/15 bg-white text-xs w-64 focus:outline-none focus:border-stone-500" />
+            </div>
+            <select id="alert-district-filter" onchange="searchAlerts()" class="px-2.5 py-1.5 rounded-lg border border-black/15 bg-parchment font-bold text-xs focus:outline-none">
+              <option value="all">All Districts</option>
+              <option value="Pune">Pune District</option>
+              <option value="Ahmednagar">Ahmednagar District</option>
+              <option value="Satara">Satara District</option>
+              <option value="Solapur">Solapur District</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Dynamic High-Efficiency Alerts List -->
+        <div class="space-y-3" id="alerts-list">
+          
+          <!-- Alert 1: Urgent Quarantine Order: FMD Cluster in Haveli -->
+          <div class="alert-item bg-white rounded-xl border-l-4 border-l-[#C62828] border border-black/10 p-4 shadow-sm space-y-3 transition-all hover:shadow-md" data-severity="critical" data-district="Pune">
+            <div class="flex flex-wrap items-center justify-between gap-2 pb-2 border-b border-black/5">
+              <div class="flex items-center gap-2">
+                <span class="chip-critical text-[10px] font-bold">CRITICAL QUARANTINE</span>
+                <span class="text-xs font-mono font-bold text-slate-900 bg-red-50 text-red-900 border border-red-200 px-2 py-0.5 rounded">10km Ring Buffer</span>
+                <span class="text-xs text-zinc-500 font-inter">Dispatched: Nov 3, 2026 &bull; 08:30 IST &bull; Pune (Haveli & Shirur)</span>
+              </div>
+              <div class="flex items-center gap-1.5 text-[11px] font-mono text-zinc-600 bg-parchment px-2 py-0.5 rounded">
+                <i data-lucide="radio" class="w-3 h-3 text-[#C62828] animate-pulse"></i>
+                <span>Gateways: SMS, WhatsApp, IVR, Gram Panchayat PA</span>
+              </div>
+            </div>
+
+            <div>
+              <h3 class="font-bold text-base text-ink font-figtree">Urgent Quarantine Order: Foot & Mouth Disease (FMD) Hotspot in Haveli</h3>
+              <p class="text-xs text-ink-secondary font-inter mt-1 leading-relaxed">
+                Confirmed viral transmission cluster. Immediate prohibition of all bovine livestock movement and commercial transit across Haveli and Daund corridors. Mandatory trivalent FMD ring vaccination protocol activated within a 10km radius around Wagholi, Loni Kalbhor, and Uruli Kanchan.
+              </p>
+            </div>
+
+            <!-- Directives & Delivery Telemetry Bar -->
+            <div class="p-2.5 bg-[#F9F7F3] rounded-lg border border-black/5 flex flex-wrap items-center justify-between gap-3 text-xs font-inter">
+              <div class="flex flex-wrap items-center gap-1.5">
+                <span class="px-2 py-0.5 rounded bg-white text-stone-800 border border-black/10 font-bold text-[10px]">HOLD: Wagholi APMC Mandi</span>
+                <span class="px-2 py-0.5 rounded bg-white text-stone-800 border border-black/10 font-bold text-[10px]">RING: 10km Perimeter Checkpoint</span>
+                <span class="px-2 py-0.5 rounded bg-white text-stone-800 border border-black/10 font-bold text-[10px]">VAX: FMD Trivalent Inactivated</span>
+              </div>
+              <div class="flex items-center gap-3 text-xs font-mono">
+                <span>Target: <strong>42,300 Farmers</strong></span>
+                <span class="text-[#16a34a]">Delivered: <strong>99.2% (41,960)</strong></span>
+                <span class="text-blue-700">Ack: <strong>88.4% (37,390)</strong></span>
+              </div>
+            </div>
+
+            <!-- Action Bar -->
+            <div class="flex flex-wrap items-center justify-between gap-2 pt-1 text-xs font-inter">
+              <div class="flex items-center gap-2">
+                <button onclick="jumpToGISCluster('fmd')" class="px-3 py-1.5 rounded-lg bg-red-50 hover:bg-red-100 text-[#C62828] border border-red-200 font-bold flex items-center gap-1.5 cursor-pointer transition-all">
+                  <i data-lucide="map-pin" class="w-3.5 h-3.5"></i> View 10km Cluster on GIS Map
+                </button>
+                <button onclick="resendAlertBroadcast('Pune Haveli Ring')" class="px-3 py-1.5 rounded-lg bg-white hover:bg-parchment text-slate-800 border border-black/15 font-semibold flex items-center gap-1.5 cursor-pointer transition-all shadow-2xs">
+                  <i data-lucide="refresh-cw" class="w-3.5 h-3.5 text-blue-600"></i> Resend to 340 Pending Farmers
+                </button>
+              </div>
+              <span class="text-[11px] text-zinc-400 font-mono">Auth: Dr. Vikram Deshmukh (DAHD)</span>
+            </div>
+          </div>
+
+          <!-- Alert 2: Vector Surge Warning: Lumpy Skin Disease in Ahmednagar -->
+          <div class="alert-item bg-white rounded-xl border-l-4 border-l-[#F2994A] border border-black/10 p-4 shadow-sm space-y-3 transition-all hover:shadow-md" data-severity="high" data-district="Ahmednagar">
+            <div class="flex flex-wrap items-center justify-between gap-2 pb-2 border-b border-black/5">
+              <div class="flex items-center gap-2">
+                <span class="chip-caution text-[10px] font-bold">VECTOR SURGE WARNING</span>
+                <span class="text-xs font-mono font-bold text-slate-900 bg-amber-50 text-amber-900 border border-amber-200 px-2 py-0.5 rounded">15km Vector Ring</span>
+                <span class="text-xs text-zinc-500 font-inter">Dispatched: Nov 2, 2026 &bull; 14:15 IST &bull; Ahmednagar (Shrirampur & Rahata)</span>
+              </div>
+              <div class="flex items-center gap-1.5 text-[11px] font-mono text-zinc-600 bg-parchment px-2 py-0.5 rounded">
+                <i data-lucide="send" class="w-3 h-3 text-[#F2994A]"></i>
+                <span>Gateways: SMS Broadcast, Krishi Vigyan Kendra WhatsApp</span>
+              </div>
+            </div>
+
+            <div>
+              <h3 class="font-bold text-base text-ink font-figtree">Vector Control Warning: Lumpy Skin Disease (LSD) Epizootic Surge</h3>
+              <p class="text-xs text-ink-secondary font-inter mt-1 leading-relaxed">
+                Atmospheric humidity and post-monsoon Stomoxys vector density spike observed. Dairy herds within 15km of the Pravara River corridor must apply synthetic pyrethroid repellent sprays and isolate feverish cattle immediately. Promptly log cutaneous nodule observations into PashuVani app.
+              </p>
+            </div>
+
+            <div class="p-2.5 bg-[#F9F7F3] rounded-lg border border-black/5 flex flex-wrap items-center justify-between gap-3 text-xs font-inter">
+              <div class="flex flex-wrap items-center gap-1.5">
+                <span class="px-2 py-0.5 rounded bg-white text-stone-800 border border-black/10 font-bold text-[10px]">SOP: Evening Smoke & Pyrethroid Fogging</span>
+                <span class="px-2 py-0.5 rounded bg-white text-stone-800 border border-black/10 font-bold text-[10px]">VAX: Goat Pox Heterologous (Uttarkashi)</span>
+                <span class="px-2 py-0.5 rounded bg-white text-stone-800 border border-black/10 font-bold text-[10px]">QUOTA: 15,000 Doses Allocated</span>
+              </div>
+              <div class="flex items-center gap-3 text-xs font-mono">
+                <span>Target: <strong>34,800 Farmers</strong></span>
+                <span class="text-[#16a34a]">Delivered: <strong>98.5% (34,278)</strong></span>
+                <span class="text-blue-700">Ack: <strong>81.2% (28,250)</strong></span>
+              </div>
+            </div>
+
+            <div class="flex flex-wrap items-center justify-between gap-2 pt-1 text-xs font-inter">
+              <div class="flex items-center gap-2">
+                <button onclick="jumpToGISCluster('lsd')" class="px-3 py-1.5 rounded-lg bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-200 font-bold flex items-center gap-1.5 cursor-pointer transition-all">
+                  <i data-lucide="map-pin" class="w-3.5 h-3.5"></i> View 15km Perimeter on Map
+                </button>
+                <button onclick="resendAlertBroadcast('Ahmednagar LSD Vector')" class="px-3 py-1.5 rounded-lg bg-white hover:bg-parchment text-slate-800 border border-black/15 font-semibold flex items-center gap-1.5 cursor-pointer transition-all shadow-2xs">
+                  <i data-lucide="refresh-cw" class="w-3.5 h-3.5 text-blue-600"></i> Broadcast Vector Advisory Push
+                </button>
+              </div>
+              <span class="text-[11px] text-zinc-400 font-mono">Auth: Joint Director Animal Husbandry</span>
+            </div>
+          </div>
+
+          <!-- Alert 3: Zoonotic Biosecurity Directive: Anthrax Suspicion in Satara -->
+          <div class="alert-item bg-white rounded-xl border-l-4 border-l-[#9A5B32] border border-black/10 p-4 shadow-sm space-y-3 transition-all hover:shadow-md" data-severity="zoonotic" data-district="Satara">
+            <div class="flex flex-wrap items-center justify-between gap-2 pb-2 border-b border-black/5">
+              <div class="flex items-center gap-2">
+                <span class="chip-critical text-[10px] font-bold bg-[#9A5B32] text-white">ZOONOTIC DIRECTIVE</span>
+                <span class="text-xs font-mono font-bold text-slate-900 bg-stone-100 text-stone-900 border border-stone-200 px-2 py-0.5 rounded">10km Buffer</span>
+                <span class="text-xs text-zinc-500 font-inter">Dispatched: Nov 2, 2026 &bull; 09:00 IST &bull; Satara (Karad Corridor)</span>
+              </div>
+              <div class="flex items-center gap-1.5 text-[11px] font-mono text-zinc-600 bg-parchment px-2 py-0.5 rounded">
+                <i data-lucide="shield-alert" class="w-3 h-3 text-[#9A5B32]"></i>
+                <span>Channels: Urgent Push, Registered Vet SMS, Forest Dept</span>
+              </div>
+            </div>
+
+            <div>
+              <h3 class="font-bold text-base text-ink font-figtree">Zoonotic Biosecurity Directive: Suspected Anthrax Spore Contamination</h3>
+              <p class="text-xs text-ink-secondary font-inter mt-1 leading-relaxed">
+                Sudden un-clotted dark blood discharge reported in deceased bullock. STRICT BIOSECURITY LEVEL B ACTIVATED. Absolutely no post-mortem incision allowed to avoid soil spore contamination. Carcass deep burial mandatory with quicklime barrier under official veterinary supervision.
+              </p>
+            </div>
+
+            <div class="p-2.5 bg-[#F9F7F3] rounded-lg border border-black/5 flex flex-wrap items-center justify-between gap-3 text-xs font-inter">
+              <div class="flex flex-wrap items-center gap-1.5">
+                <span class="px-2 py-0.5 rounded bg-white text-stone-800 border border-black/10 font-bold text-[10px]">STRICT NO POST-MORTEM</span>
+                <span class="px-2 py-0.5 rounded bg-white text-stone-800 border border-black/10 font-bold text-[10px]">BURIAL: 6-Foot Depth + Quicklime</span>
+                <span class="px-2 py-0.5 rounded bg-white text-stone-800 border border-black/10 font-bold text-[10px]">BUFFER VAX: Anthrax Sterne Spore</span>
+              </div>
+              <div class="flex items-center gap-3 text-xs font-mono">
+                <span>Target: <strong>18,200 Herders</strong></span>
+                <span class="text-[#16a34a]">Delivered: <strong>99.4% (18,090)</strong></span>
+                <span class="text-blue-700">Ack: <strong>91.0% (16,560)</strong></span>
+              </div>
+            </div>
+
+            <div class="flex flex-wrap items-center justify-between gap-2 pt-1 text-xs font-inter">
+              <div class="flex items-center gap-2">
+                <button onclick="switchTab('protocols')" class="px-3 py-1.5 rounded-lg bg-stone-100 hover:bg-stone-200 text-stone-900 border border-stone-300 font-bold flex items-center gap-1.5 cursor-pointer transition-all">
+                  <i data-lucide="book-open" class="w-3.5 h-3.5"></i> Read Anthrax Biosecurity SOP
+                </button>
+                <button onclick="resendAlertBroadcast('Satara Anthrax SOP')" class="px-3 py-1.5 rounded-lg bg-white hover:bg-parchment text-slate-800 border border-black/15 font-semibold flex items-center gap-1.5 cursor-pointer transition-all shadow-2xs">
+                  <i data-lucide="refresh-cw" class="w-3.5 h-3.5 text-blue-600"></i> Resend Biosecurity Warning
+                </button>
+              </div>
+              <span class="text-[11px] text-zinc-400 font-mono">Auth: State Veterinary Epidemiologist</span>
+            </div>
+          </div>
+
+          <!-- Alert 4: Ring Prophylaxis: PPR Small Ruminants in Solapur -->
+          <div class="alert-item bg-white rounded-xl border-l-4 border-l-[#4D6E34] border border-black/10 p-4 shadow-sm space-y-3 transition-all hover:shadow-md" data-severity="critical" data-district="Solapur">
+            <div class="flex flex-wrap items-center justify-between gap-2 pb-2 border-b border-black/5">
+              <div class="flex items-center gap-2">
+                <span class="chip-active text-[10px] font-bold bg-[#4D6E34] text-white">RING PROPHYLAXIS</span>
+                <span class="text-xs font-mono font-bold text-slate-900 bg-emerald-50 text-emerald-900 border border-emerald-200 px-2 py-0.5 rounded">12km Ring</span>
+                <span class="text-xs text-zinc-500 font-inter">Dispatched: Nov 1, 2026 &bull; 16:45 IST &bull; Solapur (Pandharpur & Barshi)</span>
+              </div>
+              <div class="flex items-center gap-1.5 text-[11px] font-mono text-zinc-600 bg-parchment px-2 py-0.5 rounded">
+                <i data-lucide="bell" class="w-3 h-3 text-[#4D6E34]"></i>
+                <span>Channels: SMS, Dhangar Shepherd Guilds, Local Mandis</span>
+              </div>
+            </div>
+
+            <div>
+              <h3 class="font-bold text-base text-ink font-figtree">Ring Prophylaxis Notice: Peste des Petits Ruminants (PPR) Containment</h3>
+              <p class="text-xs text-ink-secondary font-inter mt-1 leading-relaxed">
+                Respiratory discharge and oral erosions identified in nomadic sheep herds along the Bhima river basin. Compulsory PPR Sungri-96 live attenuated vaccination deployed. Flocks must not mingle at communal water bodies until ring vaccination completion.
+              </p>
+            </div>
+
+            <div class="p-2.5 bg-[#F9F7F3] rounded-lg border border-black/5 flex flex-wrap items-center justify-between gap-3 text-xs font-inter">
+              <div class="flex flex-wrap items-center gap-1.5">
+                <span class="px-2 py-0.5 rounded bg-white text-stone-800 border border-black/10 font-bold text-[10px]">WATER HOLE SEGREGATION</span>
+                <span class="px-2 py-0.5 rounded bg-white text-stone-800 border border-black/10 font-bold text-[10px]">SUNGRI-96 DEPLOYED (10,000 Doses)</span>
+                <span class="px-2 py-0.5 rounded bg-white text-stone-800 border border-black/10 font-bold text-[10px]">HEALTH PASS FOR TRANSIT</span>
+              </div>
+              <div class="flex items-center gap-3 text-xs font-mono">
+                <span>Target: <strong>22,150 Herders</strong></span>
+                <span class="text-[#16a34a]">Delivered: <strong>97.8% (21,660)</strong></span>
+                <span class="text-blue-700">Ack: <strong>79.6% (17,630)</strong></span>
+              </div>
+            </div>
+
+            <div class="flex flex-wrap items-center justify-between gap-2 pt-1 text-xs font-inter">
+              <div class="flex items-center gap-2">
+                <button onclick="switchTab('vaccination')" class="px-3 py-1.5 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-900 border border-emerald-200 font-bold flex items-center gap-1.5 cursor-pointer transition-all">
+                  <i data-lucide="syringe" class="w-3.5 h-3.5"></i> Check Solapur PPR Ring Stock
+                </button>
+                <button onclick="resendAlertBroadcast('Solapur PPR Sheep Herders')" class="px-3 py-1.5 rounded-lg bg-white hover:bg-parchment text-slate-800 border border-black/15 font-semibold flex items-center gap-1.5 cursor-pointer transition-all shadow-2xs">
+                  <i data-lucide="refresh-cw" class="w-3.5 h-3.5 text-blue-600"></i> Resend Nomadic Route Alert
+                </button>
+              </div>
+              <span class="text-[11px] text-zinc-400 font-mono">Auth: Regional Joint Director Solapur</span>
+            </div>
+          </div>
+
         </div>
       </section>
 
@@ -1860,28 +2128,28 @@
         </div>
 
         
-        <!-- Flat Front-Facing Modern UI Donut Chart -->
+        <!-- High-Contrast Front-Facing Donut Chart -->
         <div class="my-2 p-2 bg-[#FAF8F5] rounded-xl border border-stone-200/80 flex items-center justify-center">
           <svg width="155" height="155" viewBox="0 0 160 160" class="block">
             <!-- Soft Cream Neutral Track -->
-            <circle cx="80" cy="80" r="60" fill="none" stroke="#EFEAE1" stroke-width="15" />
+            <circle cx="80" cy="80" r="60" fill="none" stroke="#EAE4DA" stroke-width="16" />
             
-            <!-- Donut Segments -->
+            <!-- Donut Segments with Varied High-Contrast Shades -->
             <g transform="rotate(-90 80 80)">
               
-      <circle cx="80" cy="80" r="60" fill="none" stroke="#4D5E38" stroke-width="15"
+      <circle cx="80" cy="80" r="60" fill="none" stroke="#4D6E34" stroke-width="16"
         stroke-dasharray="196.04 180.96"
         stroke-dashoffset="-0.00"
         class="transition-opacity duration-200 hover:opacity-85 cursor-pointer">
         <title>FMD Trivalent: 52% (5,824 doses)</title>
       </circle>
-      <circle cx="80" cy="80" r="60" fill="none" stroke="#334155" stroke-width="15"
+      <circle cx="80" cy="80" r="60" fill="none" stroke="#1E293B" stroke-width="16"
         stroke-dasharray="143.26 233.73"
         stroke-dashoffset="-196.04"
         class="transition-opacity duration-200 hover:opacity-85 cursor-pointer">
         <title>LSD Goat Pox: 38% (4,256 doses)</title>
       </circle>
-      <circle cx="80" cy="80" r="60" fill="none" stroke="#8C7E6C" stroke-width="15"
+      <circle cx="80" cy="80" r="60" fill="none" stroke="#C4B59D" stroke-width="16"
         stroke-dasharray="37.70 339.29"
         stroke-dashoffset="-339.29"
         class="transition-opacity duration-200 hover:opacity-85 cursor-pointer">
@@ -1889,13 +2157,13 @@
       </circle>
             </g>
 
-            <!-- Crisp Divider Seams -->
-            <circle cx="80" cy="80" r="60" fill="none" stroke="#FAF8F5" stroke-width="15"
+            <!-- Crisp Clean Separation Seams -->
+            <circle cx="80" cy="80" r="60" fill="none" stroke="#FAF8F5" stroke-width="16"
               stroke-dasharray="2.5 123.16"
-              pointer-events="none" opacity="0.9" />
+              pointer-events="none" opacity="0.95" />
 
             <!-- Minimalist Central Typography: High Contrast -->
-            <text x="80" y="76" text-anchor="middle" font-family="'Figtree', sans-serif" font-size="22" font-weight="800" fill="#1E293B" letter-spacing="-0.5">93.3%</text>
+            <text x="80" y="76" text-anchor="middle" font-family="'Figtree', sans-serif" font-size="22" font-weight="800" fill="#0F172A" letter-spacing="-0.5">93.3%</text>
             <text x="80" y="92" text-anchor="middle" font-family="'Inter', sans-serif" font-size="8.5" font-weight="700" fill="#64748B" letter-spacing="0.8">RING COVERAGE</text>
           </svg>
         </div>
@@ -1904,12 +2172,12 @@
         <div class="grid grid-cols-2 gap-2 my-2.5 p-2 bg-[#F8F6F2] rounded-lg border border-stone-200/60 text-xs font-inter">
           <div>
             <span class="text-[10px] text-stone-500 uppercase font-semibold tracking-wider block">Inoculated / Quota</span>
-            <span class="font-mono font-bold text-slate-800">11,200 <span class="text-stone-400 font-normal">/ 12,000</span></span>
+            <span class="font-mono font-bold text-slate-900">11,200 <span class="text-stone-400 font-normal">/ 12,000</span></span>
           </div>
           <div class="text-right">
             <span class="text-[10px] text-stone-500 uppercase font-semibold tracking-wider block">Cold Chain</span>
-            <span class="font-mono font-bold text-slate-800 flex items-center justify-end gap-1">
-              <span class="w-1.5 h-1.5 rounded-full" style="background: #4D5E38;"></span>
+            <span class="font-mono font-bold text-slate-900 flex items-center justify-end gap-1">
+              <span class="w-1.5 h-1.5 rounded-full" style="background: #4D6E34;"></span>
               4.0°C Optimal
             </span>
           </div>
@@ -1920,39 +2188,39 @@
           
     <div class="flex items-center justify-between text-xs py-1.5 border-b border-stone-200/60 last:border-0 font-inter">
       <div class="flex items-center gap-2">
-        <span class="w-2.5 h-2.5 rounded-full flex-shrink-0" style="background-color: #4D5E38;"></span>
-        <span class="text-stone-700 font-medium">FMD Trivalent</span>
+        <span class="w-2.5 h-2.5 rounded-full flex-shrink-0" style="background-color: #4D6E34;"></span>
+        <span class="text-stone-800 font-medium">FMD Trivalent</span>
       </div>
-      <div class="font-mono text-stone-900 font-semibold">
+      <div class="font-mono text-stone-900 font-bold">
         52% <span class="text-stone-400 font-normal">(5,824)</span>
       </div>
     </div>
     <div class="flex items-center justify-between text-xs py-1.5 border-b border-stone-200/60 last:border-0 font-inter">
       <div class="flex items-center gap-2">
-        <span class="w-2.5 h-2.5 rounded-full flex-shrink-0" style="background-color: #334155;"></span>
-        <span class="text-stone-700 font-medium">LSD Goat Pox</span>
+        <span class="w-2.5 h-2.5 rounded-full flex-shrink-0" style="background-color: #1E293B;"></span>
+        <span class="text-stone-800 font-medium">LSD Goat Pox</span>
       </div>
-      <div class="font-mono text-stone-900 font-semibold">
+      <div class="font-mono text-stone-900 font-bold">
         38% <span class="text-stone-400 font-normal">(4,256)</span>
       </div>
     </div>
     <div class="flex items-center justify-between text-xs py-1.5 border-b border-stone-200/60 last:border-0 font-inter">
       <div class="flex items-center gap-2">
-        <span class="w-2.5 h-2.5 rounded-full flex-shrink-0" style="background-color: #8C7E6C;"></span>
-        <span class="text-stone-700 font-medium">PPR Ruminants</span>
+        <span class="w-2.5 h-2.5 rounded-full flex-shrink-0" style="background-color: #C4B59D;"></span>
+        <span class="text-stone-800 font-medium">PPR Ruminants</span>
       </div>
-      <div class="font-mono text-stone-900 font-semibold">
+      <div class="font-mono text-stone-900 font-bold">
         10% <span class="text-stone-400 font-normal">(1,120)</span>
       </div>
     </div>
         </div>
       </div>
 
-      <!-- Action Footer -->
+      <!-- Action Footer with Active District Filter -->
       <div class="mt-3.5 pt-2.5 border-t border-stone-100 flex items-center justify-between text-xs font-inter">
-        <button onclick="filterVaccinationByDistrict('Kolhapur')" class="text-[11px] font-semibold text-stone-700 hover:text-slate-900 flex items-center gap-1 cursor-pointer transition-colors">
+        <button onclick="filterVaccinationByDistrict('Kolhapur')" class="px-2.5 py-1 rounded bg-stone-100 hover:bg-stone-200 text-stone-800 text-[11px] font-bold flex items-center gap-1.5 cursor-pointer transition-all shadow-2xs">
+          <i data-lucide="filter" class="w-3 h-3 text-stone-600"></i>
           <span>Filter Area Records</span>
-          <i data-lucide="chevron-right" class="w-3 h-3 text-stone-400"></i>
         </button>
         <span class="text-[10px] text-stone-400 font-mono">Cold Chain Logged</span>
       </div>
@@ -1972,28 +2240,28 @@
         </div>
 
         
-        <!-- Flat Front-Facing Modern UI Donut Chart -->
+        <!-- High-Contrast Front-Facing Donut Chart -->
         <div class="my-2 p-2 bg-[#FAF8F5] rounded-xl border border-stone-200/80 flex items-center justify-center">
           <svg width="155" height="155" viewBox="0 0 160 160" class="block">
             <!-- Soft Cream Neutral Track -->
-            <circle cx="80" cy="80" r="60" fill="none" stroke="#EFEAE1" stroke-width="15" />
+            <circle cx="80" cy="80" r="60" fill="none" stroke="#EAE4DA" stroke-width="16" />
             
-            <!-- Donut Segments -->
+            <!-- Donut Segments with Varied High-Contrast Shades -->
             <g transform="rotate(-90 80 80)">
               
-      <circle cx="80" cy="80" r="60" fill="none" stroke="#334155" stroke-width="15"
+      <circle cx="80" cy="80" r="60" fill="none" stroke="#1E293B" stroke-width="16"
         stroke-dasharray="180.96 196.04"
         stroke-dashoffset="-0.00"
         class="transition-opacity duration-200 hover:opacity-85 cursor-pointer">
         <title>LSD Goat Pox: 48% (8,832 doses)</title>
       </circle>
-      <circle cx="80" cy="80" r="60" fill="none" stroke="#4D5E38" stroke-width="15"
+      <circle cx="80" cy="80" r="60" fill="none" stroke="#4D6E34" stroke-width="16"
         stroke-dasharray="128.18 248.81"
         stroke-dashoffset="-180.96"
         class="transition-opacity duration-200 hover:opacity-85 cursor-pointer">
         <title>FMD Trivalent: 34% (6,256 doses)</title>
       </circle>
-      <circle cx="80" cy="80" r="60" fill="none" stroke="#78716C" stroke-width="15"
+      <circle cx="80" cy="80" r="60" fill="none" stroke="#9A5B32" stroke-width="16"
         stroke-dasharray="67.86 309.13"
         stroke-dashoffset="-309.13"
         class="transition-opacity duration-200 hover:opacity-85 cursor-pointer">
@@ -2001,13 +2269,13 @@
       </circle>
             </g>
 
-            <!-- Crisp Divider Seams -->
-            <circle cx="80" cy="80" r="60" fill="none" stroke="#FAF8F5" stroke-width="15"
+            <!-- Crisp Clean Separation Seams -->
+            <circle cx="80" cy="80" r="60" fill="none" stroke="#FAF8F5" stroke-width="16"
               stroke-dasharray="2.5 123.16"
-              pointer-events="none" opacity="0.9" />
+              pointer-events="none" opacity="0.95" />
 
             <!-- Minimalist Central Typography: High Contrast -->
-            <text x="80" y="76" text-anchor="middle" font-family="'Figtree', sans-serif" font-size="22" font-weight="800" fill="#1E293B" letter-spacing="-0.5">87.6%</text>
+            <text x="80" y="76" text-anchor="middle" font-family="'Figtree', sans-serif" font-size="22" font-weight="800" fill="#0F172A" letter-spacing="-0.5">87.6%</text>
             <text x="80" y="92" text-anchor="middle" font-family="'Inter', sans-serif" font-size="8.5" font-weight="700" fill="#64748B" letter-spacing="0.8">RING COVERAGE</text>
           </svg>
         </div>
@@ -2016,12 +2284,12 @@
         <div class="grid grid-cols-2 gap-2 my-2.5 p-2 bg-[#F8F6F2] rounded-lg border border-stone-200/60 text-xs font-inter">
           <div>
             <span class="text-[10px] text-stone-500 uppercase font-semibold tracking-wider block">Inoculated / Quota</span>
-            <span class="font-mono font-bold text-slate-800">18,400 <span class="text-stone-400 font-normal">/ 21,000</span></span>
+            <span class="font-mono font-bold text-slate-900">18,400 <span class="text-stone-400 font-normal">/ 21,000</span></span>
           </div>
           <div class="text-right">
             <span class="text-[10px] text-stone-500 uppercase font-semibold tracking-wider block">Cold Chain</span>
-            <span class="font-mono font-bold text-slate-800 flex items-center justify-end gap-1">
-              <span class="w-1.5 h-1.5 rounded-full" style="background: #4D5E38;"></span>
+            <span class="font-mono font-bold text-slate-900 flex items-center justify-end gap-1">
+              <span class="w-1.5 h-1.5 rounded-full" style="background: #4D6E34;"></span>
               4.1°C Optimal
             </span>
           </div>
@@ -2032,39 +2300,39 @@
           
     <div class="flex items-center justify-between text-xs py-1.5 border-b border-stone-200/60 last:border-0 font-inter">
       <div class="flex items-center gap-2">
-        <span class="w-2.5 h-2.5 rounded-full flex-shrink-0" style="background-color: #334155;"></span>
-        <span class="text-stone-700 font-medium">LSD Goat Pox</span>
+        <span class="w-2.5 h-2.5 rounded-full flex-shrink-0" style="background-color: #1E293B;"></span>
+        <span class="text-stone-800 font-medium">LSD Goat Pox</span>
       </div>
-      <div class="font-mono text-stone-900 font-semibold">
+      <div class="font-mono text-stone-900 font-bold">
         48% <span class="text-stone-400 font-normal">(8,832)</span>
       </div>
     </div>
     <div class="flex items-center justify-between text-xs py-1.5 border-b border-stone-200/60 last:border-0 font-inter">
       <div class="flex items-center gap-2">
-        <span class="w-2.5 h-2.5 rounded-full flex-shrink-0" style="background-color: #4D5E38;"></span>
-        <span class="text-stone-700 font-medium">FMD Trivalent</span>
+        <span class="w-2.5 h-2.5 rounded-full flex-shrink-0" style="background-color: #4D6E34;"></span>
+        <span class="text-stone-800 font-medium">FMD Trivalent</span>
       </div>
-      <div class="font-mono text-stone-900 font-semibold">
+      <div class="font-mono text-stone-900 font-bold">
         34% <span class="text-stone-400 font-normal">(6,256)</span>
       </div>
     </div>
     <div class="flex items-center justify-between text-xs py-1.5 border-b border-stone-200/60 last:border-0 font-inter">
       <div class="flex items-center gap-2">
-        <span class="w-2.5 h-2.5 rounded-full flex-shrink-0" style="background-color: #78716C;"></span>
-        <span class="text-stone-700 font-medium">Anthrax Spore</span>
+        <span class="w-2.5 h-2.5 rounded-full flex-shrink-0" style="background-color: #9A5B32;"></span>
+        <span class="text-stone-800 font-medium">Anthrax Spore</span>
       </div>
-      <div class="font-mono text-stone-900 font-semibold">
+      <div class="font-mono text-stone-900 font-bold">
         18% <span class="text-stone-400 font-normal">(3,312)</span>
       </div>
     </div>
         </div>
       </div>
 
-      <!-- Action Footer -->
+      <!-- Action Footer with Active District Filter -->
       <div class="mt-3.5 pt-2.5 border-t border-stone-100 flex items-center justify-between text-xs font-inter">
-        <button onclick="filterVaccinationByDistrict('Pune')" class="text-[11px] font-semibold text-stone-700 hover:text-slate-900 flex items-center gap-1 cursor-pointer transition-colors">
+        <button onclick="filterVaccinationByDistrict('Pune')" class="px-2.5 py-1 rounded bg-stone-100 hover:bg-stone-200 text-stone-800 text-[11px] font-bold flex items-center gap-1.5 cursor-pointer transition-all shadow-2xs">
+          <i data-lucide="filter" class="w-3 h-3 text-stone-600"></i>
           <span>Filter Area Records</span>
-          <i data-lucide="chevron-right" class="w-3 h-3 text-stone-400"></i>
         </button>
         <span class="text-[10px] text-stone-400 font-mono">Cold Chain Logged</span>
       </div>
@@ -2084,28 +2352,28 @@
         </div>
 
         
-        <!-- Flat Front-Facing Modern UI Donut Chart -->
+        <!-- High-Contrast Front-Facing Donut Chart -->
         <div class="my-2 p-2 bg-[#FAF8F5] rounded-xl border border-stone-200/80 flex items-center justify-center">
           <svg width="155" height="155" viewBox="0 0 160 160" class="block">
             <!-- Soft Cream Neutral Track -->
-            <circle cx="80" cy="80" r="60" fill="none" stroke="#EFEAE1" stroke-width="15" />
+            <circle cx="80" cy="80" r="60" fill="none" stroke="#EAE4DA" stroke-width="16" />
             
-            <!-- Donut Segments -->
+            <!-- Donut Segments with Varied High-Contrast Shades -->
             <g transform="rotate(-90 80 80)">
               
-      <circle cx="80" cy="80" r="60" fill="none" stroke="#334155" stroke-width="15"
+      <circle cx="80" cy="80" r="60" fill="none" stroke="#1E293B" stroke-width="16"
         stroke-dasharray="207.35 169.65"
         stroke-dashoffset="-0.00"
         class="transition-opacity duration-200 hover:opacity-85 cursor-pointer">
         <title>LSD Goat Pox: 55% (7,040 doses)</title>
       </circle>
-      <circle cx="80" cy="80" r="60" fill="none" stroke="#4D5E38" stroke-width="15"
+      <circle cx="80" cy="80" r="60" fill="none" stroke="#4D6E34" stroke-width="16"
         stroke-dasharray="131.95 245.04"
         stroke-dashoffset="-207.35"
         class="transition-opacity duration-200 hover:opacity-85 cursor-pointer">
         <title>FMD Trivalent: 35% (4,480 doses)</title>
       </circle>
-      <circle cx="80" cy="80" r="60" fill="none" stroke="#78716C" stroke-width="15"
+      <circle cx="80" cy="80" r="60" fill="none" stroke="#9A5B32" stroke-width="16"
         stroke-dasharray="37.70 339.29"
         stroke-dashoffset="-339.29"
         class="transition-opacity duration-200 hover:opacity-85 cursor-pointer">
@@ -2113,13 +2381,13 @@
       </circle>
             </g>
 
-            <!-- Crisp Divider Seams -->
-            <circle cx="80" cy="80" r="60" fill="none" stroke="#FAF8F5" stroke-width="15"
+            <!-- Crisp Clean Separation Seams -->
+            <circle cx="80" cy="80" r="60" fill="none" stroke="#FAF8F5" stroke-width="16"
               stroke-dasharray="2.5 123.16"
-              pointer-events="none" opacity="0.9" />
+              pointer-events="none" opacity="0.95" />
 
             <!-- Minimalist Central Typography: High Contrast -->
-            <text x="80" y="76" text-anchor="middle" font-family="'Figtree', sans-serif" font-size="22" font-weight="800" fill="#1E293B" letter-spacing="-0.5">85.3%</text>
+            <text x="80" y="76" text-anchor="middle" font-family="'Figtree', sans-serif" font-size="22" font-weight="800" fill="#0F172A" letter-spacing="-0.5">85.3%</text>
             <text x="80" y="92" text-anchor="middle" font-family="'Inter', sans-serif" font-size="8.5" font-weight="700" fill="#64748B" letter-spacing="0.8">RING COVERAGE</text>
           </svg>
         </div>
@@ -2128,12 +2396,12 @@
         <div class="grid grid-cols-2 gap-2 my-2.5 p-2 bg-[#F8F6F2] rounded-lg border border-stone-200/60 text-xs font-inter">
           <div>
             <span class="text-[10px] text-stone-500 uppercase font-semibold tracking-wider block">Inoculated / Quota</span>
-            <span class="font-mono font-bold text-slate-800">12,800 <span class="text-stone-400 font-normal">/ 15,000</span></span>
+            <span class="font-mono font-bold text-slate-900">12,800 <span class="text-stone-400 font-normal">/ 15,000</span></span>
           </div>
           <div class="text-right">
             <span class="text-[10px] text-stone-500 uppercase font-semibold tracking-wider block">Cold Chain</span>
-            <span class="font-mono font-bold text-slate-800 flex items-center justify-end gap-1">
-              <span class="w-1.5 h-1.5 rounded-full" style="background: #4D5E38;"></span>
+            <span class="font-mono font-bold text-slate-900 flex items-center justify-end gap-1">
+              <span class="w-1.5 h-1.5 rounded-full" style="background: #4D6E34;"></span>
               3.8°C Steady
             </span>
           </div>
@@ -2144,39 +2412,39 @@
           
     <div class="flex items-center justify-between text-xs py-1.5 border-b border-stone-200/60 last:border-0 font-inter">
       <div class="flex items-center gap-2">
-        <span class="w-2.5 h-2.5 rounded-full flex-shrink-0" style="background-color: #334155;"></span>
-        <span class="text-stone-700 font-medium">LSD Goat Pox</span>
+        <span class="w-2.5 h-2.5 rounded-full flex-shrink-0" style="background-color: #1E293B;"></span>
+        <span class="text-stone-800 font-medium">LSD Goat Pox</span>
       </div>
-      <div class="font-mono text-stone-900 font-semibold">
+      <div class="font-mono text-stone-900 font-bold">
         55% <span class="text-stone-400 font-normal">(7,040)</span>
       </div>
     </div>
     <div class="flex items-center justify-between text-xs py-1.5 border-b border-stone-200/60 last:border-0 font-inter">
       <div class="flex items-center gap-2">
-        <span class="w-2.5 h-2.5 rounded-full flex-shrink-0" style="background-color: #4D5E38;"></span>
-        <span class="text-stone-700 font-medium">FMD Trivalent</span>
+        <span class="w-2.5 h-2.5 rounded-full flex-shrink-0" style="background-color: #4D6E34;"></span>
+        <span class="text-stone-800 font-medium">FMD Trivalent</span>
       </div>
-      <div class="font-mono text-stone-900 font-semibold">
+      <div class="font-mono text-stone-900 font-bold">
         35% <span class="text-stone-400 font-normal">(4,480)</span>
       </div>
     </div>
     <div class="flex items-center justify-between text-xs py-1.5 border-b border-stone-200/60 last:border-0 font-inter">
       <div class="flex items-center gap-2">
-        <span class="w-2.5 h-2.5 rounded-full flex-shrink-0" style="background-color: #78716C;"></span>
-        <span class="text-stone-700 font-medium">Anthrax Spore</span>
+        <span class="w-2.5 h-2.5 rounded-full flex-shrink-0" style="background-color: #9A5B32;"></span>
+        <span class="text-stone-800 font-medium">Anthrax Spore</span>
       </div>
-      <div class="font-mono text-stone-900 font-semibold">
+      <div class="font-mono text-stone-900 font-bold">
         10% <span class="text-stone-400 font-normal">(1,280)</span>
       </div>
     </div>
         </div>
       </div>
 
-      <!-- Action Footer -->
+      <!-- Action Footer with Active District Filter -->
       <div class="mt-3.5 pt-2.5 border-t border-stone-100 flex items-center justify-between text-xs font-inter">
-        <button onclick="filterVaccinationByDistrict('Ahmednagar')" class="text-[11px] font-semibold text-stone-700 hover:text-slate-900 flex items-center gap-1 cursor-pointer transition-colors">
+        <button onclick="filterVaccinationByDistrict('Ahmednagar')" class="px-2.5 py-1 rounded bg-stone-100 hover:bg-stone-200 text-stone-800 text-[11px] font-bold flex items-center gap-1.5 cursor-pointer transition-all shadow-2xs">
+          <i data-lucide="filter" class="w-3 h-3 text-stone-600"></i>
           <span>Filter Area Records</span>
-          <i data-lucide="chevron-right" class="w-3 h-3 text-stone-400"></i>
         </button>
         <span class="text-[10px] text-stone-400 font-mono">Cold Chain Logged</span>
       </div>
@@ -2196,34 +2464,34 @@
         </div>
 
         
-        <!-- Flat Front-Facing Modern UI Donut Chart -->
+        <!-- High-Contrast Front-Facing Donut Chart -->
         <div class="my-2 p-2 bg-[#FAF8F5] rounded-xl border border-stone-200/80 flex items-center justify-center">
           <svg width="155" height="155" viewBox="0 0 160 160" class="block">
             <!-- Soft Cream Neutral Track -->
-            <circle cx="80" cy="80" r="60" fill="none" stroke="#EFEAE1" stroke-width="15" />
+            <circle cx="80" cy="80" r="60" fill="none" stroke="#EAE4DA" stroke-width="16" />
             
-            <!-- Donut Segments -->
+            <!-- Donut Segments with Varied High-Contrast Shades -->
             <g transform="rotate(-90 80 80)">
               
-      <circle cx="80" cy="80" r="60" fill="none" stroke="#334155" stroke-width="15"
+      <circle cx="80" cy="80" r="60" fill="none" stroke="#1E293B" stroke-width="16"
         stroke-dasharray="168.89 208.10"
         stroke-dashoffset="-0.00"
         class="transition-opacity duration-200 hover:opacity-85 cursor-pointer">
         <title>LSD Goat Pox: 44.8% (27,350 doses)</title>
       </circle>
-      <circle cx="80" cy="80" r="60" fill="none" stroke="#4D5E38" stroke-width="15"
+      <circle cx="80" cy="80" r="60" fill="none" stroke="#4D6E34" stroke-width="16"
         stroke-dasharray="122.15 254.85"
         stroke-dashoffset="-168.89"
         class="transition-opacity duration-200 hover:opacity-85 cursor-pointer">
         <title>FMD Trivalent: 32.4% (19,770 doses)</title>
       </circle>
-      <circle cx="80" cy="80" r="60" fill="none" stroke="#78716C" stroke-width="15"
+      <circle cx="80" cy="80" r="60" fill="none" stroke="#9A5B32" stroke-width="16"
         stroke-dasharray="51.27 325.72"
         stroke-dashoffset="-291.04"
         class="transition-opacity duration-200 hover:opacity-85 cursor-pointer">
         <title>Anthrax Spore: 13.6% (8,300 doses)</title>
       </circle>
-      <circle cx="80" cy="80" r="60" fill="none" stroke="#8C7E6C" stroke-width="15"
+      <circle cx="80" cy="80" r="60" fill="none" stroke="#C4B59D" stroke-width="16"
         stroke-dasharray="34.68 342.31"
         stroke-dashoffset="-342.31"
         class="transition-opacity duration-200 hover:opacity-85 cursor-pointer">
@@ -2231,13 +2499,13 @@
       </circle>
             </g>
 
-            <!-- Crisp Divider Seams -->
-            <circle cx="80" cy="80" r="60" fill="none" stroke="#FAF8F5" stroke-width="15"
+            <!-- Crisp Clean Separation Seams -->
+            <circle cx="80" cy="80" r="60" fill="none" stroke="#FAF8F5" stroke-width="16"
               stroke-dasharray="2.5 91.75"
-              pointer-events="none" opacity="0.9" />
+              pointer-events="none" opacity="0.95" />
 
             <!-- Minimalist Central Typography: High Contrast -->
-            <text x="80" y="76" text-anchor="middle" font-family="'Figtree', sans-serif" font-size="22" font-weight="800" fill="#1E293B" letter-spacing="-0.5">84.8%</text>
+            <text x="80" y="76" text-anchor="middle" font-family="'Figtree', sans-serif" font-size="22" font-weight="800" fill="#0F172A" letter-spacing="-0.5">84.8%</text>
             <text x="80" y="92" text-anchor="middle" font-family="'Inter', sans-serif" font-size="8.5" font-weight="700" fill="#64748B" letter-spacing="0.8">RING COVERAGE</text>
           </svg>
         </div>
@@ -2246,12 +2514,12 @@
         <div class="grid grid-cols-2 gap-2 my-2.5 p-2 bg-[#F8F6F2] rounded-lg border border-stone-200/60 text-xs font-inter">
           <div>
             <span class="text-[10px] text-stone-500 uppercase font-semibold tracking-wider block">Inoculated / Quota</span>
-            <span class="font-mono font-bold text-slate-800">61,050 <span class="text-stone-400 font-normal">/ 72,000</span></span>
+            <span class="font-mono font-bold text-slate-900">61,050 <span class="text-stone-400 font-normal">/ 72,000</span></span>
           </div>
           <div class="text-right">
             <span class="text-[10px] text-stone-500 uppercase font-semibold tracking-wider block">Cold Chain</span>
-            <span class="font-mono font-bold text-slate-800 flex items-center justify-end gap-1">
-              <span class="w-1.5 h-1.5 rounded-full" style="background: #334155;"></span>
+            <span class="font-mono font-bold text-slate-900 flex items-center justify-end gap-1">
+              <span class="w-1.5 h-1.5 rounded-full" style="background: #1E293B;"></span>
               4.2°C Fleet Mean
             </span>
           </div>
@@ -2262,48 +2530,48 @@
           
     <div class="flex items-center justify-between text-xs py-1.5 border-b border-stone-200/60 last:border-0 font-inter">
       <div class="flex items-center gap-2">
-        <span class="w-2.5 h-2.5 rounded-full flex-shrink-0" style="background-color: #334155;"></span>
-        <span class="text-stone-700 font-medium">LSD Goat Pox</span>
+        <span class="w-2.5 h-2.5 rounded-full flex-shrink-0" style="background-color: #1E293B;"></span>
+        <span class="text-stone-800 font-medium">LSD Goat Pox</span>
       </div>
-      <div class="font-mono text-stone-900 font-semibold">
+      <div class="font-mono text-stone-900 font-bold">
         44.8% <span class="text-stone-400 font-normal">(27,350)</span>
       </div>
     </div>
     <div class="flex items-center justify-between text-xs py-1.5 border-b border-stone-200/60 last:border-0 font-inter">
       <div class="flex items-center gap-2">
-        <span class="w-2.5 h-2.5 rounded-full flex-shrink-0" style="background-color: #4D5E38;"></span>
-        <span class="text-stone-700 font-medium">FMD Trivalent</span>
+        <span class="w-2.5 h-2.5 rounded-full flex-shrink-0" style="background-color: #4D6E34;"></span>
+        <span class="text-stone-800 font-medium">FMD Trivalent</span>
       </div>
-      <div class="font-mono text-stone-900 font-semibold">
+      <div class="font-mono text-stone-900 font-bold">
         32.4% <span class="text-stone-400 font-normal">(19,770)</span>
       </div>
     </div>
     <div class="flex items-center justify-between text-xs py-1.5 border-b border-stone-200/60 last:border-0 font-inter">
       <div class="flex items-center gap-2">
-        <span class="w-2.5 h-2.5 rounded-full flex-shrink-0" style="background-color: #78716C;"></span>
-        <span class="text-stone-700 font-medium">Anthrax Spore</span>
+        <span class="w-2.5 h-2.5 rounded-full flex-shrink-0" style="background-color: #9A5B32;"></span>
+        <span class="text-stone-800 font-medium">Anthrax Spore</span>
       </div>
-      <div class="font-mono text-stone-900 font-semibold">
+      <div class="font-mono text-stone-900 font-bold">
         13.6% <span class="text-stone-400 font-normal">(8,300)</span>
       </div>
     </div>
     <div class="flex items-center justify-between text-xs py-1.5 border-b border-stone-200/60 last:border-0 font-inter">
       <div class="flex items-center gap-2">
-        <span class="w-2.5 h-2.5 rounded-full flex-shrink-0" style="background-color: #8C7E6C;"></span>
-        <span class="text-stone-700 font-medium">PPR Ruminants</span>
+        <span class="w-2.5 h-2.5 rounded-full flex-shrink-0" style="background-color: #C4B59D;"></span>
+        <span class="text-stone-800 font-medium">PPR Ruminants</span>
       </div>
-      <div class="font-mono text-stone-900 font-semibold">
+      <div class="font-mono text-stone-900 font-bold">
         9.2% <span class="text-stone-400 font-normal">(5,630)</span>
       </div>
     </div>
         </div>
       </div>
 
-      <!-- Action Footer -->
+      <!-- Action Footer with Active District Filter -->
       <div class="mt-3.5 pt-2.5 border-t border-stone-100 flex items-center justify-between text-xs font-inter">
-        <button onclick="filterVaccinationByDistrict('all')" class="text-[11px] font-semibold text-stone-700 hover:text-slate-900 flex items-center gap-1 cursor-pointer transition-colors">
+        <button onclick="filterVaccinationByDistrict('all')" class="px-2.5 py-1 rounded bg-stone-100 hover:bg-stone-200 text-stone-800 text-[11px] font-bold flex items-center gap-1.5 cursor-pointer transition-all shadow-2xs">
+          <i data-lucide="filter" class="w-3 h-3 text-stone-600"></i>
           <span>Filter Area Records</span>
-          <i data-lucide="chevron-right" class="w-3 h-3 text-stone-400"></i>
         </button>
         <span class="text-[10px] text-stone-400 font-mono">Cold Chain Logged</span>
       </div>
@@ -2323,28 +2591,28 @@
         </div>
 
         
-        <!-- Flat Front-Facing Modern UI Donut Chart -->
+        <!-- High-Contrast Front-Facing Donut Chart -->
         <div class="my-2 p-2 bg-[#FAF8F5] rounded-xl border border-stone-200/80 flex items-center justify-center">
           <svg width="155" height="155" viewBox="0 0 160 160" class="block">
             <!-- Soft Cream Neutral Track -->
-            <circle cx="80" cy="80" r="60" fill="none" stroke="#EFEAE1" stroke-width="15" />
+            <circle cx="80" cy="80" r="60" fill="none" stroke="#EAE4DA" stroke-width="16" />
             
-            <!-- Donut Segments -->
+            <!-- Donut Segments with Varied High-Contrast Shades -->
             <g transform="rotate(-90 80 80)">
               
-      <circle cx="80" cy="80" r="60" fill="none" stroke="#78716C" stroke-width="15"
+      <circle cx="80" cy="80" r="60" fill="none" stroke="#9A5B32" stroke-width="16"
         stroke-dasharray="158.34 218.65"
         stroke-dashoffset="-0.00"
         class="transition-opacity duration-200 hover:opacity-85 cursor-pointer">
         <title>Anthrax Spore: 42% (3,948 doses)</title>
       </circle>
-      <circle cx="80" cy="80" r="60" fill="none" stroke="#334155" stroke-width="15"
+      <circle cx="80" cy="80" r="60" fill="none" stroke="#1E293B" stroke-width="16"
         stroke-dasharray="143.26 233.73"
         stroke-dashoffset="-158.34"
         class="transition-opacity duration-200 hover:opacity-85 cursor-pointer">
         <title>LSD Goat Pox: 38% (3,572 doses)</title>
       </circle>
-      <circle cx="80" cy="80" r="60" fill="none" stroke="#4D5E38" stroke-width="15"
+      <circle cx="80" cy="80" r="60" fill="none" stroke="#4D6E34" stroke-width="16"
         stroke-dasharray="75.40 301.59"
         stroke-dashoffset="-301.59"
         class="transition-opacity duration-200 hover:opacity-85 cursor-pointer">
@@ -2352,13 +2620,13 @@
       </circle>
             </g>
 
-            <!-- Crisp Divider Seams -->
-            <circle cx="80" cy="80" r="60" fill="none" stroke="#FAF8F5" stroke-width="15"
+            <!-- Crisp Clean Separation Seams -->
+            <circle cx="80" cy="80" r="60" fill="none" stroke="#FAF8F5" stroke-width="16"
               stroke-dasharray="2.5 123.16"
-              pointer-events="none" opacity="0.9" />
+              pointer-events="none" opacity="0.95" />
 
             <!-- Minimalist Central Typography: High Contrast -->
-            <text x="80" y="76" text-anchor="middle" font-family="'Figtree', sans-serif" font-size="22" font-weight="800" fill="#1E293B" letter-spacing="-0.5">81.7%</text>
+            <text x="80" y="76" text-anchor="middle" font-family="'Figtree', sans-serif" font-size="22" font-weight="800" fill="#0F172A" letter-spacing="-0.5">81.7%</text>
             <text x="80" y="92" text-anchor="middle" font-family="'Inter', sans-serif" font-size="8.5" font-weight="700" fill="#64748B" letter-spacing="0.8">RING COVERAGE</text>
           </svg>
         </div>
@@ -2367,12 +2635,12 @@
         <div class="grid grid-cols-2 gap-2 my-2.5 p-2 bg-[#F8F6F2] rounded-lg border border-stone-200/60 text-xs font-inter">
           <div>
             <span class="text-[10px] text-stone-500 uppercase font-semibold tracking-wider block">Inoculated / Quota</span>
-            <span class="font-mono font-bold text-slate-800">9,400 <span class="text-stone-400 font-normal">/ 11,500</span></span>
+            <span class="font-mono font-bold text-slate-900">9,400 <span class="text-stone-400 font-normal">/ 11,500</span></span>
           </div>
           <div class="text-right">
             <span class="text-[10px] text-stone-500 uppercase font-semibold tracking-wider block">Cold Chain</span>
-            <span class="font-mono font-bold text-slate-800 flex items-center justify-end gap-1">
-              <span class="w-1.5 h-1.5 rounded-full" style="background: #4D5E38;"></span>
+            <span class="font-mono font-bold text-slate-900 flex items-center justify-end gap-1">
+              <span class="w-1.5 h-1.5 rounded-full" style="background: #4D6E34;"></span>
               4.4°C Safe
             </span>
           </div>
@@ -2383,39 +2651,39 @@
           
     <div class="flex items-center justify-between text-xs py-1.5 border-b border-stone-200/60 last:border-0 font-inter">
       <div class="flex items-center gap-2">
-        <span class="w-2.5 h-2.5 rounded-full flex-shrink-0" style="background-color: #78716C;"></span>
-        <span class="text-stone-700 font-medium">Anthrax Spore</span>
+        <span class="w-2.5 h-2.5 rounded-full flex-shrink-0" style="background-color: #9A5B32;"></span>
+        <span class="text-stone-800 font-medium">Anthrax Spore</span>
       </div>
-      <div class="font-mono text-stone-900 font-semibold">
+      <div class="font-mono text-stone-900 font-bold">
         42% <span class="text-stone-400 font-normal">(3,948)</span>
       </div>
     </div>
     <div class="flex items-center justify-between text-xs py-1.5 border-b border-stone-200/60 last:border-0 font-inter">
       <div class="flex items-center gap-2">
-        <span class="w-2.5 h-2.5 rounded-full flex-shrink-0" style="background-color: #334155;"></span>
-        <span class="text-stone-700 font-medium">LSD Goat Pox</span>
+        <span class="w-2.5 h-2.5 rounded-full flex-shrink-0" style="background-color: #1E293B;"></span>
+        <span class="text-stone-800 font-medium">LSD Goat Pox</span>
       </div>
-      <div class="font-mono text-stone-900 font-semibold">
+      <div class="font-mono text-stone-900 font-bold">
         38% <span class="text-stone-400 font-normal">(3,572)</span>
       </div>
     </div>
     <div class="flex items-center justify-between text-xs py-1.5 border-b border-stone-200/60 last:border-0 font-inter">
       <div class="flex items-center gap-2">
-        <span class="w-2.5 h-2.5 rounded-full flex-shrink-0" style="background-color: #4D5E38;"></span>
-        <span class="text-stone-700 font-medium">FMD Trivalent</span>
+        <span class="w-2.5 h-2.5 rounded-full flex-shrink-0" style="background-color: #4D6E34;"></span>
+        <span class="text-stone-800 font-medium">FMD Trivalent</span>
       </div>
-      <div class="font-mono text-stone-900 font-semibold">
+      <div class="font-mono text-stone-900 font-bold">
         20% <span class="text-stone-400 font-normal">(1,880)</span>
       </div>
     </div>
         </div>
       </div>
 
-      <!-- Action Footer -->
+      <!-- Action Footer with Active District Filter -->
       <div class="mt-3.5 pt-2.5 border-t border-stone-100 flex items-center justify-between text-xs font-inter">
-        <button onclick="filterVaccinationByDistrict('Satara')" class="text-[11px] font-semibold text-stone-700 hover:text-slate-900 flex items-center gap-1 cursor-pointer transition-colors">
+        <button onclick="filterVaccinationByDistrict('Satara')" class="px-2.5 py-1 rounded bg-stone-100 hover:bg-stone-200 text-stone-800 text-[11px] font-bold flex items-center gap-1.5 cursor-pointer transition-all shadow-2xs">
+          <i data-lucide="filter" class="w-3 h-3 text-stone-600"></i>
           <span>Filter Area Records</span>
-          <i data-lucide="chevron-right" class="w-3 h-3 text-stone-400"></i>
         </button>
         <span class="text-[10px] text-stone-400 font-mono">Cold Chain Logged</span>
       </div>
@@ -2435,28 +2703,28 @@
         </div>
 
         
-        <!-- Flat Front-Facing Modern UI Donut Chart -->
+        <!-- High-Contrast Front-Facing Donut Chart -->
         <div class="my-2 p-2 bg-[#FAF8F5] rounded-xl border border-stone-200/80 flex items-center justify-center">
           <svg width="155" height="155" viewBox="0 0 160 160" class="block">
             <!-- Soft Cream Neutral Track -->
-            <circle cx="80" cy="80" r="60" fill="none" stroke="#EFEAE1" stroke-width="15" />
+            <circle cx="80" cy="80" r="60" fill="none" stroke="#EAE4DA" stroke-width="16" />
             
-            <!-- Donut Segments -->
+            <!-- Donut Segments with Varied High-Contrast Shades -->
             <g transform="rotate(-90 80 80)">
               
-      <circle cx="80" cy="80" r="60" fill="none" stroke="#8C7E6C" stroke-width="15"
+      <circle cx="80" cy="80" r="60" fill="none" stroke="#C4B59D" stroke-width="16"
         stroke-dasharray="169.65 207.35"
         stroke-dashoffset="-0.00"
         class="transition-opacity duration-200 hover:opacity-85 cursor-pointer">
         <title>PPR Ruminants: 45% (3,442 doses)</title>
       </circle>
-      <circle cx="80" cy="80" r="60" fill="none" stroke="#4D5E38" stroke-width="15"
+      <circle cx="80" cy="80" r="60" fill="none" stroke="#4D6E34" stroke-width="16"
         stroke-dasharray="131.95 245.04"
         stroke-dashoffset="-169.65"
         class="transition-opacity duration-200 hover:opacity-85 cursor-pointer">
         <title>FMD Trivalent: 35% (2,678 doses)</title>
       </circle>
-      <circle cx="80" cy="80" r="60" fill="none" stroke="#334155" stroke-width="15"
+      <circle cx="80" cy="80" r="60" fill="none" stroke="#1E293B" stroke-width="16"
         stroke-dasharray="75.40 301.59"
         stroke-dashoffset="-301.59"
         class="transition-opacity duration-200 hover:opacity-85 cursor-pointer">
@@ -2464,13 +2732,13 @@
       </circle>
             </g>
 
-            <!-- Crisp Divider Seams -->
-            <circle cx="80" cy="80" r="60" fill="none" stroke="#FAF8F5" stroke-width="15"
+            <!-- Crisp Clean Separation Seams -->
+            <circle cx="80" cy="80" r="60" fill="none" stroke="#FAF8F5" stroke-width="16"
               stroke-dasharray="2.5 123.16"
-              pointer-events="none" opacity="0.9" />
+              pointer-events="none" opacity="0.95" />
 
             <!-- Minimalist Central Typography: High Contrast -->
-            <text x="80" y="76" text-anchor="middle" font-family="'Figtree', sans-serif" font-size="22" font-weight="800" fill="#1E293B" letter-spacing="-0.5">76.5%</text>
+            <text x="80" y="76" text-anchor="middle" font-family="'Figtree', sans-serif" font-size="22" font-weight="800" fill="#0F172A" letter-spacing="-0.5">76.5%</text>
             <text x="80" y="92" text-anchor="middle" font-family="'Inter', sans-serif" font-size="8.5" font-weight="700" fill="#64748B" letter-spacing="0.8">RING COVERAGE</text>
           </svg>
         </div>
@@ -2479,12 +2747,12 @@
         <div class="grid grid-cols-2 gap-2 my-2.5 p-2 bg-[#F8F6F2] rounded-lg border border-stone-200/60 text-xs font-inter">
           <div>
             <span class="text-[10px] text-stone-500 uppercase font-semibold tracking-wider block">Inoculated / Quota</span>
-            <span class="font-mono font-bold text-slate-800">7,650 <span class="text-stone-400 font-normal">/ 10,000</span></span>
+            <span class="font-mono font-bold text-slate-900">7,650 <span class="text-stone-400 font-normal">/ 10,000</span></span>
           </div>
           <div class="text-right">
             <span class="text-[10px] text-stone-500 uppercase font-semibold tracking-wider block">Cold Chain</span>
-            <span class="font-mono font-bold text-slate-800 flex items-center justify-end gap-1">
-              <span class="w-1.5 h-1.5 rounded-full" style="background: #78716C;"></span>
+            <span class="font-mono font-bold text-slate-900 flex items-center justify-end gap-1">
+              <span class="w-1.5 h-1.5 rounded-full" style="background: #9A5B32;"></span>
               4.6°C Monitored
             </span>
           </div>
@@ -2495,39 +2763,39 @@
           
     <div class="flex items-center justify-between text-xs py-1.5 border-b border-stone-200/60 last:border-0 font-inter">
       <div class="flex items-center gap-2">
-        <span class="w-2.5 h-2.5 rounded-full flex-shrink-0" style="background-color: #8C7E6C;"></span>
-        <span class="text-stone-700 font-medium">PPR Ruminants</span>
+        <span class="w-2.5 h-2.5 rounded-full flex-shrink-0" style="background-color: #C4B59D;"></span>
+        <span class="text-stone-800 font-medium">PPR Ruminants</span>
       </div>
-      <div class="font-mono text-stone-900 font-semibold">
+      <div class="font-mono text-stone-900 font-bold">
         45% <span class="text-stone-400 font-normal">(3,442)</span>
       </div>
     </div>
     <div class="flex items-center justify-between text-xs py-1.5 border-b border-stone-200/60 last:border-0 font-inter">
       <div class="flex items-center gap-2">
-        <span class="w-2.5 h-2.5 rounded-full flex-shrink-0" style="background-color: #4D5E38;"></span>
-        <span class="text-stone-700 font-medium">FMD Trivalent</span>
+        <span class="w-2.5 h-2.5 rounded-full flex-shrink-0" style="background-color: #4D6E34;"></span>
+        <span class="text-stone-800 font-medium">FMD Trivalent</span>
       </div>
-      <div class="font-mono text-stone-900 font-semibold">
+      <div class="font-mono text-stone-900 font-bold">
         35% <span class="text-stone-400 font-normal">(2,678)</span>
       </div>
     </div>
     <div class="flex items-center justify-between text-xs py-1.5 border-b border-stone-200/60 last:border-0 font-inter">
       <div class="flex items-center gap-2">
-        <span class="w-2.5 h-2.5 rounded-full flex-shrink-0" style="background-color: #334155;"></span>
-        <span class="text-stone-700 font-medium">LSD Goat Pox</span>
+        <span class="w-2.5 h-2.5 rounded-full flex-shrink-0" style="background-color: #1E293B;"></span>
+        <span class="text-stone-800 font-medium">LSD Goat Pox</span>
       </div>
-      <div class="font-mono text-stone-900 font-semibold">
+      <div class="font-mono text-stone-900 font-bold">
         20% <span class="text-stone-400 font-normal">(1,530)</span>
       </div>
     </div>
         </div>
       </div>
 
-      <!-- Action Footer -->
+      <!-- Action Footer with Active District Filter -->
       <div class="mt-3.5 pt-2.5 border-t border-stone-100 flex items-center justify-between text-xs font-inter">
-        <button onclick="filterVaccinationByDistrict('Solapur')" class="text-[11px] font-semibold text-stone-700 hover:text-slate-900 flex items-center gap-1 cursor-pointer transition-colors">
+        <button onclick="filterVaccinationByDistrict('Solapur')" class="px-2.5 py-1 rounded bg-stone-100 hover:bg-stone-200 text-stone-800 text-[11px] font-bold flex items-center gap-1.5 cursor-pointer transition-all shadow-2xs">
+          <i data-lucide="filter" class="w-3 h-3 text-stone-600"></i>
           <span>Filter Area Records</span>
-          <i data-lucide="chevron-right" class="w-3 h-3 text-stone-400"></i>
         </button>
         <span class="text-[10px] text-stone-400 font-mono">Cold Chain Logged</span>
       </div>
@@ -2535,7 +2803,7 @@
           </div>
         </div>
         <!-- TABLE SECTION: Area-Wise Animal Vaccination Records -->
-        <div class="vetra-card overflow-hidden">
+        <div id="vax-table-card" class="vetra-card overflow-hidden transition-all duration-300">
           <div class="p-4 border-b border-black/5 flex flex-wrap items-center justify-between gap-3 bg-parchment/40">
             <div>
               <h3 class="font-bold text-base text-ink font-figtree">Area-Wise Animal Inoculation Records</h3>
@@ -3550,6 +3818,57 @@
     }
 
     // Switch Surveillance Tabs
+    
+    // Filter Alerts by Severity Pill
+    function filterAlertsTab(sev) {
+      ['all', 'critical', 'high', 'zoonotic', 'prophylactic'].forEach(function(s) {
+        var pill = document.getElementById('alert-pill-' + s);
+        if (pill) {
+          pill.className = (s === sev)
+            ? 'px-3 py-1.5 rounded-lg font-bold text-xs bg-slate-900 text-white shadow-xs cursor-pointer transition-all'
+            : 'px-3 py-1.5 rounded-lg font-bold text-xs bg-stone-100 text-stone-700 hover:bg-stone-200 cursor-pointer transition-all';
+        }
+      });
+
+      var items = document.querySelectorAll('.alert-item');
+      items.forEach(function(item) {
+        var itemSev = item.getAttribute('data-severity');
+        if (sev === 'all' || itemSev === sev) {
+          item.style.display = 'block';
+        } else {
+          item.style.display = 'none';
+        }
+      });
+    }
+    window.filterAlertsTab = filterAlertsTab;
+
+    // Search & District filter on alerts
+    function searchAlerts() {
+      var query = document.getElementById('alert-search-input') ? document.getElementById('alert-search-input').value.toLowerCase() : '';
+      var dist = document.getElementById('alert-district-filter') ? document.getElementById('alert-district-filter').value : 'all';
+
+      var items = document.querySelectorAll('.alert-item');
+      items.forEach(function(item) {
+        var itemDist = item.getAttribute('data-district') || '';
+        var text = item.innerText.toLowerCase();
+        var matchDist = (dist === 'all' || itemDist.toLowerCase() === dist.toLowerCase());
+        var matchQuery = (query === '' || text.indexOf(query) > -1);
+
+        if (matchDist && matchQuery) {
+          item.style.display = 'block';
+        } else {
+          item.style.display = 'none';
+        }
+      });
+    }
+    window.searchAlerts = searchAlerts;
+
+    // Resend broadcast feedback helper
+    function resendAlertBroadcast(alertTitle) {
+      showNotificationToast('Emergency Broadcast re-dispatched to pending numbers for ' + alertTitle);
+    }
+    window.resendAlertBroadcast = resendAlertBroadcast;
+
     function switchTab(tabId) {
       ['overview', 'map', 'protocols', 'cases', 'alerts', 'vaccination', 'workforce'].forEach(function(t) {
         var el = document.getElementById('tab-' + t);
@@ -3843,14 +4162,28 @@
     // Filter Vaccination Records by District Card
     function filterVaccinationByDistrict(district) {
       var select = document.getElementById('vax-filter-district');
-      if (select) {
-        select.value = district;
-        if (typeof filterVaccinationTable === 'function') filterVaccinationTable();
-      }
-      var targetTable = document.getElementById('tab-vaccination');
-      if (targetTable) {
-        var tableSection = targetTable.querySelector('.vetra-card:last-child');
-        if (tableSection) tableSection.scrollIntoView({ behavior: 'smooth' });
+      var diseaseSelect = document.getElementById('vax-filter-disease');
+      var searchInput = document.getElementById('vax-search');
+
+      if (select) select.value = district;
+      if (diseaseSelect) diseaseSelect.value = 'all';
+      if (searchInput) searchInput.value = '';
+
+      if (typeof renderVaccinationTable === 'function') renderVaccinationTable();
+
+      // Show toast confirmation
+      var countEl = document.getElementById('vax-visible-count');
+      var countText = countEl ? countEl.innerText : 'Records';
+      showNotificationToast('Filtered: ' + (district === 'all' ? 'All Maharashtra Districts' : district + ' District') + ' (' + countText + ')');
+
+      // Smooth scroll to table card and highlight
+      var tableCard = document.getElementById('vax-table-card') || document.querySelector('#tab-vaccination .vetra-card:last-child');
+      if (tableCard) {
+        tableCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        tableCard.classList.add('ring-2', 'ring-emerald-500/40');
+        setTimeout(function() {
+          tableCard.classList.remove('ring-2', 'ring-emerald-500/40');
+        }, 1500);
       }
     }
     window.filterVaccinationByDistrict = filterVaccinationByDistrict;
@@ -3917,12 +4250,12 @@
         .then(function(res) { return res.json(); })
         .then(function(geoData) {
           districtLayer = L.geoJSON(geoData, {
-            style: { color: '#16a34a', weight: 1, fillOpacity: 0.1 },
+            style: { color: '#94a3b8', weight: 1, fillColor: 'transparent', fillOpacity: 0 },
             onEachFeature: function(feature, layer) {
               if (feature.properties && feature.properties.name) {
                 layer.bindTooltip(
                   "<div style='font-family:Figtree,sans-serif;font-size:12px;padding:2px;'>" +
-                  "<strong style='color:#16a34a;'>" + feature.properties.name + " District</strong><br>" +
+                  "<strong style='color:#334155;'>" + feature.properties.name + " District</strong><br>" +
                   "<span style='color:#555;font-size:11px;'>Active Cases: <strong>" + (feature.properties.active_cases || 0) + "</strong></span><br>" +
                   "<span style='color:#777;font-size:11px;'>Surveillance: " + (feature.properties.surveillance_status || 'Monitored') + "</span>" +
                   "</div>",
@@ -3930,11 +4263,10 @@
                 );
               }
             }
-          }).addTo(fullMap);
+          });
+          // Not added to fullMap by default (clean cluster view)
 
-          L.geoJSON(geoData, {
-            style: { color: '#16a34a', weight: 1, fillOpacity: 0.08 }
-          }).addTo(overviewMap);
+          // Clean overviewMap without district boundary overlays
         })
         .catch(function(err) {
           console.warn('Could not load /geo/districts.json', err);
@@ -4263,13 +4595,45 @@
     // AREA-WISE VACCINATION REGISTRY DATA & LOGIC (PERSISTENT VIA LOCALSTORAGE)
     // =========================================================================
     var defaultVaccinationRecords = [
+      // Kolhapur District (Western Dairy Belt)
+      { id: "MH-KOL-05112", species: "Pandharpuri Buffalo", farmer: "Santosh Kadam", district: "Kolhapur", taluka: "Karveer", vaccine: "FMD Trivalent", batch: "FMD-881B", temp: "3.9°C", date: "Nov 4, 2026", status: "Completed", officer: "Dr. Suresh Patil" },
+      { id: "MH-KOL-05189", species: "Holstein Cross", farmer: "Dilip Patil", district: "Kolhapur", taluka: "Shirol", vaccine: "FMD Trivalent", batch: "FMD-881B", temp: "4.0°C", date: "Nov 3, 2026", status: "Completed", officer: "Dr. Suresh Patil" },
+      { id: "MH-KOL-05244", species: "Gir Cow", farmer: "Tanaji Bhosale", district: "Kolhapur", taluka: "Hatkanangle", vaccine: "Goat Pox (LSD)", batch: "LSD-2026-99A", temp: "4.1°C", date: "Nov 3, 2026", status: "Completed", officer: "Dr. Manisha Shinde" },
+      { id: "MH-KOL-05301", species: "Murrah Buffalo", farmer: "Raghunath Sawant", district: "Kolhapur", taluka: "Radhanagari", vaccine: "FMD Trivalent", batch: "FMD-881B", temp: "3.8°C", date: "Nov 2, 2026", status: "Completed", officer: "Dr. Suresh Patil" },
+      { id: "MH-KOL-05378", species: "Osmanabadi Goat", farmer: "Pandurang Powar", district: "Kolhapur", taluka: "Kagal", vaccine: "PPR Sungri-96", batch: "PPR-554M", temp: "4.2°C", date: "Nov 1, 2026", status: "Completed", officer: "Dr. Manisha Shinde" },
+
+      // Pune District (Hotspot Ring Area)
       { id: "MH-PUN-08412", species: "Gir Cow", farmer: "Ramesh Jadhav", district: "Pune", taluka: "Haveli (Wagholi)", vaccine: "Goat Pox (LSD)", batch: "LSD-2026-99A", temp: "4.1°C", date: "Nov 3, 2026", status: "Completed", officer: "Dr. Anita Deshmukh" },
       { id: "MH-PUN-09124", species: "Murrah Buffalo", farmer: "Balasaheb Shinde", district: "Pune", taluka: "Shirur", vaccine: "FMD Trivalent", batch: "FMD-881B", temp: "3.8°C", date: "Nov 3, 2026", status: "Completed", officer: "Dr. Sanjay Thorat" },
+      { id: "MH-PUN-09255", species: "Jersey Cross", farmer: "Mahadev Gaikwad", district: "Pune", taluka: "Khed (Chakan)", vaccine: "Goat Pox (LSD)", batch: "LSD-2026-99A", temp: "4.3°C", date: "Nov 2, 2026", status: "Completed", officer: "Dr. Anita Deshmukh" },
+      { id: "MH-PUN-09388", species: "Khillari Bull", farmer: "Sambhaji More", district: "Pune", taluka: "Baramati", vaccine: "Anthrax Spore", batch: "ANT-012X", temp: "4.0°C", date: "Nov 2, 2026", status: "Completed", officer: "Dr. Sanjay Thorat" },
+      { id: "MH-PUN-09419", species: "Dangi Cow", farmer: "Dnyaneshwar Jagtap", district: "Pune", taluka: "Daund", vaccine: "FMD Trivalent", batch: "FMD-881B", temp: "3.9°C", date: "Nov 1, 2026", status: "Completed", officer: "Dr. Anita Deshmukh" },
+      { id: "MH-PUN-09502", species: "Murrah Buffalo", farmer: "Kashinath Pawar", district: "Pune", taluka: "Junnar", vaccine: "Goat Pox (LSD)", batch: "LSD-2026-99A", temp: "4.2°C", date: "Nov 1, 2026", status: "Completed", officer: "Dr. Sanjay Thorat" },
+
+      // Ahmednagar District (Vector Surge Zone)
       { id: "MH-AHM-04721", species: "Crossbred Holstein", farmer: "Eknath Vikhe", district: "Ahmednagar", taluka: "Rahata", vaccine: "Goat Pox (LSD)", batch: "LSD-2026-99A", temp: "4.4°C", date: "Nov 2, 2026", status: "Completed", officer: "Dr. Prashant Vikhe" },
+      { id: "MH-AHM-04812", species: "Gir Cow", farmer: "Bhaskar Kolhe", district: "Ahmednagar", taluka: "Shrirampur", vaccine: "Goat Pox (LSD)", batch: "LSD-2026-99A", temp: "3.9°C", date: "Nov 2, 2026", status: "Completed", officer: "Dr. Prashant Vikhe" },
+      { id: "MH-AHM-04899", species: "Murrah Buffalo", farmer: "Shankarrao Gadakh", district: "Ahmednagar", taluka: "Newasa", vaccine: "FMD Trivalent", batch: "FMD-881B", temp: "4.0°C", date: "Nov 1, 2026", status: "Completed", officer: "Dr. Sunita Tambe" },
+      { id: "MH-AHM-04956", species: "Red Sindhi Cross", farmer: "Babanrao Thorat", district: "Ahmednagar", taluka: "Sangamner", vaccine: "Goat Pox (LSD)", batch: "LSD-2026-99A", temp: "4.2°C", date: "Nov 1, 2026", status: "Completed", officer: "Dr. Prashant Vikhe" },
+      { id: "MH-AHM-05011", species: "Khillari Cow", farmer: "Namdev Kale", district: "Ahmednagar", taluka: "Kopargaon", vaccine: "Anthrax Spore", batch: "ANT-012X", temp: "4.1°C", date: "Oct 31, 2026", status: "Completed", officer: "Dr. Sunita Tambe" },
+
+      // Satara District (Karad Corridor)
       { id: "MH-SAT-02198", species: "Khillari Bull", farmer: "Anandrao Patil", district: "Satara", taluka: "Karad", vaccine: "Anthrax Spore", batch: "ANT-012X", temp: "4.0°C", date: "Nov 2, 2026", status: "Completed", officer: "Dr. Rajesh Gaikwad" },
+      { id: "MH-SAT-02264", species: "Crossbred Jersey", farmer: "Vijayrao Mohite", district: "Satara", taluka: "Phaltan", vaccine: "Goat Pox (LSD)", batch: "LSD-2026-99A", temp: "4.3°C", date: "Nov 2, 2026", status: "Completed", officer: "Dr. Rajesh Gaikwad" },
+      { id: "MH-SAT-02319", species: "Gir Cow", farmer: "Hanmantrao Shinde", district: "Satara", taluka: "Khatav", vaccine: "Anthrax Spore", batch: "ANT-012X", temp: "4.2°C", date: "Nov 1, 2026", status: "Completed", officer: "Dr. Meena Salunkhe" },
+      { id: "MH-SAT-02402", species: "Murrah Buffalo", farmer: "Shivajirao Kadam", district: "Satara", taluka: "Koregaon", vaccine: "FMD Trivalent", batch: "FMD-881B", temp: "3.9°C", date: "Oct 31, 2026", status: "Completed", officer: "Dr. Rajesh Gaikwad" },
+
+      // Solapur District (Drought Transit)
       { id: "MH-SOL-06833", species: "Osmanabadi Goat", farmer: "Suresh Mali", district: "Solapur", taluka: "Pandharpur", vaccine: "PPR Sungri-96", batch: "PPR-554M", temp: "4.6°C", date: "Nov 1, 2026", status: "Completed", officer: "Dr. Sunil Mane" },
-      { id: "MH-KOL-05112", species: "Pandharpuri Buffalo", farmer: "Santosh Kadam", district: "Kolhapur", taluka: "Karveer", vaccine: "FMD Trivalent", batch: "FMD-881B", temp: "3.9°C", date: "Nov 1, 2026", status: "Completed", officer: "Dr. Suresh Patil" },
-      { id: "MH-NAS-07341", species: "Dangi Cow", farmer: "Vitthal Gite", district: "Nashik", taluka: "Sinnar", vaccine: "Goat Pox (LSD)", batch: "LSD-2026-99A", temp: "4.2°C", date: "Oct 31, 2026", status: "Completed", officer: "Dr. Nitin Aher" }
+      { id: "MH-SOL-06912", species: "Deccani Sheep", farmer: "Govind Shinde", district: "Solapur", taluka: "Barshi", vaccine: "PPR Sungri-96", batch: "PPR-554M", temp: "4.5°C", date: "Nov 1, 2026", status: "Completed", officer: "Dr. Sunil Mane" },
+      { id: "MH-SOL-07005", species: "Pandharpuri Buffalo", farmer: "Tukaram Deshmukh", district: "Solapur", taluka: "Madha", vaccine: "FMD Trivalent", batch: "FMD-881B", temp: "4.1°C", date: "Oct 31, 2026", status: "Completed", officer: "Dr. Deepa Kulkarni" },
+      { id: "MH-SOL-07089", species: "Khillari Cow", farmer: "Maruti Raut", district: "Solapur", taluka: "Sangole", vaccine: "Goat Pox (LSD)", batch: "LSD-2026-99A", temp: "4.3°C", date: "Oct 31, 2026", status: "Completed", officer: "Dr. Sunil Mane" },
+
+      // Nashik & Sangli Districts
+      { id: "MH-NAS-07341", species: "Dangi Cow", farmer: "Vitthal Gite", district: "Nashik", taluka: "Sinnar", vaccine: "Goat Pox (LSD)", batch: "LSD-2026-99A", temp: "4.2°C", date: "Oct 31, 2026", status: "Completed", officer: "Dr. Nitin Aher" },
+      { id: "MH-NAS-07418", species: "Holstein Cross", farmer: "Kisan Bhor", district: "Nashik", taluka: "Niphad", vaccine: "FMD Trivalent", batch: "FMD-881B", temp: "4.0°C", date: "Oct 30, 2026", status: "Completed", officer: "Dr. Nitin Aher" },
+      { id: "MH-SAN-08119", species: "Murrah Buffalo", farmer: "Jaywant Patil", district: "Sangli", taluka: "Miraj", vaccine: "FMD Trivalent", batch: "FMD-881B", temp: "3.9°C", date: "Oct 30, 2026", status: "Completed", officer: "Dr. Sachin Lad" },
+      { id: "MH-SAN-08204", species: "Gir Cow", farmer: "Vasantrao Kadam", district: "Sangli", taluka: "Walwa", vaccine: "Goat Pox (LSD)", batch: "LSD-2026-99A", temp: "4.1°C", date: "Oct 29, 2026", status: "Completed", officer: "Dr. Sachin Lad" }
     ];
 
     function getStoredVaccinations() {
@@ -4631,7 +4995,12 @@
       return xml;
     }
 
-    function showExportToast(msg) {
+    function showNotificationToast(msg) {
+    showExportToast(msg);
+  }
+  window.showNotificationToast = showNotificationToast;
+
+  function showExportToast(msg) {
       var toast = document.createElement('div');
       toast.className = 'fixed bottom-5 right-5 z-50 bg-[#141414] text-white px-4 py-3 rounded-xl shadow-2xl flex items-center gap-2.5 font-figtree text-xs border border-white/20 animate-fadeIn';
       toast.innerHTML = '<span class="w-2.5 h-2.5 rounded-full bg-[#94e130] animate-pulse"></span><span>' + msg + '</span>';

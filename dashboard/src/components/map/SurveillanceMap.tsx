@@ -41,7 +41,7 @@ export const SurveillanceMap: React.FC<SurveillanceMapProps> = ({ pins = [], clu
 
   const [activeTile, setActiveTile] = useState<TileLayerType>('maptiler');
   const [showClusters, setShowClusters] = useState(true);
-  const [showDistricts, setShowDistricts] = useState(true);
+  const [showDistricts, setShowDistricts] = useState(false);
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [districtFilter, setDistrictFilter] = useState<string>('all');
 
@@ -121,16 +121,16 @@ export const SurveillanceMap: React.FC<SurveillanceMapProps> = ({ pins = [], clu
     if (showDistricts && districtGeoJSON) {
       const geoLayer = L.geoJSON(districtGeoJSON, {
         style: {
-          color: '#16a34a',
-          weight: 1.5,
-          fillColor: '#16a34a',
-          fillOpacity: 0.1,
+          color: '#94a3b8',
+          weight: 1,
+          fillColor: 'transparent',
+          fillOpacity: 0,
         },
         onEachFeature: (feature: any, layer: any) => {
           if (feature && feature.properties && feature.properties.name) {
             layer.bindTooltip(
               `<div style="font-family: 'Figtree', sans-serif; font-size: 12px; padding: 2px;">
-                <div style="font-weight: 700; color: #16a34a;">${feature.properties.name} District</div>
+                <div style="font-weight: 700; color: #334155;">${feature.properties.name} District</div>
                 <div style="color: #555; font-size: 11px;">Status: <strong>${feature.properties.surveillance_status || 'Monitored'}</strong></div>
                 <div style="color: #777; font-size: 11px;">Active Cases: <strong>${feature.properties.active_cases || 0}</strong> • Risk: <strong>${feature.properties.risk_level || 'Normal'}</strong></div>
               </div>`,
@@ -338,7 +338,7 @@ export const SurveillanceMap: React.FC<SurveillanceMapProps> = ({ pins = [], clu
               onChange={(e) => setShowDistricts(e.target.checked)}
               className="accent-brand-primary"
             />
-            <span className="w-2.5 h-2.5 rounded-sm bg-[#16a34a]/30 border border-[#16a34a]"></span>
+            <span className="w-2.5 h-2.5 rounded-sm bg-slate-200 border border-slate-400"></span>
             <span className="font-semibold text-ink">District Boundaries</span>
           </label>
         </div>
@@ -366,7 +366,7 @@ export const SurveillanceMap: React.FC<SurveillanceMapProps> = ({ pins = [], clu
             <span className="w-3.5 h-3.5 rounded-full border border-dashed border-alert-critical bg-alert-critical/20"></span> ML Risk Cluster
           </span>
           <span className="flex items-center gap-1.5">
-            <span className="w-3 h-2 border border-[#16a34a] bg-[#16a34a]/20 rounded-xs"></span> District GeoJSON
+            <span className="w-3 h-2 border border-slate-400 bg-slate-200 rounded-xs"></span> District Boundaries
           </span>
         </div>
         <div>
