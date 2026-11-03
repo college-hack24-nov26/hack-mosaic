@@ -1,7 +1,9 @@
 // @ts-nocheck
 import React, { useState, useEffect, useRef } from 'react';
 import { MapCasePin, OutbreakCluster } from '../../types';
+import stateGeoJSON from '../../data/state.json';
 import districtGeoJSON from '../../data/districts.json';
+import talukaGeoJSON from '../../data/talukas.json';
 
 interface SurveillanceMapProps {
   pins: MapCasePin[];
@@ -37,13 +39,31 @@ export const SurveillanceMap: React.FC<SurveillanceMapProps> = ({ pins = [], clu
   const tileLayerRef = useRef<any>(null);
   const markersLayerRef = useRef<any>(null);
   const clustersLayerRef = useRef<any>(null);
+  const stateLayerRef = useRef<any>(null);
   const districtsLayerRef = useRef<any>(null);
+  const talukasLayerRef = useRef<any>(null);
 
   const [activeTile, setActiveTile] = useState<TileLayerType>('maptiler');
   const [showClusters, setShowClusters] = useState(true);
+  const [showState, setShowState] = useState(true);
   const [showDistricts, setShowDistricts] = useState(true);
+  const [showTalukas, setShowTalukas] = useState(true);
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [districtFilter, setDistrictFilter] = useState<string>('all');
+
+  const recenterMap = (mode: 'clusters' | 'state' = 'clusters') => {
+    const L = (window as any).L;
+    if (!mapInstanceRef.current || !L) return;
+    mapInstanceRef.current.closePopup();
+    mapInstanceRef.current.invalidateSize(true);
+    if (mode === 'state') {
+      const stateBounds = L.latLngBounds([15.60, 72.65], [22.05, 80.90]);
+      mapInstanceRef.current.flyToBounds(stateBounds, { padding: [24, 24], duration: 0.65 });
+    } else {
+      const clusterBounds = L.latLngBounds([16.55, 73.30], [20.15, 75.85]);
+      mapInstanceRef.current.flyToBounds(clusterBounds, { padding: [28, 28], maxZoom: 8, duration: 0.65 });
+    }
+  };
 
   // Filter Pins
   const filteredPins = pins.filter((pin) => {
@@ -60,19 +80,32 @@ export const SurveillanceMap: React.FC<SurveillanceMapProps> = ({ pins = [], clu
     if (!L) return;
 
     if (!mapInstanceRef.current) {
+      const mhBounds = L.latLngBounds([14.8, 71.8], [22.8, 81.8]);
       const map = L.map(mapContainerRef.current, {
-        center: [18.5204, 74.2000],
+        center: [18.4500, 74.3500],
         zoom: 8,
-        scrollWheelZoom: true,
+        minZoom: 6,
+        maxZoom: 18,
+        maxBounds: mhBounds,
+        maxBoundsViscosity: 1.0,
+        scrollWheelZoom: false,
       });
 
       mapInstanceRef.current = map;
+
+      map.on('zoomend', () => {
+        if (map.getZoom() < 6) {
+          map.setView([18.4500, 74.3500], 7, { animate: false });
+        }
+      });
 
       // Base Tile Layer
       const initialSource = TILE_SOURCES[activeTile];
       tileLayerRef.current = L.tileLayer(initialSource.url, {
         attribution: initialSource.attribution,
+        minZoom: 6,
         maxZoom: initialSource.maxZoom,
+        noWrap: true,
       }).addTo(map);
 
       // Automatic fallback if tile provider fails
@@ -84,7 +117,9 @@ export const SurveillanceMap: React.FC<SurveillanceMapProps> = ({ pins = [], clu
       });
 
       // Layer Groups
+      stateLayerRef.current = L.layerGroup().addTo(map);
       districtsLayerRef.current = L.layerGroup().addTo(map);
+      talukasLayerRef.current = L.layerGroup().addTo(map);
       clustersLayerRef.current = L.layerGroup().addTo(map);
       markersLayerRef.current = L.layerGroup().addTo(map);
 
@@ -111,6 +146,27 @@ export const SurveillanceMap: React.FC<SurveillanceMapProps> = ({ pins = [], clu
     tileLayerRef.current.setUrl(source.url);
   }, [activeTile]);
 
+  // Update State Boundary Layer
+  useEffect(() => {
+    const L = (window as any).L;
+    if (!mapInstanceRef.current || !stateLayerRef.current || !L) return;
+    stateLayerRef.current.clearLayers();
+    if (showState && stateGeoJSON) {
+      const geoLayer = L.geoJSON(stateGeoJSON, {
+        style: {
+          color: '#1e293b',
+          weight: 2.5,
+          opacity: 0.85,
+          dashArray: '8, 4',
+          fillColor: '#64748b',
+          fillOpacity: 0.015,
+          interactive: false,
+        },
+      });
+      stateLayerRef.current.addLayer(geoLayer);
+    }
+  }, [showState]);
+
   // Update District Boundaries Layer
   useEffect(() => {
     const L = (window as any).L;
@@ -121,21 +177,27 @@ export const SurveillanceMap: React.FC<SurveillanceMapProps> = ({ pins = [], clu
     if (showDistricts && districtGeoJSON) {
       const geoLayer = L.geoJSON(districtGeoJSON, {
         style: {
-          color: '#16a34a',
-          weight: 1.5,
-          fillColor: '#16a34a',
-          fillOpacity: 0.1,
+          color: '#475569',
+          weight: 1.4,
+          dashArray: '5, 4',
+          fillColor: '#64748b',
+          fillOpacity: 0.02,
         },
         onEachFeature: (feature: any, layer: any) => {
           if (feature && feature.properties && feature.properties.name) {
             layer.bindTooltip(
               `<div style="font-family: 'Figtree', sans-serif; font-size: 12px; padding: 2px;">
-                <div style="font-weight: 700; color: #16a34a;">${feature.properties.name} District</div>
+                <div style="font-weight: 700; color: #334155;">${feature.properties.name} District</div>
                 <div style="color: #555; font-size: 11px;">Status: <strong>${feature.properties.surveillance_status || 'Monitored'}</strong></div>
                 <div style="color: #777; font-size: 11px;">Active Cases: <strong>${feature.properties.active_cases || 0}</strong> • Risk: <strong>${feature.properties.risk_level || 'Normal'}</strong></div>
               </div>`,
               { sticky: true }
             );
+            layer.on('click', () => {
+              if (mapInstanceRef.current) {
+                mapInstanceRef.current.flyToBounds(layer.getBounds(), { padding: [26, 26], maxZoom: 9, duration: 0.55 });
+              }
+            });
           }
         },
       });
@@ -143,6 +205,42 @@ export const SurveillanceMap: React.FC<SurveillanceMapProps> = ({ pins = [], clu
       districtsLayerRef.current.addLayer(geoLayer);
     }
   }, [showDistricts]);
+
+  // Update Taluka Boundaries Layer
+  useEffect(() => {
+    const L = (window as any).L;
+    if (!mapInstanceRef.current || !talukasLayerRef.current || !L) return;
+    talukasLayerRef.current.clearLayers();
+    if (showTalukas && talukaGeoJSON) {
+      const geoLayer = L.geoJSON(talukaGeoJSON, {
+        style: {
+          color: '#0f766e',
+          weight: 1.3,
+          dashArray: '2, 4',
+          fillColor: '#14b8a6',
+          fillOpacity: 0.05,
+        },
+        onEachFeature: (feature: any, layer: any) => {
+          if (feature && feature.properties && feature.properties.name) {
+            layer.bindTooltip(
+              `<div style="font-family: 'Figtree', sans-serif; font-size: 12px; padding: 2px;">
+                <div style="font-weight: 700; color: #0f766e;">${feature.properties.name} Taluka (${feature.properties.district} District)</div>
+                <div style="color: #555; font-size: 11px;">Vet Officer: <strong>${feature.properties.vet_officer || 'Assigned'}</strong></div>
+                <div style="color: #777; font-size: 11px;">Active Cases: <strong>${feature.properties.active_cases || 0}</strong> • ${feature.properties.surveillance_status || 'Monitored'}</div>
+              </div>`,
+              { sticky: true }
+            );
+            layer.on('click', () => {
+              if (mapInstanceRef.current) {
+                mapInstanceRef.current.flyToBounds(layer.getBounds(), { padding: [32, 32], maxZoom: 11, duration: 0.55 });
+              }
+            });
+          }
+        },
+      });
+      talukasLayerRef.current.addLayer(geoLayer);
+    }
+  }, [showTalukas]);
 
   // Update Outbreak Clusters Layer
   useEffect(() => {
@@ -242,7 +340,7 @@ export const SurveillanceMap: React.FC<SurveillanceMapProps> = ({ pins = [], clu
   }, [filteredPins]);
 
   return (
-    <div className="vetra-card p-0 overflow-hidden relative shadow-sm">
+    <div className="vetra-card p-0 overflow-hidden relative shadow-sm flex flex-col justify-between h-full">
       {/* Map Control Header */}
       <div className="p-4 bg-surface-card border-b border-black/10 flex flex-wrap items-center justify-between gap-3 font-figtree">
         <div>
@@ -330,23 +428,66 @@ export const SurveillanceMap: React.FC<SurveillanceMapProps> = ({ pins = [], clu
             <span className="font-semibold text-ink">ML Hotspots</span>
           </label>
 
-          {/* District Boundaries Toggle */}
-          <label className="flex items-center gap-1.5 px-3 py-1.5 rounded-sm bg-parchment border border-border-hairline cursor-pointer select-none">
-            <input
-              type="checkbox"
-              checked={showDistricts}
-              onChange={(e) => setShowDistricts(e.target.checked)}
-              className="accent-brand-primary"
-            />
-            <span className="w-2.5 h-2.5 rounded-sm bg-[#16a34a]/30 border border-[#16a34a]"></span>
-            <span className="font-semibold text-ink">District Boundaries</span>
-          </label>
+          {/* Administrative Boundaries Toggles (State / District / Taluka) */}
+          <div className="flex items-center gap-2 px-3 py-1.5 rounded-sm bg-parchment border border-border-hairline">
+            <span className="font-bold text-ink">Boundaries:</span>
+            <label className="flex items-center gap-1 cursor-pointer select-none">
+              <input
+                type="checkbox"
+                checked={showState}
+                onChange={(e) => setShowState(e.target.checked)}
+                className="accent-brand-primary"
+              />
+              <span className="font-semibold text-ink">State</span>
+            </label>
+            <label className="flex items-center gap-1 cursor-pointer select-none">
+              <input
+                type="checkbox"
+                checked={showDistricts}
+                onChange={(e) => setShowDistricts(e.target.checked)}
+                className="accent-brand-primary"
+              />
+              <span className="font-semibold text-ink">Districts</span>
+            </label>
+            <label className="flex items-center gap-1 cursor-pointer select-none">
+              <input
+                type="checkbox"
+                checked={showTalukas}
+                onChange={(e) => setShowTalukas(e.target.checked)}
+                className="accent-brand-primary"
+              />
+              <span className="font-semibold text-ink">Talukas</span>
+            </label>
+          </div>
+
+          {/* Recenter Map Button */}
+          <button
+            onClick={() => recenterMap('clusters')}
+            className="px-3 py-1.5 rounded-sm bg-parchment hover:bg-white border border-border-hairline font-semibold text-ink cursor-pointer transition-all"
+            title="Recenter Map on Maharashtra Surveillance Zone"
+          >
+            ⌖ Recenter
+          </button>
         </div>
       </div>
 
       {/* Direct Leaflet Map Canvas Container */}
-      <div className="h-[520px] w-full relative z-0">
-        <div ref={mapContainerRef} className="h-full w-full" />
+      <div className="flex-1 min-h-[540px] w-full relative z-0">
+        <div ref={mapContainerRef} className="absolute inset-0 h-full w-full" />
+        <div className="absolute top-3 right-3 z-[450] flex items-center gap-1.5">
+          <button
+            onClick={() => recenterMap('clusters')}
+            className="px-2.5 py-1.5 rounded-lg bg-white/95 hover:bg-white text-ink border border-black/20 shadow-md text-xs font-bold cursor-pointer"
+          >
+            ⌖ Active Clusters
+          </button>
+          <button
+            onClick={() => recenterMap('state')}
+            className="px-2.5 py-1.5 rounded-lg bg-white/95 hover:bg-white text-ink border border-black/20 shadow-md text-xs font-bold cursor-pointer"
+          >
+            ⌖ Recenter State
+          </button>
+        </div>
       </div>
 
       {/* Map Legend Footer */}
@@ -366,7 +507,7 @@ export const SurveillanceMap: React.FC<SurveillanceMapProps> = ({ pins = [], clu
             <span className="w-3.5 h-3.5 rounded-full border border-dashed border-alert-critical bg-alert-critical/20"></span> ML Risk Cluster
           </span>
           <span className="flex items-center gap-1.5">
-            <span className="w-3 h-2 border border-[#16a34a] bg-[#16a34a]/20 rounded-xs"></span> District GeoJSON
+            <span className="w-3 h-2 border border-slate-400 bg-slate-200 rounded-xs"></span> District Boundaries
           </span>
         </div>
         <div>
