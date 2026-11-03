@@ -603,7 +603,7 @@
   <!-- ========================================================================= -->
   <!-- 1. NETFLIX-STYLE CINEMATIC LOGO INTRO PAGE                                -->
   <!-- ========================================================================= -->
-  <div id="pashuvani-gov-splash">
+  <div id="pashuvani-gov-splash" onclick="dismissGovSplash()" class="cursor-pointer" title="Click anywhere to enter dashboard">
     <div class="gov-guilloche-pattern"></div>
     <div class="gov-ambient-light"></div>
 
@@ -685,7 +685,15 @@
         </div>
       </div>
 
-      <div class="mt-3 text-[9px] text-zinc-400 font-mono">
+      
+      <div class="mt-4 flex items-center justify-center gap-3">
+        <button onclick="event.stopPropagation(); dismissGovSplash();" class="aero-btn aero-btn-lime px-6 py-2.5 text-xs font-extrabold flex items-center gap-2 cursor-pointer shadow-md">
+          <span>Enter Surveillance Console</span>
+          <i data-lucide="arrow-right" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+      <div class="mt-3 text-[9px] text-zinc-500 font-mono">
         Krishi Bhawan &bull; National Animal Health Disease Surveillance Network
       </div>
     </div>
@@ -1227,10 +1235,10 @@
 
             <!-- Base Map Tile Switcher (OpenStreetMap / MapTiler / Satellite) -->
             <div class="flex items-center gap-1 bg-parchment p-0.5 rounded-lg border border-black/10 mt-2 sm:mt-0">
-              <button id="full-tile-osm" onclick="setTileLayer('osm')" class="seg-btn seg-btn-active">
+              <button id="full-tile-osm" onclick="setTileLayer('osm')" class="seg-btn seg-btn-inactive">
                 <i data-lucide="compass" class="w-3 h-3 text-emerald-600"></i> OpenStreetMap
               </button>
-              <button id="full-tile-maptiler" onclick="setTileLayer('maptiler')" class="seg-btn seg-btn-inactive">
+              <button id="full-tile-maptiler" onclick="setTileLayer('maptiler')" class="seg-btn seg-btn-active">
                 <i data-lucide="map" class="w-3 h-3 text-blue-600"></i> MapTiler
               </button>
               <button id="full-tile-satellite" onclick="setTileLayer('satellite')" class="seg-btn seg-btn-inactive">
@@ -3341,12 +3349,8 @@
       setTimeout(dismissGovSplash, 2400);
     }
 
-    // Auto-launch splash dismissal after 2.4s
-    setTimeout(dismissGovSplash, 2400);
-    }
-
-    // Auto-launch splash after 2.8s
-    setTimeout(dismissNetflixSplash, 2800);
+        // Auto-launch splash dismissal after 1.8s
+    setTimeout(dismissGovSplash, 1800);
 
     // Live IST Clock
     function updateLiveClock() {
@@ -3366,7 +3370,7 @@
     var allMarkers = [];
 
     // Map Tile Layer Sources (OpenStreetMap + MapTiler + Satellite)
-    var MAPTILER_KEY = 'cKTaQaghkXlhl6xd2pWw';
+    var MAPTILER_KEY = 'cKTaQaghkXIhI6xd2pWw';
     var tileSources = {
       osm: {
         url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
@@ -3777,7 +3781,7 @@
     // ---------------------------------------------------------------------------
     window.addEventListener('DOMContentLoaded', function() {
       var centerCoords = [18.5204, 74.2500]; // Maharashtra Center Coordinates
-      var defaultSource = tileSources.osm;
+      var defaultSource = tileSources.maptiler;
 
       // 1. Overview Tab Mini-Map
       overviewMap = L.map('overview-map', { zoomControl: false }).setView(centerCoords, 8);
@@ -3786,6 +3790,16 @@
       // 2. Full GIS Surveillance Map
       fullMap = L.map('full-map').setView(centerCoords, 8);
       fullTileLayer = L.tileLayer(defaultSource.url, { attribution: defaultSource.attr, maxZoom: 18 }).addTo(fullMap);
+
+      // Automatic fallback in case of tile load failure
+      overviewTileLayer.on('tileerror', function() {
+        console.warn('Overview tile error, falling back to OpenStreetMap backup');
+        overviewTileLayer.setUrl(tileSources.osm.url);
+      });
+      fullTileLayer.on('tileerror', function() {
+        console.warn('Full map tile error, falling back to OpenStreetMap backup');
+        fullTileLayer.setUrl(tileSources.osm.url);
+      });
 
       var cases = [
         { id: 'rpt_001', pos: [18.5204, 73.8567], color: '#C62828', title: 'Cow (Gir) Ã¢â‚¬â€ FMD Confirmed', district: 'Pune (Haveli)', status: 'verified', diseaseCode: 'FMD' },
