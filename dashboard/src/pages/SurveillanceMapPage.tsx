@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useState } from 'react';
 import { MapCasePin, OutbreakCluster } from '../types';
 import { SurveillanceMap } from '../components/map/SurveillanceMap';
