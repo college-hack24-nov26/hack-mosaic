@@ -6,6 +6,7 @@ import '../../core/theme/app_typography.dart';
 import '../../core/widgets/async_states.dart';
 import '../../data/models/vet_models.dart';
 import '../../data/vet_repository.dart';
+import 'vet_inbox_screen.dart';
 import 'vet_report_details_screen.dart';
 
 /// Full animal health history screen (`GET /animals/{id}/record`).
@@ -116,7 +117,295 @@ class _VetAnimalHistoryScreenState extends State<VetAnimalHistoryScreen> with Si
                     ),
                   ],
                 ),
+      bottomNavigationBar: _loading || _record == null ? null : _buildBottomRecordActions(),
     );
+  }
+
+  Widget _buildBottomRecordActions() {
+    return SafeArea(
+      child: Container(
+        padding: const EdgeInsets.all(AppSpacing.md),
+        decoration: BoxDecoration(
+          color: AppColors.surface,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.08),
+              blurRadius: 8,
+              offset: const Offset(0, -2),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            Expanded(
+              child: OutlinedButton.icon(
+                onPressed: _showAddNoteAndTreatmentModal,
+                icon: const Icon(Icons.medication_liquid, size: 18, color: AppColors.primary),
+                label: const Text(
+                  'नोंद / उपचार (Add Note)',
+                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppColors.primary),
+                ),
+                style: OutlinedButton.styleFrom(
+                  side: const BorderSide(color: AppColors.primary),
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                ),
+              ),
+            ),
+            const SizedBox(width: AppSpacing.sm),
+            Expanded(
+              child: ElevatedButton.icon(
+                onPressed: _showAddVaccinationModal,
+                icon: const Icon(Icons.vaccines, size: 18, color: Colors.white),
+                label: const Text(
+                  'लसीकरण (Vaccinate)',
+                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.white),
+                ),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.primary,
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _showAddNoteAndTreatmentModal() async {
+    final summaryCtrl = TextEditingController(
+      text: 'Clinical examination completed. Vitals recorded; animal under isolation protocol.',
+    );
+    final treatmentCtrl = TextEditingController(text: 'Meloxicam + Oxytetracycline LA');
+    final dosageCtrl = TextEditingController(text: '10 ml IM × 3 days');
+    bool includeTreatment = true;
+    bool saving = false;
+
+    final saved = await showModalBottomSheet<bool>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: AppColors.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(AppSpacing.radiusXl)),
+      ),
+      builder: (ctx) {
+        return StatefulBuilder(
+          builder: (ctx, setModalState) {
+            return Padding(
+              padding: EdgeInsets.only(
+                left: AppSpacing.lg,
+                right: AppSpacing.lg,
+                top: AppSpacing.lg,
+                bottom: MediaQuery.of(ctx).viewInsets.bottom + AppSpacing.lg,
+              ),
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('📝 क्लिनिकल नोंद आणि उपचार (Clinical Note & Treatment)', style: AppTypography.sectionHeading),
+                    const Divider(),
+                    const SizedBox(height: AppSpacing.sm),
+                    TextField(
+                      controller: summaryCtrl,
+                      maxLines: 3,
+                      decoration: const InputDecoration(
+                        labelText: 'क्लिनिकल निरीक्षण (Clinical Observation)',
+                      ),
+                    ),
+                    const SizedBox(height: AppSpacing.sm),
+                    CheckboxListTile(
+                      contentPadding: EdgeInsets.zero,
+                      value: includeTreatment,
+                      title: const Text('औषधोपचार जोडा (Also log prescribed treatment)'),
+                      onChanged: (v) => setModalState(() => includeTreatment = v ?? false),
+                    ),
+                    if (includeTreatment) ...[
+                      TextField(
+                        controller: treatmentCtrl,
+                        decoration: const InputDecoration(
+                          labelText: 'औषध / उपचार नाव (Treatment / Medicine)',
+                          isDense: true,
+                        ),
+                      ),
+                      const SizedBox(height: AppSpacing.sm),
+                      TextField(
+                        controller: dosageCtrl,
+                        decoration: const InputDecoration(
+                          labelText: 'मात्रा आणि कालावधी (Dosage & Duration)',
+                          isDense: true,
+                        ),
+                      ),
+                    ],
+                    const SizedBox(height: AppSpacing.lg),
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton.icon(
+                        onPressed: saving
+                            ? null
+                            : () async {
+                                setModalState(() => saving = true);
+                                final summaryText = summaryCtrl.text.trim().isEmpty
+                                    ? 'Clinical observation logged by Veterinarian.'
+                                    : summaryCtrl.text.trim();
+                                await _repo.addHealthRecord(
+                                  widget.animalId,
+                                  summary: summaryText,
+                                  data: const {'source': 'vet_portal'},
+                                );
+                                if (includeTreatment && treatmentCtrl.text.trim().isNotEmpty) {
+                                  final recentRepId = _record?.recentReports.firstOrNull?.s('id') ?? 'rep-sat-2026-001';
+                                  await _repo.addTreatment(
+                                    widget.animalId,
+                                    reportId: recentRepId,
+                                    treatmentName: treatmentCtrl.text.trim(),
+                                    dosage: dosageCtrl.text.trim(),
+                                    startedOn: DateTime.now().toIso8601String().substring(0, 10),
+                                    notes: summaryText,
+                                  );
+                                }
+                                if (ctx.mounted) Navigator.of(ctx).pop(true);
+                              },
+                        icon: const Icon(Icons.save, color: Colors.white),
+                        label: Text(
+                          saving ? 'जतन करत आहे...' : 'नोंद जतन करा (Save to Animal Record)',
+                          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.primary,
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+
+    if (saved == true && mounted) {
+      await _load();
+      _tabController.animateTo(includeTreatment ? 1 : 0);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Clinical note & treatment saved to animal health passport.'),
+            backgroundColor: AppColors.successGreen,
+          ),
+        );
+      }
+    }
+  }
+
+  Future<void> _showAddVaccinationModal() async {
+    String selectedVaccine = 'Goat Pox Vaccine (LSD Prophylaxis)';
+    final batchCtrl = TextEditingController(text: 'GPV-2026-SATARA-09');
+    bool saving = false;
+
+    const vaccines = [
+      'Goat Pox Vaccine (LSD Prophylaxis)',
+      'FMD Trivalent Vaccine (लाळ खुरकत लस)',
+      'HS + BQ Combined Vaccine (घटसर्प-फऱ्या)',
+      'Brucella S19 Vaccine',
+      'PPR Vaccine (शेळी-मेंढी देवी)',
+    ];
+
+    final saved = await showModalBottomSheet<bool>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: AppColors.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(AppSpacing.radiusXl)),
+      ),
+      builder: (ctx) {
+        return StatefulBuilder(
+          builder: (ctx, setModalState) {
+            return Padding(
+              padding: EdgeInsets.only(
+                left: AppSpacing.lg,
+                right: AppSpacing.lg,
+                top: AppSpacing.lg,
+                bottom: MediaQuery.of(ctx).viewInsets.bottom + AppSpacing.lg,
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('💉 लसीकरण नोंदवा (Record Vaccination)', style: AppTypography.sectionHeading),
+                  const Divider(),
+                  const SizedBox(height: AppSpacing.sm),
+                  DropdownButtonFormField<String>(
+                    initialValue: selectedVaccine,
+                    decoration: const InputDecoration(
+                      labelText: 'लसीचे नाव (Vaccine Name)',
+                      isDense: true,
+                    ),
+                    items: vaccines.map((v) => DropdownMenuItem(value: v, child: Text(v))).toList(),
+                    onChanged: (v) {
+                      if (v != null) setModalState(() => selectedVaccine = v);
+                    },
+                  ),
+                  const SizedBox(height: AppSpacing.md),
+                  TextField(
+                    controller: batchCtrl,
+                    decoration: const InputDecoration(
+                      labelText: 'बॅच क्रमांक (Batch Number)',
+                      isDense: true,
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.lg),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton.icon(
+                      onPressed: saving
+                          ? null
+                          : () async {
+                              setModalState(() => saving = true);
+                              final today = DateTime.now();
+                              final nextDue = today.add(const Duration(days: 180));
+                              await _repo.addVaccination(
+                                widget.animalId,
+                                vaccineName: selectedVaccine,
+                                batchNumber: batchCtrl.text.trim(),
+                                administeredOn: today.toIso8601String().substring(0, 10),
+                                nextDueOn: nextDue.toIso8601String().substring(0, 10),
+                              );
+                              if (ctx.mounted) Navigator.of(ctx).pop(true);
+                            },
+                      icon: const Icon(Icons.vaccines, color: Colors.white),
+                      label: Text(
+                        saving ? 'जतन करत आहे...' : 'लसीकरण जतन करा (Save Vaccination)',
+                        style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.primary,
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
+
+    if (saved == true && mounted) {
+      await _load();
+      _tabController.animateTo(2);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Vaccination recorded in Animal Health Passport.'),
+            backgroundColor: AppColors.successGreen,
+          ),
+        );
+      }
+    }
   }
 
   Widget _buildOverviewCard(ReportAnimalFull animal) {
@@ -475,7 +764,21 @@ class _VetAnimalRecordsSearchScreenState extends State<VetAnimalRecordsSearchScr
                                     'Tag: ${a.tagNumber ?? 'None'}${rep.farmer != null ? ' • ${rep.farmer!.fullName}' : ''}',
                                     style: AppTypography.caption,
                                   ),
-                                  trailing: const Icon(Icons.chevron_right, color: AppColors.textMuted),
+                                  trailing: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      IconButton(
+                                        tooltip: 'केस अहवाल / Case Report',
+                                        icon: const Icon(Icons.assignment_outlined, color: AppColors.infoBlue, size: 20),
+                                        onPressed: () => Navigator.of(context).push(
+                                          MaterialPageRoute(
+                                            builder: (_) => VetReportDetailsScreen(reportId: rep.id),
+                                          ),
+                                        ),
+                                      ),
+                                      const Icon(Icons.chevron_right, color: AppColors.textMuted),
+                                    ],
+                                  ),
                                   onTap: () => Navigator.of(context).push(
                                     MaterialPageRoute(
                                       builder: (_) => VetAnimalHistoryScreen(
@@ -491,6 +794,26 @@ class _VetAnimalRecordsSearchScreenState extends State<VetAnimalRecordsSearchScr
                           ),
           ),
         ],
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        backgroundColor: AppColors.primary,
+        foregroundColor: Colors.white,
+        icon: const Icon(Icons.add_box_outlined),
+        label: const Text('नवीन फील्ड केस / Field Case', style: TextStyle(fontWeight: FontWeight.bold)),
+        onPressed: () async {
+          final nav = Navigator.of(context);
+          final created = await showVetFieldCaseModal(context);
+          if (created != null && mounted) {
+            await _load();
+            if (!mounted) return;
+            await nav.push(
+              MaterialPageRoute(
+                builder: (_) => VetReportDetailsScreen(reportId: created.id),
+              ),
+            );
+            _load();
+          }
+        },
       ),
     );
   }

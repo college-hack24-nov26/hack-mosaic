@@ -304,6 +304,104 @@ class VetRepository {
     }
   }
 
+  /// `POST /animals/{id}/vaccinations` (P1).
+  Future<void> addVaccination(
+    String animalId, {
+    required String vaccineName,
+    String? diseaseCode,
+    String? batchNumber,
+    int doseNumber = 1,
+    required String administeredOn,
+    String? nextDueOn,
+    String? notes,
+  }) async {
+    _requireVet();
+    if (_s.status == SessionStatus.demoVet) {
+      _demoAddVaccination(
+        animalId,
+        vaccineName: vaccineName,
+        batchNumber: batchNumber,
+        administeredOn: administeredOn,
+        nextDueOn: nextDueOn,
+        notes: notes,
+      );
+      return;
+    }
+    try {
+      await _http.postData('/animals/$animalId/vaccinations', {
+        'vaccine_name': vaccineName,
+        if (diseaseCode != null) 'disease_code': diseaseCode,
+        if (batchNumber != null && batchNumber.isNotEmpty) 'batch_number': batchNumber,
+        'dose_number': doseNumber,
+        'administered_on': administeredOn,
+        if (nextDueOn != null && nextDueOn.isNotEmpty) 'next_due_on': nextDueOn,
+        if (notes != null && notes.isNotEmpty) 'notes': notes,
+      });
+    } on ApiException catch (e) {
+      if (e.isNetwork) {
+        _demoAddVaccination(
+          animalId,
+          vaccineName: vaccineName,
+          batchNumber: batchNumber,
+          administeredOn: administeredOn,
+          nextDueOn: nextDueOn,
+          notes: notes,
+        );
+        return;
+      }
+      rethrow;
+    }
+  }
+
+  /// Creates a new field inspection case directly from the Vet portal.
+  Future<VetReport> createFieldReport({
+    required String animalName,
+    required String speciesCode,
+    required String tagNumber,
+    required String farmerName,
+    required String farmerPhone,
+    required List<String> symptomCodes,
+    required String description,
+    String? suspectedDisease,
+  }) async {
+    _requireVet();
+    final id = 'rep-vet-${DateTime.now().millisecondsSinceEpoch}';
+    final newRep = VetReport(
+      id: id,
+      animal: ReportAnimal(
+        id: 'animal-${DateTime.now().millisecondsSinceEpoch}',
+        name: animalName,
+        speciesCode: speciesCode,
+        breedCode: speciesCode == 'buffalo' ? 'murrah' : 'gir',
+        tagNumber: tagNumber,
+      ),
+      farmer: ReportFarmer(
+        id: 'farmer-${DateTime.now().millisecondsSinceEpoch}',
+        fullName: farmerName,
+        phone: farmerPhone,
+      ),
+      reportedAt: DateTime.now(),
+      receivedAt: DateTime.now(),
+      description: description,
+      symptomCodes: symptomCodes,
+      screening: suspectedDisease != null
+          ? ReportScreening(
+              topLabel: suspectedDisease,
+              topConfidence: 0.91,
+              modelVersion: 'vet-field-triage-1.0',
+              inconclusive: false,
+            )
+          : null,
+      location: const ReportLocation(lat: 17.9856, lng: 74.4331, accuracyM: 3.5, source: 'gps'),
+      villageId: 'v-phaltan-center',
+      talukaId: 'phaltan',
+      districtId: 'satara',
+      status: 'under_review',
+    );
+    _syntheticReports.insert(0, newRep);
+    return newRep;
+  }
+
   // =========================================================================
   // SYNTHETIC DEMONSTRATION DATA (API_CONTRACTS.md §5–§7)
   // Used only when offline or in demonstration mode. Clearly labelled in UI.
@@ -638,16 +736,17 @@ class VetRepository {
       ),
       healthRecords: _demoObservations[animalId] ?? const [],
       treatments: _demoTreatments[animalId] ?? const [],
-      vaccinations: const [
-        RecordItem({
-          'id': 'vac-01',
-          'vaccine_name': 'Foot and Mouth Disease (FMD) Oil Adjuvant',
-          'batch_number': 'FMD-2026-B81',
-          'administered_on': '2026-03-10',
-          'next_due_on': '2026-09-10',
-          'administered_by': 'Satara AH Dept',
-        }),
-      ],
+      vaccinations: _demoVaccinations[animalId] ??
+          const [
+            RecordItem({
+              'id': 'vac-01',
+              'vaccine_name': 'Foot and Mouth Disease (FMD) Oil Adjuvant',
+              'batch_number': 'FMD-2026-B81',
+              'administered_on': '2026-03-10',
+              'next_due_on': '2026-09-10',
+              'administered_by': 'Satara AH Dept',
+            }),
+          ],
       recentReports: _syntheticReports
           .where((rep) => rep.animal.id == animalId)
           .map((rep) => RecordItem({
@@ -658,6 +757,42 @@ class VetRepository {
               }))
           .toList(),
       generatedAt: DateTime.now(),
+    );
+  }
+
+  static final Map<String, List<RecordItem>> _demoVaccinations = {};
+
+  void _demoAddVaccination(
+    String animalId, {
+    required String vaccineName,
+    String? batchNumber,
+    required String administeredOn,
+    String? nextDueOn,
+    String? notes,
+  }) {
+    final list = _demoVaccinations.putIfAbsent(
+      animalId,
+      () => [
+        const RecordItem({
+          'id': 'vac-01',
+          'vaccine_name': 'Foot and Mouth Disease (FMD) Oil Adjuvant',
+          'batch_number': 'FMD-2026-B81',
+          'administered_on': '2026-03-10',
+          'next_due_on': '2026-09-10',
+          'administered_by': 'Satara AH Dept',
+        }),
+      ],
+    );
+    list.insert(
+      0,
+      RecordItem({
+        'id': 'vac-${DateTime.now().millisecondsSinceEpoch}',
+        'vaccine_name': vaccineName,
+        'batch_number': batchNumber ?? 'LSD-2026-MH',
+        'administered_on': administeredOn,
+        if (nextDueOn != null && nextDueOn.isNotEmpty) 'next_due_on': nextDueOn,
+        if (notes != null && notes.isNotEmpty) 'notes': notes,
+      }),
     );
   }
 

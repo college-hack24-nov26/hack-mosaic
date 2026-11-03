@@ -153,6 +153,55 @@ class _LoginScreenState extends State<LoginScreen> {
               isLoading: _busy,
               onPressed: _busy ? null : _submit,
             ),
+            const SizedBox(height: AppSpacing.lg),
+            Container(
+              padding: const EdgeInsets.all(AppSpacing.md),
+              decoration: BoxDecoration(
+                color: AppColors.surfaceContainer,
+                borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+                border: Border.all(color: AppColors.border),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      const Icon(Icons.bolt, size: 16, color: AppColors.primary),
+                      const SizedBox(width: 6),
+                      Text(
+                        vet
+                            ? '⚡ डेमो पशुवैद्यक खाते (Quick Fill Vet)'
+                            : '⚡ डेमो शेतकरी खाते (Quick Fill Farmer)',
+                        style: AppTypography.caption.copyWith(fontWeight: FontWeight.bold),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  SizedBox(
+                    width: double.infinity,
+                    child: OutlinedButton.icon(
+                      onPressed: () {
+                        setState(() {
+                          _phone.text = vet ? '9890112233' : '9876543210';
+                          _password.text = 'Password@123';
+                          _error = null;
+                        });
+                      },
+                      icon: Icon(
+                        vet ? Icons.medical_services_outlined : Icons.agriculture,
+                        size: 16,
+                      ),
+                      label: Text(
+                        vet
+                            ? 'Dr. Rajesh Kulkarni (9890112233)'
+                            : 'Ramesh Jadhav (9876543210)',
+                        style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
             if (vet) ...[
               const SizedBox(height: AppSpacing.lg),
               TextButton.icon(

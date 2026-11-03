@@ -12,6 +12,9 @@ import '../../core/services/location_service.dart';
 import '../../data/local/offline_store.dart';
 import '../../data/models/veterinarian_model.dart';
 import '../../data/models/outbreak_zone_model.dart';
+import '../reports/create_report_screen.dart';
+import '../reports/reports_history_screen.dart';
+import 'vet_consultation_screen.dart';
 
 class NearbyScreen extends StatefulWidget {
   final int initialTabIndex;
@@ -335,6 +338,19 @@ class _NearbyScreenState extends State<NearbyScreen> with SingleTickerProviderSt
     return Container(
       margin: const EdgeInsets.only(bottom: AppSpacing.md),
       child: AppCard(
+        onTap: () {
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (_) => VetConsultationScreen(
+                vet: vet,
+                onShowOnMap: () {
+                  _tabController.animateTo(1);
+                  _mapController.move(LatLng(vet.latitude, vet.longitude), 15.0);
+                },
+              ),
+            ),
+          );
+        },
         padding: const EdgeInsets.all(AppSpacing.md),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -465,10 +481,11 @@ class _NearbyScreenState extends State<NearbyScreen> with SingleTickerProviderSt
             ),
             const SizedBox(height: 12),
 
-            // Action Buttons: Call & Directions
+            // Action Buttons: Consult/Book, Call & Directions
             Row(
               children: [
                 Expanded(
+                  flex: 5,
                   child: ElevatedButton.icon(
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.primary,
@@ -478,13 +495,26 @@ class _NearbyScreenState extends State<NearbyScreen> with SingleTickerProviderSt
                         borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
                       ),
                     ),
-                    icon: const Icon(Icons.call, size: 16),
-                    label: Text(AppStrings.t('call_vet'), style: const TextStyle(fontSize: 13)),
-                    onPressed: () => _callVeterinarian(vet.phone),
+                    icon: const Icon(Icons.event_available, size: 16),
+                    label: const Text('भेट / सल्ला (Consult)', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                    onPressed: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => VetConsultationScreen(
+                            vet: vet,
+                            onShowOnMap: () {
+                              _tabController.animateTo(1);
+                              _mapController.move(LatLng(vet.latitude, vet.longitude), 15.0);
+                            },
+                          ),
+                        ),
+                      );
+                    },
                   ),
                 ),
-                const SizedBox(width: AppSpacing.sm),
+                const SizedBox(width: AppSpacing.xs),
                 Expanded(
+                  flex: 3,
                   child: OutlinedButton.icon(
                     style: OutlinedButton.styleFrom(
                       foregroundColor: AppColors.primary,
@@ -494,10 +524,22 @@ class _NearbyScreenState extends State<NearbyScreen> with SingleTickerProviderSt
                         borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
                       ),
                     ),
-                    icon: const Icon(Icons.navigation_outlined, size: 16),
-                    label: Text(AppStrings.t('directions'), style: const TextStyle(fontSize: 13)),
-                    onPressed: () => _openDirections(vet.latitude, vet.longitude, vet.clinicName),
+                    icon: const Icon(Icons.call, size: 15),
+                    label: Text(AppStrings.t('call_vet'), style: const TextStyle(fontSize: 12)),
+                    onPressed: () => _callVeterinarian(vet.phone),
                   ),
+                ),
+                const SizedBox(width: AppSpacing.xs),
+                IconButton(
+                  tooltip: AppStrings.t('directions'),
+                  style: IconButton.styleFrom(
+                    side: const BorderSide(color: AppColors.border),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+                    ),
+                  ),
+                  icon: const Icon(Icons.navigation_outlined, size: 18, color: AppColors.primary),
+                  onPressed: () => _openDirections(vet.latitude, vet.longitude, vet.clinicName),
                 ),
               ],
             ),
@@ -913,6 +955,40 @@ class _NearbyScreenState extends State<NearbyScreen> with SingleTickerProviderSt
                   'GPS Coordinates: $_currentLat, $_currentLng',
                   style: AppTypography.caption.copyWith(color: AppColors.textMuted),
                 ),
+                const SizedBox(height: 16),
+                Row(
+                  children: [
+                    Expanded(
+                      child: ElevatedButton.icon(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.primary,
+                          foregroundColor: Colors.white,
+                        ),
+                        icon: const Icon(Icons.assignment_late_outlined, size: 16),
+                        label: Text(AppStrings.t('action_report')),
+                        onPressed: () {
+                          Navigator.pop(context);
+                          Navigator.of(context).push(
+                            MaterialPageRoute(builder: (_) => const CreateReportScreen()),
+                          );
+                        },
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: OutlinedButton.icon(
+                        icon: const Icon(Icons.history, size: 16),
+                        label: Text(AppStrings.t('case_history')),
+                        onPressed: () {
+                          Navigator.pop(context);
+                          Navigator.of(context).push(
+                            MaterialPageRoute(builder: (_) => const ReportsHistoryScreen()),
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                ),
               ],
             ),
           ),
@@ -962,14 +1038,31 @@ class _NearbyScreenState extends State<NearbyScreen> with SingleTickerProviderSt
                   style: AppTypography.caption,
                 ),
                 const SizedBox(height: 16),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton.icon(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primary,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                    ),
+                    icon: const Icon(Icons.event_available, size: 18),
+                    label: const Text('📅 फार्म भेट / सल्ला बुक करा (Consult & Book Visit)'),
+                    onPressed: () {
+                      Navigator.pop(context);
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => VetConsultationScreen(vet: vet),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+                const SizedBox(height: 10),
                 Row(
                   children: [
                     Expanded(
-                      child: ElevatedButton.icon(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.primary,
-                          foregroundColor: Colors.white,
-                        ),
+                      child: OutlinedButton.icon(
                         icon: const Icon(Icons.call, size: 16),
                         label: Text(AppStrings.t('call_vet')),
                         onPressed: () {
@@ -1078,8 +1171,22 @@ class _NearbyScreenState extends State<NearbyScreen> with SingleTickerProviderSt
                   backgroundColor: AppColors.alertCritical,
                   onPressed: () {
                     Navigator.pop(context);
-                    // Switch tab to report in main screen or pop
+                    Navigator.of(context).push(
+                      MaterialPageRoute(builder: (_) => const CreateReportScreen()),
+                    );
                   },
+                ),
+                const SizedBox(height: 8),
+                SizedBox(
+                  width: double.infinity,
+                  child: OutlinedButton.icon(
+                    icon: const Icon(Icons.medical_services_outlined, size: 16),
+                    label: Text(AppStrings.t('tab_nearby_vets')),
+                    onPressed: () {
+                      Navigator.pop(context);
+                      _tabController.animateTo(0);
+                    },
+                  ),
                 ),
               ],
             ),
@@ -1128,6 +1235,38 @@ class _NearbyScreenState extends State<NearbyScreen> with SingleTickerProviderSt
                 Text(
                   AppStrings.t('verified_by_dept'),
                   style: AppTypography.bodyDefault.copyWith(fontSize: 13, color: AppColors.successGreen),
+                ),
+                const SizedBox(height: 16),
+                Row(
+                  children: [
+                    Expanded(
+                      child: ElevatedButton.icon(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.alertCritical,
+                          foregroundColor: Colors.white,
+                        ),
+                        icon: const Icon(Icons.assignment_late_outlined, size: 16),
+                        label: Text(AppStrings.t('action_report')),
+                        onPressed: () {
+                          Navigator.pop(context);
+                          Navigator.of(context).push(
+                            MaterialPageRoute(builder: (_) => const CreateReportScreen()),
+                          );
+                        },
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: OutlinedButton.icon(
+                        icon: const Icon(Icons.medical_services_outlined, size: 16),
+                        label: Text(AppStrings.t('tab_nearby_vets')),
+                        onPressed: () {
+                          Navigator.pop(context);
+                          _tabController.animateTo(0);
+                        },
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),

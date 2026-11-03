@@ -7,13 +7,24 @@ import '../../core/theme/app_typography.dart';
 import '../../core/widgets/async_states.dart';
 import '../../data/models/vet_models.dart';
 import '../../data/vet_repository.dart';
+import 'vet_inbox_screen.dart';
 import 'vet_report_details_screen.dart';
 
 class VetDashboardScreen extends StatefulWidget {
-  const VetDashboardScreen({super.key, this.onNavigateToInbox, this.onNavigateToMap});
+  const VetDashboardScreen({
+    super.key,
+    this.onNavigateToInbox,
+    this.onNavigateToInboxTab,
+    this.onNavigateToMap,
+    this.onNavigateToAnimals,
+    this.onNavigateToProfile,
+  });
 
   final VoidCallback? onNavigateToInbox;
+  final ValueChanged<int>? onNavigateToInboxTab;
   final VoidCallback? onNavigateToMap;
+  final VoidCallback? onNavigateToAnimals;
+  final VoidCallback? onNavigateToProfile;
 
   @override
   State<VetDashboardScreen> createState() => _VetDashboardScreenState();
@@ -110,6 +121,11 @@ class _VetDashboardScreenState extends State<VetDashboardScreen> {
                       // 2. Metrics Statistics Grid
                       _buildMetricsSection(),
 
+                      const SizedBox(height: AppSpacing.lg),
+
+                      // 2b. Quick Actions Bar (No dead ends)
+                      _buildQuickActionsSection(),
+
                       const SizedBox(height: AppSpacing.xl),
 
                       // 3. Waiting Longest (Priority Queue)
@@ -128,87 +144,91 @@ class _VetDashboardScreenState extends State<VetDashboardScreen> {
   }
 
   Widget _buildProfileCard(String name, dynamic vet) {
-    return Container(
-      padding: const EdgeInsets.all(AppSpacing.lg),
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [AppColors.primary, AppColors.primaryLight],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
+    return InkWell(
+      onTap: widget.onNavigateToProfile,
+      borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
+      child: Container(
+        padding: const EdgeInsets.all(AppSpacing.lg),
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            colors: [AppColors.primary, AppColors.primaryLight],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.primary.withValues(alpha: 0.25),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
         ),
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.primary.withValues(alpha: 0.25),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              const CircleAvatar(
-                radius: 26,
-                backgroundColor: Colors.white,
-                child: Icon(Icons.medical_services, color: AppColors.primary, size: 28),
-              ),
-              const SizedBox(width: AppSpacing.md),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      AppStrings.t('vet_welcome'),
-                      style: AppTypography.caption.copyWith(color: Colors.white70),
-                    ),
-                    Text(
-                      name.startsWith('Dr.') ? name : 'Dr. $name',
-                      style: AppTypography.screenTitle.copyWith(color: Colors.white),
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                const CircleAvatar(
+                  radius: 26,
+                  backgroundColor: Colors.white,
+                  child: Icon(Icons.medical_services, color: AppColors.primary, size: 28),
                 ),
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.2),
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: Colors.white70),
+                const SizedBox(width: AppSpacing.md),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        AppStrings.t('vet_welcome'),
+                        style: AppTypography.caption.copyWith(color: Colors.white70),
+                      ),
+                      Text(
+                        name.startsWith('Dr.') ? name : 'Dr. $name',
+                        style: AppTypography.screenTitle.copyWith(color: Colors.white),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
                 ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(Icons.verified, size: 14, color: Colors.white),
-                    const SizedBox(width: 4),
-                    Text(
-                      AppStrings.t('vet_verified'),
-                      style: AppTypography.badge.copyWith(color: Colors.white),
-                    ),
-                  ],
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.2),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: Colors.white70),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(Icons.verified, size: 14, color: Colors.white),
+                      const SizedBox(width: 4),
+                      Text(
+                        AppStrings.t('vet_verified'),
+                        style: AppTypography.badge.copyWith(color: Colors.white),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            ],
-          ),
-          const SizedBox(height: AppSpacing.md),
-          const Divider(color: Colors.white24, height: 1),
-          const SizedBox(height: AppSpacing.sm),
-          Wrap(
-            spacing: 8,
-            runSpacing: 4,
-            children: [
-              if (vet?.districtName != null || vet?.districtId != null)
-                _infoChip(Icons.location_on, '${AppStrings.t('vet_district')}: ${vet?.districtName ?? vet?.districtId}'),
-              if (vet?.talukaName != null || vet?.talukaId != null)
-                _infoChip(Icons.domain, vet?.talukaName ?? vet?.talukaId),
-              if (vet?.clinicName != null && (vet?.clinicName as String).isNotEmpty)
-                _infoChip(Icons.local_hospital, vet!.clinicName),
-            ],
-          ),
-        ],
+              ],
+            ),
+            const SizedBox(height: AppSpacing.md),
+            const Divider(color: Colors.white24, height: 1),
+            const SizedBox(height: AppSpacing.sm),
+            Wrap(
+              spacing: 8,
+              runSpacing: 4,
+              children: [
+                if (vet?.districtName != null || vet?.districtId != null)
+                  _infoChip(Icons.location_on, '${AppStrings.t('vet_district')}: ${vet?.districtName ?? vet?.districtId}'),
+                if (vet?.talukaName != null || vet?.talukaId != null)
+                  _infoChip(Icons.domain, vet?.talukaName ?? vet?.talukaId),
+                if (vet?.clinicName != null && (vet?.clinicName as String).isNotEmpty)
+                  _infoChip(Icons.local_hospital, vet!.clinicName),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -256,7 +276,9 @@ class _VetDashboardScreenState extends State<VetDashboardScreen> {
                 count: _totals.pending,
                 color: AppColors.cautionAmber,
                 icon: Icons.hourglass_top,
-                onTap: widget.onNavigateToInbox,
+                onTap: () => widget.onNavigateToInboxTab != null
+                    ? widget.onNavigateToInboxTab!(0)
+                    : widget.onNavigateToInbox?.call(),
               ),
             ),
             const SizedBox(width: AppSpacing.sm),
@@ -266,7 +288,9 @@ class _VetDashboardScreenState extends State<VetDashboardScreen> {
                 count: _totals.confirmed,
                 color: AppColors.alertCritical,
                 icon: Icons.check_circle_outline,
-                onTap: widget.onNavigateToInbox,
+                onTap: () => widget.onNavigateToInboxTab != null
+                    ? widget.onNavigateToInboxTab!(1)
+                    : widget.onNavigateToInbox?.call(),
               ),
             ),
           ],
@@ -280,7 +304,9 @@ class _VetDashboardScreenState extends State<VetDashboardScreen> {
                 count: _totals.flagged,
                 color: AppColors.cautionAmber,
                 icon: Icons.flag_outlined,
-                onTap: widget.onNavigateToInbox,
+                onTap: () => widget.onNavigateToInboxTab != null
+                    ? widget.onNavigateToInboxTab!(3)
+                    : widget.onNavigateToInbox?.call(),
               ),
             ),
             const SizedBox(width: AppSpacing.sm),
@@ -290,12 +316,139 @@ class _VetDashboardScreenState extends State<VetDashboardScreen> {
                 count: _totals.rejected,
                 color: AppColors.textMuted,
                 icon: Icons.cancel_outlined,
-                onTap: widget.onNavigateToInbox,
+                onTap: () => widget.onNavigateToInboxTab != null
+                    ? widget.onNavigateToInboxTab!(2)
+                    : widget.onNavigateToInbox?.call(),
               ),
             ),
           ],
         ),
       ],
+    );
+  }
+
+  Widget _buildQuickActionsSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('⚡ जलद कृती (Quick Actions)', style: AppTypography.sectionHeading),
+        const SizedBox(height: AppSpacing.sm),
+        Row(
+          children: [
+            Expanded(
+              child: _quickActionTile(
+                icon: Icons.add_box_outlined,
+                title: 'नवीन फील्ड केस',
+                subtitle: 'Log Field Inspection',
+                color: AppColors.primary,
+                onTap: () async {
+                  final nav = Navigator.of(context);
+                  final created = await showVetFieldCaseModal(context);
+                  if (created != null && mounted) {
+                    await _load();
+                    if (!mounted) return;
+                    await nav.push(
+                      MaterialPageRoute(
+                        builder: (_) => VetReportDetailsScreen(reportId: created.id),
+                      ),
+                    );
+                    _load();
+                  }
+                },
+              ),
+            ),
+            const SizedBox(width: AppSpacing.sm),
+            Expanded(
+              child: _quickActionTile(
+                icon: Icons.map_outlined,
+                title: 'उद्रेक नकाशा',
+                subtitle: 'District Outbreak Map',
+                color: AppColors.alertCritical,
+                onTap: widget.onNavigateToMap,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: AppSpacing.sm),
+        Row(
+          children: [
+            Expanded(
+              child: _quickActionTile(
+                icon: Icons.pets_outlined,
+                title: 'पशु आरोग्य नोंदवही',
+                subtitle: 'Animal Health Registry',
+                color: AppColors.infoBlue,
+                onTap: widget.onNavigateToAnimals,
+              ),
+            ),
+            const SizedBox(width: AppSpacing.sm),
+            Expanded(
+              child: _quickActionTile(
+                icon: Icons.assignment_turned_in_outlined,
+                title: 'प्रलंबित तपासणी',
+                subtitle: 'Verify Pending Queue',
+                color: AppColors.cautionAmber,
+                onTap: () => widget.onNavigateToInboxTab != null
+                    ? widget.onNavigateToInboxTab!(0)
+                    : widget.onNavigateToInbox?.call(),
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _quickActionTile({
+    required IconData icon,
+    required String title,
+    required String subtitle,
+    required Color color,
+    VoidCallback? onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+      child: Container(
+        padding: const EdgeInsets.all(AppSpacing.md),
+        decoration: BoxDecoration(
+          color: AppColors.surface,
+          borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+          border: Border.all(color: color.withValues(alpha: 0.3)),
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: color.withValues(alpha: 0.12),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Icon(icon, size: 20, color: color),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: AppTypography.cardTitle.copyWith(fontSize: 13),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  Text(
+                    subtitle,
+                    style: AppTypography.caption.copyWith(fontSize: 11, color: AppColors.textSecondary),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 

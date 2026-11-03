@@ -10,13 +10,14 @@ import '../../data/vet_repository.dart';
 import 'vet_report_details_screen.dart';
 
 class VetInboxScreen extends StatefulWidget {
-  const VetInboxScreen({super.key});
+  const VetInboxScreen({super.key, this.initialTabIndex = 0});
+  final int initialTabIndex;
 
   @override
-  State<VetInboxScreen> createState() => _VetInboxScreenState();
+  State<VetInboxScreen> createState() => VetInboxScreenState();
 }
 
-class _VetInboxScreenState extends State<VetInboxScreen> with SingleTickerProviderStateMixin {
+class VetInboxScreenState extends State<VetInboxScreen> with SingleTickerProviderStateMixin {
   late TabController _tabController;
   final _searchController = TextEditingController();
   final _repo = VetRepository.shared;
@@ -29,11 +30,31 @@ class _VetInboxScreenState extends State<VetInboxScreen> with SingleTickerProvid
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 4, vsync: this);
+    _tabController = TabController(
+      length: 4,
+      vsync: this,
+      initialIndex: widget.initialTabIndex.clamp(0, 3),
+    );
     _tabController.addListener(() => setState(() {}));
     _searchController.addListener(() {
       setState(() => _searchQuery = _searchController.text.trim().toLowerCase());
     });
+    _load();
+  }
+
+  @override
+  void didUpdateWidget(covariant VetInboxScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.initialTabIndex != widget.initialTabIndex) {
+      selectSubTab(widget.initialTabIndex);
+    }
+  }
+
+  void selectSubTab(int index) {
+    final target = index.clamp(0, 3);
+    if (_tabController.index != target) {
+      _tabController.animateTo(target);
+    }
     _load();
   }
 
@@ -177,6 +198,29 @@ class _VetInboxScreenState extends State<VetInboxScreen> with SingleTickerProvid
             ),
           ),
         ],
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        backgroundColor: AppColors.primary,
+        foregroundColor: Colors.white,
+        icon: const Icon(Icons.add_box_outlined),
+        label: const Text(
+          'नवीन फील्ड केस / Field Case',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+        onPressed: () async {
+          final nav = Navigator.of(context);
+          final created = await showVetFieldCaseModal(context);
+          if (created != null && mounted) {
+            await _load();
+            if (!mounted) return;
+            await nav.push(
+              MaterialPageRoute(
+                builder: (_) => VetReportDetailsScreen(reportId: created.id),
+              ),
+            );
+            _load();
+          }
+        },
       ),
     );
   }
@@ -424,4 +468,236 @@ class _VetInboxScreenState extends State<VetInboxScreen> with SingleTickerProvid
       ),
     );
   }
+}
+
+/// Reusable modal sheet for a Veterinarian to log a new field inspection case
+/// directly from VetDashboardScreen or VetInboxScreen.
+Future<VetReport?> showVetFieldCaseModal(BuildContext context) {
+  final animalNameCtrl = TextEditingController(text: 'Gauri');
+  final tagCtrl = TextEditingController(text: 'MH-11-9402');
+  final farmerNameCtrl = TextEditingController(text: 'Ramesh Jadhav');
+  final farmerPhoneCtrl = TextEditingController(text: '+919876543210');
+  final notesCtrl = TextEditingController(
+    text: 'Field inspection in Phaltan block: animal showing clinical signs requiring immediate verification.',
+  );
+
+  String speciesCode = 'cattle';
+  String diseaseLabel = 'lumpy_skin_disease';
+  final Set<String> selectedSymptoms = {'skin_nodules', 'high_fever'};
+  bool submitting = false;
+
+  const symptomOptions = [
+    ('skin_nodules', 'Skin Nodules / गाठी'),
+    ('high_fever', 'High Fever / तीव्र ताप'),
+    ('mouth_blisters', 'Mouth Blisters / तोंडात फोड'),
+    ('excess_salivation', 'Salivation / लाळ गळणे'),
+    ('reduced_milk', 'Milk Drop / दूध घटणे'),
+    ('lameness', 'Lameness / लंगडणे'),
+  ];
+
+  const diseaseOptions = [
+    ('lumpy_skin_disease', 'Lumpy Skin Disease (LSD)'),
+    ('foot_and_mouth_disease', 'Foot & Mouth Disease (FMD)'),
+    ('mastitis', 'Mastitis (कासदाह)'),
+    ('blackquarter', 'Black Quarter (फऱ्या)'),
+    ('hemorrhagic_septicemia', 'Hemorrhagic Septicemia (घटसर्प)'),
+  ];
+
+  return showModalBottomSheet<VetReport>(
+    context: context,
+    isScrollControlled: true,
+    backgroundColor: AppColors.surface,
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(AppSpacing.radiusXl)),
+    ),
+    builder: (ctx) {
+      return StatefulBuilder(
+        builder: (ctx, setModalState) {
+          return Padding(
+            padding: EdgeInsets.only(
+              left: AppSpacing.lg,
+              right: AppSpacing.lg,
+              top: AppSpacing.lg,
+              bottom: MediaQuery.of(ctx).viewInsets.bottom + AppSpacing.lg,
+            ),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        children: [
+                          const Icon(Icons.medical_information, color: AppColors.primary),
+                          const SizedBox(width: 8),
+                          Text(
+                            'नवीन फील्ड तपासणी अहवाल (Field Case)',
+                            style: AppTypography.sectionHeading,
+                          ),
+                        ],
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.close),
+                        onPressed: () => Navigator.of(ctx).pop(),
+                      ),
+                    ],
+                  ),
+                  const Divider(),
+                  const SizedBox(height: AppSpacing.sm),
+                  Text('प्रजाती निवडा (Species)', style: AppTypography.caption.copyWith(fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 6),
+                  Wrap(
+                    spacing: 8,
+                    children: [
+                      for (final sp in [
+                        ('cattle', 'गाय (Cattle)'),
+                        ('buffalo', 'म्हैस (Buffalo)'),
+                        ('goat', 'शेळी (Goat)'),
+                        ('sheep', 'मेंढी (Sheep)'),
+                      ])
+                        ChoiceChip(
+                          label: Text(sp.$2),
+                          selected: speciesCode == sp.$1,
+                          selectedColor: AppColors.primary.withValues(alpha: 0.2),
+                          onSelected: (_) => setModalState(() => speciesCode = sp.$1),
+                        ),
+                    ],
+                  ),
+                  const SizedBox(height: AppSpacing.md),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: TextField(
+                          controller: animalNameCtrl,
+                          decoration: const InputDecoration(
+                            labelText: 'जनावराचे नाव (Animal Name)',
+                            isDense: true,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: AppSpacing.sm),
+                      Expanded(
+                        child: TextField(
+                          controller: tagCtrl,
+                          decoration: const InputDecoration(
+                            labelText: 'टॅग क्र. (Ear Tag)',
+                            isDense: true,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: AppSpacing.md),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: TextField(
+                          controller: farmerNameCtrl,
+                          decoration: const InputDecoration(
+                            labelText: 'शेतकऱ्याचे नाव (Farmer)',
+                            isDense: true,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: AppSpacing.sm),
+                      Expanded(
+                        child: TextField(
+                          controller: farmerPhoneCtrl,
+                          decoration: const InputDecoration(
+                            labelText: 'मोबाईल (Phone)',
+                            isDense: true,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: AppSpacing.md),
+                  Text('लक्षणे (Clinical Symptoms)', style: AppTypography.caption.copyWith(fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 6),
+                  Wrap(
+                    spacing: 6,
+                    runSpacing: 4,
+                    children: symptomOptions.map((opt) {
+                      final active = selectedSymptoms.contains(opt.$1);
+                      return FilterChip(
+                        label: Text(opt.$2, style: const TextStyle(fontSize: 12)),
+                        selected: active,
+                        selectedColor: AppColors.primary.withValues(alpha: 0.18),
+                        onSelected: (v) {
+                          setModalState(() {
+                            if (v) {
+                              selectedSymptoms.add(opt.$1);
+                            } else if (selectedSymptoms.length > 1) {
+                              selectedSymptoms.remove(opt.$1);
+                            }
+                          });
+                        },
+                      );
+                    }).toList(),
+                  ),
+                  const SizedBox(height: AppSpacing.md),
+                  DropdownButtonFormField<String>(
+                    initialValue: diseaseLabel,
+                    decoration: const InputDecoration(
+                      labelText: 'प्राथमिक निरीक्षण (Suspected Condition)',
+                      isDense: true,
+                    ),
+                    items: diseaseOptions
+                        .map((d) => DropdownMenuItem(value: d.$1, child: Text(d.$2)))
+                        .toList(),
+                    onChanged: (v) {
+                      if (v != null) setModalState(() => diseaseLabel = v);
+                    },
+                  ),
+                  const SizedBox(height: AppSpacing.md),
+                  TextField(
+                    controller: notesCtrl,
+                    maxLines: 2,
+                    decoration: const InputDecoration(
+                      labelText: 'निरीक्षण टिप (Clinical Field Notes)',
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.lg),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton.icon(
+                      onPressed: submitting
+                          ? null
+                          : () async {
+                              setModalState(() => submitting = true);
+                              final created = await VetRepository.shared.createFieldReport(
+                                speciesCode: speciesCode,
+                                animalName: animalNameCtrl.text.trim().isEmpty ? 'Field Animal' : animalNameCtrl.text.trim(),
+                                tagNumber: tagCtrl.text.trim().isEmpty ? 'MH-11-FIELD' : tagCtrl.text.trim(),
+                                farmerName: farmerNameCtrl.text.trim().isEmpty ? 'Local Farmer' : farmerNameCtrl.text.trim(),
+                                farmerPhone: farmerPhoneCtrl.text.trim().isEmpty ? '+919876543210' : farmerPhoneCtrl.text.trim(),
+                                symptomCodes: selectedSymptoms.toList(),
+                                description: notesCtrl.text.trim(),
+                                suspectedDisease: diseaseLabel,
+                              );
+                              if (ctx.mounted) {
+                                Navigator.of(ctx).pop(created);
+                              }
+                            },
+                      icon: const Icon(Icons.check_circle_outline, color: Colors.white),
+                      label: Text(
+                        submitting ? 'जतन करत आहे...' : 'फील्ड केस तयार करा (Create & Review Case)',
+                        style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.primary,
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      );
+    },
+  );
 }

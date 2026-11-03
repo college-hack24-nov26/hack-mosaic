@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../core/localization/app_strings.dart';
+import '../../core/services/voice_service.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_spacing.dart';
 import '../../core/theme/app_typography.dart';
@@ -144,6 +145,19 @@ class _VetReportDetailsScreenState extends State<VetReportDetailsScreen> {
         backgroundColor: AppColors.background,
         elevation: 0,
         actions: [
+          IconButton(
+            tooltip: 'आवाजात ऐका / Speak Case Summary',
+            icon: const Icon(Icons.volume_up_outlined, color: AppColors.primary),
+            onPressed: () {
+              final animalLabel = r.animal.name ?? r.animal.speciesCode;
+              final diseaseLabel = r.verification?.diseaseCode != null
+                  ? ReferenceApi.shared.diseaseName(r.verification!.diseaseCode!)
+                  : (r.screening != null ? ReferenceApi.shared.diseaseName(r.screening!.topLabel) : 'Unknown');
+              VoiceService().speakEmergencyMarathi(
+                'पशुवैद्यकीय अहवाल. जनावर: $animalLabel. शेतकरी: ${r.farmer?.fullName ?? "अज्ञात"}. स्थिती: ${r.status}. प्राथमिक निरीक्षण: $diseaseLabel. हे प्राथमिक तपासणी निरीक्षण आहे, अंतिम निदान पशुवैद्यकाचे आहे.',
+              );
+            },
+          ),
           IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: _load,
@@ -659,7 +673,7 @@ class _VetReportDetailsScreenState extends State<VetReportDetailsScreen> {
     );
   }
 
-  Widget? _buildBottomActionBar(VetReport r) {
+  Widget _buildBottomActionBar(VetReport r) {
     return SafeArea(
       child: Container(
         padding: const EdgeInsets.all(AppSpacing.md),
@@ -686,6 +700,26 @@ class _VetReportDetailsScreenState extends State<VetReportDetailsScreen> {
                 ),
               ),
               const SizedBox(width: AppSpacing.sm),
+            ] else if (r.status == 'under_review') ...[
+              Expanded(
+                child: AppButton(
+                  label: AppStrings.t('animal_history'),
+                  icon: Icons.history,
+                  isSecondary: true,
+                  onPressed: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) => VetAnimalHistoryScreen(
+                          animalId: r.animal.id,
+                          animalName: r.animal.name,
+                          speciesCode: r.animal.speciesCode,
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+              const SizedBox(width: AppSpacing.sm),
             ],
             if (r.isPending) ...[
               Expanded(
@@ -704,7 +738,25 @@ class _VetReportDetailsScreenState extends State<VetReportDetailsScreen> {
                   },
                 ),
               ),
-            ] else if (r.status == 'confirmed') ...[
+            ] else ...[
+              Expanded(
+                child: AppButton(
+                  label: 'निर्णय बदला / Update',
+                  icon: Icons.edit_note,
+                  isSecondary: true,
+                  onPressed: () async {
+                    final res = await Navigator.of(context).push<VetReport>(
+                      MaterialPageRoute(
+                        builder: (_) => VetVerificationScreen(report: r),
+                      ),
+                    );
+                    if (res != null && mounted) {
+                      setState(() => _report = res);
+                    }
+                  },
+                ),
+              ),
+              const SizedBox(width: AppSpacing.sm),
               Expanded(
                 child: AppButton(
                   label: AppStrings.t('document_treatment'),
@@ -715,6 +767,7 @@ class _VetReportDetailsScreenState extends State<VetReportDetailsScreen> {
                         builder: (_) => VetTreatmentScreen(report: r),
                       ),
                     );
+                    _load();
                   },
                 ),
               ),

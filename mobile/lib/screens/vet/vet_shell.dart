@@ -23,6 +23,8 @@ class VetShell extends StatefulWidget {
 
 class VetShellState extends State<VetShell> {
   late int _currentIndex;
+  int _inboxSubTab = 0;
+  final GlobalKey<VetInboxScreenState> _inboxKey = GlobalKey<VetInboxScreenState>();
 
   @override
   void initState() {
@@ -34,6 +36,15 @@ class VetShellState extends State<VetShell> {
     if (mounted && index >= 0 && index < 5) {
       setState(() => _currentIndex = index);
     }
+  }
+
+  void switchInboxSubTab(int subTab) {
+    if (!mounted) return;
+    setState(() {
+      _currentIndex = 1;
+      _inboxSubTab = subTab.clamp(0, 3);
+    });
+    _inboxKey.currentState?.selectSubTab(_inboxSubTab);
   }
 
   @override
@@ -74,8 +85,14 @@ class VetShellState extends State<VetShell> {
               child: IndexedStack(
                 index: _currentIndex,
                 children: [
-                  VetDashboardScreen(onNavigateToInbox: () => switchTab(1), onNavigateToMap: () => switchTab(2)),
-                  const VetInboxScreen(),
+                  VetDashboardScreen(
+                    onNavigateToInbox: () => switchInboxSubTab(0),
+                    onNavigateToInboxTab: switchInboxSubTab,
+                    onNavigateToMap: () => switchTab(2),
+                    onNavigateToAnimals: () => switchTab(3),
+                    onNavigateToProfile: () => switchTab(4),
+                  ),
+                  VetInboxScreen(key: _inboxKey, initialTabIndex: _inboxSubTab),
                   const VetMapScreen(),
                   const VetAnimalRecordsSearchScreen(),
                   const VetProfileScreen(),

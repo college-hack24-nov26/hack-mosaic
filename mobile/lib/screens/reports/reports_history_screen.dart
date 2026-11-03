@@ -7,10 +7,18 @@ import '../../core/widgets/app_card.dart';
 import '../../core/widgets/status_badge.dart';
 import '../../data/local/offline_store.dart';
 import '../../data/models/disease_report_model.dart';
+import 'create_report_screen.dart';
 import 'report_details_screen.dart';
 
 class ReportsHistoryScreen extends StatefulWidget {
-  const ReportsHistoryScreen({super.key});
+  final String initialFilter;
+  final bool embedded;
+
+  const ReportsHistoryScreen({
+    super.key,
+    this.initialFilter = 'all',
+    this.embedded = false,
+  });
 
   @override
   State<ReportsHistoryScreen> createState() => _ReportsHistoryScreenState();
@@ -18,7 +26,13 @@ class ReportsHistoryScreen extends StatefulWidget {
 
 class _ReportsHistoryScreenState extends State<ReportsHistoryScreen> {
   final OfflineStore _store = OfflineStore();
-  String _selectedFilter = 'all'; // 'all', 'pending', 'confirmed'
+  late String _selectedFilter;
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedFilter = widget.initialFilter;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -36,45 +50,62 @@ class _ReportsHistoryScreenState extends State<ReportsHistoryScreen> {
           return true;
         }).toList();
 
+        final content = Column(
+          children: [
+            // Filter Chips Row
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.sm),
+              color: AppColors.surface,
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: [
+                    _buildFilterChip('all', '${AppStrings.t('filter_all')} (${allReports.length})'),
+                    const SizedBox(width: AppSpacing.sm),
+                    _buildFilterChip('pending', AppStrings.t('filter_in_review')),
+                    const SizedBox(width: AppSpacing.sm),
+                    _buildFilterChip('confirmed', AppStrings.t('filter_confirmed')),
+                  ],
+                ),
+              ),
+            ),
+
+            // Reports List
+            Expanded(
+              child: filteredReports.isEmpty
+                  ? _buildEmptyState()
+                  : ListView.builder(
+                      padding: const EdgeInsets.all(AppSpacing.lg),
+                      itemCount: filteredReports.length,
+                      itemBuilder: (context, index) {
+                        final report = filteredReports[index];
+                        return _buildReportCard(report);
+                      },
+                    ),
+            ),
+          ],
+        );
+
+        if (widget.embedded) {
+          return content;
+        }
+
         return Scaffold(
           backgroundColor: AppColors.background,
           appBar: AppBar(
             title: Text(AppStrings.t('case_history')),
           ),
-          body: Column(
-            children: [
-              // Filter Chips Row
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.sm),
-                color: AppColors.surface,
-                child: SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                    children: [
-                      _buildFilterChip('all', '${AppStrings.t('filter_all')} (${allReports.length})'),
-                      const SizedBox(width: AppSpacing.sm),
-                      _buildFilterChip('pending', AppStrings.t('filter_in_review')),
-                      const SizedBox(width: AppSpacing.sm),
-                      _buildFilterChip('confirmed', AppStrings.t('filter_confirmed')),
-                    ],
-                  ),
-                ),
-              ),
-
-              // Reports List
-              Expanded(
-                child: filteredReports.isEmpty
-                    ? _buildEmptyState()
-                    : ListView.builder(
-                        padding: const EdgeInsets.all(AppSpacing.lg),
-                        itemCount: filteredReports.length,
-                        itemBuilder: (context, index) {
-                          final report = filteredReports[index];
-                          return _buildReportCard(report);
-                        },
-                      ),
-              ),
-            ],
+          body: content,
+          floatingActionButton: FloatingActionButton.extended(
+            backgroundColor: AppColors.primary,
+            foregroundColor: Colors.white,
+            icon: const Icon(Icons.add_alert),
+            label: Text(AppStrings.t('action_report')),
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => const CreateReportScreen()),
+              );
+            },
           ),
         );
       },
