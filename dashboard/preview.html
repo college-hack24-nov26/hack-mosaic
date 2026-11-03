@@ -718,11 +718,36 @@
         </div>
       </div>
 
-      <!-- Location Scope Selector Dropdown -->
-      <div class="hidden sm:flex items-center gap-1.5 bg-parchment/80 border border-black/10 px-3 py-1 rounded text-xs">
-        <i data-lucide="map-pin" class="w-3.5 h-3.5 text-zinc-500"></i>
-        <span>Scope: <strong>Maharashtra (Statewide)</strong></span>
-        <i data-lucide="chevron-down" class="w-3 h-3 text-zinc-500"></i>
+      <!-- Location Scope Selector Dropdown (State / District / Taluka) -->
+      <div class="hidden sm:flex items-center gap-1.5 bg-parchment/80 border border-black/10 px-2.5 py-1 rounded text-xs">
+        <i data-lucide="map-pin" class="w-3.5 h-3.5 text-emerald-700 shrink-0"></i>
+        <span class="text-zinc-600">Scope:</span>
+        <select id="global-scope-select" onchange="onGlobalScopeChange(this.value)" class="bg-transparent font-bold text-ink focus:outline-none cursor-pointer text-xs">
+          <option value="state:Maharashtra">Maharashtra (Statewide)</option>
+          <optgroup label="Districts (Administrative)">
+            <option value="district:Pune">Pune District</option>
+            <option value="district:Satara">Satara District</option>
+            <option value="district:Ahmednagar">Ahmednagar District</option>
+            <option value="district:Solapur">Solapur District</option>
+            <option value="district:Kolhapur">Kolhapur District</option>
+            <option value="district:Nashik">Nashik District</option>
+            <option value="district:Sangli">Sangli District</option>
+          </optgroup>
+          <optgroup label="Active Talukas / Tehsils">
+            <option value="taluka:Phaltan">Phaltan Taluka (Satara)</option>
+            <option value="taluka:Karad">Karad Taluka (Satara)</option>
+            <option value="taluka:Haveli">Haveli Taluka (Pune)</option>
+            <option value="taluka:Shirur">Shirur Taluka (Pune)</option>
+            <option value="taluka:Khed">Khed Taluka (Pune)</option>
+            <option value="taluka:Baramati">Baramati Taluka (Pune)</option>
+            <option value="taluka:Shrirampur">Shrirampur Taluka (Ahmednagar)</option>
+            <option value="taluka:Sangamner">Sangamner Taluka (Ahmednagar)</option>
+            <option value="taluka:Pandharpur">Pandharpur Taluka (Solapur)</option>
+            <option value="taluka:Karveer">Karveer Taluka (Kolhapur)</option>
+            <option value="taluka:Niphad">Niphad Taluka (Nashik)</option>
+            <option value="taluka:Miraj">Miraj Taluka (Sangli)</option>
+          </optgroup>
+        </select>
       </div>
 
       <!-- Live Telemetry Status Badge -->
@@ -924,20 +949,36 @@
         <!-- Overview Map Preview & XGBoost Intelligence Card -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div class="lg:col-span-2 vetra-card p-0 overflow-hidden flex flex-col justify-between relative shadow-sm">
-            <div class="p-4 border-b border-black/10 flex items-center justify-between bg-white">
+            <div class="p-4 border-b border-black/10 flex flex-wrap items-center justify-between gap-2 bg-white">
               <div>
                 <div class="flex items-center gap-2">
                   <span class="w-2.5 h-2.5 rounded-full bg-[#8C5A48] animate-pulse"></span>
                   <h3 class="font-bold text-base text-ink">Active Geographic Disease Clusters</h3>
                   <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-50 text-emerald-800 border border-emerald-200 font-semibold">Live Telemetry</span>
                 </div>
-                <p class="text-xs text-ink-metadata font-inter mt-0.5">PostGIS spatial cluster tracking &bull; Maharashtra Statewide GIS</p>
+                <p class="text-xs text-ink-metadata font-inter mt-0.5">PostGIS spatial cluster tracking &bull; Maharashtra State, District &amp; Taluka Boundaries</p>
               </div>
-              <div class="flex items-center gap-2">
-                <button onclick="resetOverviewMapView()" title="Recenter on Maharashtra" class="px-2.5 py-1 text-xs font-semibold rounded bg-parchment hover:bg-white border border-black/15 flex items-center gap-1 transition-all cursor-pointer shadow-2xs">
+              <div class="flex flex-wrap items-center gap-2">
+                <!-- Quick Boundary Toggles on Overview Map -->
+                <div class="flex items-center gap-2 px-2.5 py-1 rounded bg-parchment/80 border border-black/10 text-[11px] font-inter">
+                  <span class="font-bold text-zinc-700">Boundaries:</span>
+                  <label class="flex items-center gap-1 cursor-pointer select-none">
+                    <input type="checkbox" id="ov-bound-state" checked onchange="toggleBoundaryLayer('state', this.checked)" class="accent-zinc-800 rounded">
+                    <span>State</span>
+                  </label>
+                  <label class="flex items-center gap-1 cursor-pointer select-none">
+                    <input type="checkbox" id="ov-bound-districts" checked onchange="toggleBoundaryLayer('districts', this.checked)" class="accent-zinc-800 rounded">
+                    <span>Districts</span>
+                  </label>
+                  <label class="flex items-center gap-1 cursor-pointer select-none">
+                    <input type="checkbox" id="ov-bound-talukas" checked onchange="toggleBoundaryLayer('talukas', this.checked)" class="accent-zinc-800 rounded">
+                    <span>Talukas</span>
+                  </label>
+                </div>
+                <button onclick="resetOverviewMapView()" title="Recenter on Maharashtra Surveillance Zone" class="px-2.5 py-1 text-xs font-semibold rounded bg-parchment hover:bg-white border border-black/15 flex items-center gap-1 transition-all cursor-pointer shadow-2xs whitespace-nowrap">
                   <i data-lucide="crosshair" class="w-3.5 h-3.5 text-zinc-600"></i> Recenter
                 </button>
-                <button onclick="switchTab('map')" class="aero-btn aero-btn-lime px-3 py-1.5 text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow-sm">
+                <button onclick="switchTab('map')" class="aero-btn aero-btn-lime px-3 py-1.5 text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow-sm whitespace-nowrap">
                   <span>Open Full GIS Canvas</span>
                   <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
                 </button>
@@ -947,6 +988,15 @@
             <!-- Leaflet Map Container: absolute inset-0 fills 100% of available card height -->
             <div class="flex-1 w-full relative z-0" style="min-height: 500px;">
               <div id="overview-map" class="absolute inset-0 w-full h-full"></div>
+              <!-- Floating On-Map Recenter & Scope Control -->
+              <div class="absolute top-3 right-3 z-[450] flex items-center gap-1.5">
+                <button onclick="resetOverviewMapView('clusters')" class="px-2.5 py-1.5 rounded-lg bg-white/95 hover:bg-white text-ink border border-black/20 shadow-md text-[11px] font-bold flex items-center gap-1 cursor-pointer transition-all" title="Zoom to Active Surveillance Clusters">
+                  <i data-lucide="target" class="w-3.5 h-3.5 text-[#C62828]"></i> Active Clusters
+                </button>
+                <button onclick="resetOverviewMapView('state')" class="px-2.5 py-1.5 rounded-lg bg-white/95 hover:bg-white text-ink border border-black/20 shadow-md text-[11px] font-bold flex items-center gap-1 cursor-pointer transition-all" title="Fit Full Maharashtra State Boundary">
+                  <i data-lucide="crosshair" class="w-3.5 h-3.5 text-[#2F6FDE]"></i> Recenter State
+                </button>
+              </div>
             </div>
 
             <!-- Active Cluster Buffer Strip: bottom of overview map card -->
@@ -1153,22 +1203,25 @@
                 </span>
               </div>
               <p class="text-xs text-zinc-500 font-inter mt-1">
-                Statewide spatial cluster tracking Ã¢â‚¬Â¢ WGS84 GeoJSON vectors Ã¢â‚¬Â¢ Administrative boundary layers
+                Statewide spatial cluster tracking &bull; WGS84 GeoJSON vectors &bull; State, District &amp; Taluka boundary layers
               </p>
             </div>
 
             <!-- View Options & Export Actions from Screenshot 1 -->
-            <div class="flex items-center gap-2 text-xs font-inter">
-              <button id="view-mode-map" onclick="toggleGISViewMode('map')" class="px-3 py-1.5 rounded-lg bg-white border border-black/20 font-bold shadow-sm flex items-center gap-1.5 text-[#141414]">
+            <div class="flex flex-wrap items-center gap-2 text-xs font-inter">
+              <button onclick="resetFullMapView('clusters')" class="px-3 py-1.5 rounded-lg bg-parchment hover:bg-white border border-black/15 font-bold text-[#141414] flex items-center gap-1.5 cursor-pointer shadow-2xs" title="Recenter Map on Maharashtra Surveillance Zone">
+                <i data-lucide="crosshair" class="w-3.5 h-3.5 text-[#2F6FDE]"></i> Recenter
+              </button>
+              <button id="view-mode-map" onclick="toggleGISViewMode('map')" class="px-3 py-1.5 rounded-lg bg-white border border-black/20 font-bold shadow-sm flex items-center gap-1.5 text-[#141414] cursor-pointer">
                 <i data-lucide="map-pin" class="w-3.5 h-3.5 text-[#2F6FDE]"></i> Spatial Map View
               </button>
-              <button id="view-mode-table" onclick="toggleGISViewMode('table')" class="px-3 py-1.5 rounded-lg bg-parchment/60 border border-black/10 text-zinc-600 hover:text-black flex items-center gap-1.5">
+              <button id="view-mode-table" onclick="toggleGISViewMode('table')" class="px-3 py-1.5 rounded-lg bg-parchment/60 border border-black/10 text-zinc-600 hover:text-black flex items-center gap-1.5 cursor-pointer">
                 <i data-lucide="table" class="w-3.5 h-3.5"></i> Accessible Table (WCAG)
               </button>
-              <button onclick="exportGISData()" class="px-3 py-1.5 rounded-lg bg-parchment/60 border border-black/10 text-zinc-600 hover:text-black flex items-center gap-1.5">
+              <button onclick="exportGISData()" class="px-3 py-1.5 rounded-lg bg-parchment/60 border border-black/10 text-zinc-600 hover:text-black flex items-center gap-1.5 cursor-pointer">
                 <i data-lucide="download" class="w-3.5 h-3.5"></i> Export GIS (CSV)
               </button>
-              <button onclick="refreshGIS()" class="px-3 py-1.5 rounded-lg bg-parchment/60 border border-black/10 text-zinc-600 hover:text-black flex items-center gap-1.5">
+              <button onclick="refreshGIS()" class="px-3 py-1.5 rounded-lg bg-parchment/60 border border-black/10 text-zinc-600 hover:text-black flex items-center gap-1.5 cursor-pointer">
                 <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> Sync
               </button>
             </div>
@@ -1215,13 +1268,41 @@
 
               <div class="flex items-center gap-1.5 bg-parchment px-2.5 py-1 rounded-md border border-black/10">
                 <span class="text-zinc-500 text-[11px]">District:</span>
-                <select id="map-district-filter" onchange="applyGISFilters()" class="bg-transparent font-semibold focus:outline-none cursor-pointer text-xs">
+                <select id="map-district-filter" onchange="onSelectGISDistrictFilter(this.value)" class="bg-transparent font-semibold focus:outline-none cursor-pointer text-xs">
                   <option value="all">Maharashtra (Statewide)</option>
                   <option value="Pune">Pune District</option>
-                  <option value="Ahmednagar">Ahmednagar</option>
-                  <option value="Satara">Satara</option>
-                  <option value="Solapur">Solapur</option>
-                  <option value="Kolhapur">Kolhapur</option>
+                  <option value="Satara">Satara District</option>
+                  <option value="Ahmednagar">Ahmednagar District</option>
+                  <option value="Solapur">Solapur District</option>
+                  <option value="Kolhapur">Kolhapur District</option>
+                  <option value="Nashik">Nashik District</option>
+                  <option value="Sangli">Sangli District</option>
+                </select>
+              </div>
+
+              <div class="flex items-center gap-1.5 bg-parchment px-2.5 py-1 rounded-md border border-black/10">
+                <span class="text-zinc-500 text-[11px]">Taluka:</span>
+                <select id="map-taluka-filter" onchange="onSelectGISTalukaFilter(this.value)" class="bg-transparent font-semibold focus:outline-none cursor-pointer text-xs">
+                  <option value="all">All Talukas</option>
+                  <option value="Phaltan">Phaltan (Satara)</option>
+                  <option value="Karad">Karad (Satara)</option>
+                  <option value="Koregaon">Koregaon (Satara)</option>
+                  <option value="Khatav">Khatav (Satara)</option>
+                  <option value="Haveli">Haveli (Pune)</option>
+                  <option value="Shirur">Shirur (Pune)</option>
+                  <option value="Khed">Khed (Pune)</option>
+                  <option value="Baramati">Baramati (Pune)</option>
+                  <option value="Daund">Daund (Pune)</option>
+                  <option value="Indapur">Indapur (Pune)</option>
+                  <option value="Shrirampur">Shrirampur (Ahmednagar)</option>
+                  <option value="Sangamner">Sangamner (Ahmednagar)</option>
+                  <option value="Rahuri">Rahuri (Ahmednagar)</option>
+                  <option value="Pandharpur">Pandharpur (Solapur)</option>
+                  <option value="Barshi">Barshi (Solapur)</option>
+                  <option value="Karveer">Karveer (Kolhapur)</option>
+                  <option value="Niphad">Niphad (Nashik)</option>
+                  <option value="Sinnar">Sinnar (Nashik)</option>
+                  <option value="Miraj">Miraj (Sangli)</option>
                 </select>
               </div>
             </div>
@@ -1232,7 +1313,7 @@
                 <i data-lucide="search" class="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-zinc-400"></i>
                 <input type="text" id="map-quick-search" oninput="applyGISFilters()" placeholder="Search cluster or tag..." class="pl-8 pr-3 py-1 text-xs rounded-md border border-black/15 bg-parchment font-inter focus:outline-none w-48" />
               </div>
-              <button onclick="resetGISFilters()" class="text-zinc-500 hover:text-black flex items-center gap-1 text-xs">
+              <button onclick="resetGISFilters()" class="text-zinc-500 hover:text-black flex items-center gap-1 text-xs cursor-pointer">
                 <i data-lucide="rotate-ccw" class="w-3 h-3"></i> Reset
               </button>
               <span class="px-2.5 py-0.5 rounded bg-blue-50 text-[#2F6FDE] font-bold text-[11px] border border-blue-200" id="visible-pins-badge">
@@ -1275,15 +1356,15 @@
 
               <span class="font-bold text-[#141414] text-[11px]">Boundaries:</span>
               <label class="flex items-center gap-1 cursor-pointer select-none">
-                <input type="checkbox" checked class="accent-zinc-800 rounded">
+                <input type="checkbox" id="bound-state" checked onchange="toggleBoundaryLayer('state', this.checked)" class="accent-zinc-800 rounded">
                 <span>State</span>
               </label>
               <label class="flex items-center gap-1 cursor-pointer select-none">
-                <input type="checkbox" checked class="accent-zinc-800 rounded">
+                <input type="checkbox" id="bound-districts" checked onchange="toggleBoundaryLayer('districts', this.checked)" class="accent-zinc-800 rounded">
                 <span>Districts</span>
               </label>
               <label class="flex items-center gap-1 cursor-pointer select-none">
-                <input type="checkbox" class="accent-zinc-800 rounded">
+                <input type="checkbox" id="bound-talukas" checked onchange="toggleBoundaryLayer('talukas', this.checked)" class="accent-zinc-800 rounded">
                 <span>Talukas</span>
               </label>
             </div>
@@ -1305,6 +1386,15 @@
         <!-- Fullscreen Leaflet Map Area -->
         <div id="gis-map-canvas-container" class="vetra-card p-0 overflow-hidden relative shadow-md" style="min-height: 600px;">
           <div id="full-map" style="height: 600px; width: 100%;"></div>
+          <!-- Floating On-Map Recenter & Scope Control -->
+          <div class="absolute top-3 right-3 z-[450] flex items-center gap-1.5">
+            <button onclick="resetFullMapView('clusters')" class="px-3 py-1.5 rounded-lg bg-white/95 hover:bg-white text-ink border border-black/20 shadow-md text-xs font-bold flex items-center gap-1.5 cursor-pointer transition-all" title="Zoom to Active Surveillance Clusters">
+              <i data-lucide="target" class="w-3.5 h-3.5 text-[#C62828]"></i> Active Clusters
+            </button>
+            <button onclick="resetFullMapView('state')" class="px-3 py-1.5 rounded-lg bg-white/95 hover:bg-white text-ink border border-black/20 shadow-md text-xs font-bold flex items-center gap-1.5 cursor-pointer transition-all" title="Fit Full Maharashtra State Boundary">
+              <i data-lucide="crosshair" class="w-3.5 h-3.5 text-[#2F6FDE]"></i> Recenter State
+            </button>
+          </div>
 
           <!-- Loading overlay indicator when re-syncing -->
           <div id="gis-loading-overlay" style="display: none;" class="absolute inset-0 bg-white/75 backdrop-blur-xs z-30 flex flex-col items-center justify-center">
@@ -4206,50 +4296,202 @@
       document.body.removeChild(link);
     }
 
+    // Global Boundary Layer References & Feature Lookups
+    var boundaryLayers = {
+      overview: { state: null, districts: null, talukas: null },
+      full: { state: null, districts: null, talukas: null }
+    };
+    var districtFeatureBounds = {};
+    var talukaFeatureBounds = {};
+
+    function toggleBoundaryLayer(layerType, checked) {
+      // Sync checkboxes across Overview and Full GIS maps
+      var ovChk = document.getElementById('ov-bound-' + layerType);
+      var fullChk = document.getElementById('bound-' + layerType);
+      if (ovChk && ovChk.checked !== checked) ovChk.checked = checked;
+      if (fullChk && fullChk.checked !== checked) fullChk.checked = checked;
+
+      var ovLayer = boundaryLayers.overview[layerType];
+      var flLayer = boundaryLayers.full[layerType];
+
+      if (overviewMap && ovLayer) {
+        if (checked) {
+          if (!overviewMap.hasLayer(ovLayer)) overviewMap.addLayer(ovLayer);
+        } else {
+          if (overviewMap.hasLayer(ovLayer)) overviewMap.removeLayer(ovLayer);
+        }
+      }
+      if (fullMap && flLayer) {
+        if (checked) {
+          if (!fullMap.hasLayer(flLayer)) fullMap.addLayer(flLayer);
+        } else {
+          if (fullMap.hasLayer(flLayer)) fullMap.removeLayer(flLayer);
+        }
+      }
+
+      var labelMap = { state: 'Maharashtra State Boundary', districts: '36 District Boundaries', talukas: 'Taluka / Tehsil Boundaries' };
+      if (typeof showNotificationToast === 'function') {
+        showNotificationToast((checked ? '✓ Enabled: ' : 'Hidden: ') + (labelMap[layerType] || layerType));
+      }
+    }
+    window.toggleBoundaryLayer = toggleBoundaryLayer;
+
+    function zoomMapsToDistrict(distName) {
+      if (!distName || distName === 'all') {
+        resetOverviewMapView('clusters');
+        resetFullMapView('clusters');
+        return;
+      }
+      var bounds = districtFeatureBounds[distName.toLowerCase()];
+      if (bounds) {
+        if (overviewMap) {
+          overviewMap.invalidateSize(true);
+          overviewMap.flyToBounds(bounds, { padding: [24, 24], maxZoom: 9, duration: 0.6 });
+        }
+        if (fullMap) {
+          fullMap.invalidateSize(true);
+          fullMap.flyToBounds(bounds, { padding: [32, 32], maxZoom: 10, duration: 0.6 });
+        }
+      } else if (outbreakDistrictData && outbreakDistrictData[distName] && outbreakDistrictData[distName].coords) {
+        if (overviewMap) overviewMap.setView(outbreakDistrictData[distName].coords, 9);
+        if (fullMap) fullMap.setView(outbreakDistrictData[distName].coords, 9);
+      }
+    }
+    window.zoomMapsToDistrict = zoomMapsToDistrict;
+
+    function zoomMapsToTaluka(talukaName) {
+      if (!talukaName || talukaName === 'all') {
+        var distEl = document.getElementById('map-district-filter');
+        if (distEl && distEl.value !== 'all') {
+          zoomMapsToDistrict(distEl.value);
+        } else {
+          resetFullMapView('clusters');
+        }
+        return;
+      }
+      // Ensure Taluka boundary layer is visible when focusing a Taluka
+      toggleBoundaryLayer('talukas', true);
+      var info = talukaFeatureBounds[talukaName.toLowerCase()];
+      if (info && info.bounds) {
+        if (overviewMap) {
+          overviewMap.invalidateSize(true);
+          overviewMap.flyToBounds(info.bounds, { padding: [28, 28], maxZoom: 11, duration: 0.6 });
+        }
+        if (fullMap) {
+          fullMap.invalidateSize(true);
+          fullMap.flyToBounds(info.bounds, { padding: [36, 36], maxZoom: 11, duration: 0.6 });
+        }
+      }
+    }
+    window.zoomMapsToTaluka = zoomMapsToTaluka;
+
+    function onGlobalScopeChange(scopeVal) {
+      if (!scopeVal) return;
+      var parts = scopeVal.split(':');
+      var kind = parts[0];
+      var name = parts[1] || 'Maharashtra';
+
+      if (kind === 'state') {
+        var distFilter = document.getElementById('map-district-filter');
+        var talFilter = document.getElementById('map-taluka-filter');
+        if (distFilter) distFilter.value = 'all';
+        if (talFilter) talFilter.value = 'all';
+        applyGISFilters();
+        resetOverviewMapView('state');
+        resetFullMapView('state');
+      } else if (kind === 'district') {
+        var distFilter2 = document.getElementById('map-district-filter');
+        var talFilter2 = document.getElementById('map-taluka-filter');
+        if (distFilter2) distFilter2.value = name;
+        if (talFilter2) talFilter2.value = 'all';
+        applyGISFilters();
+        zoomMapsToDistrict(name);
+        if (typeof showNotificationToast === 'function') {
+          showNotificationToast('Scope focused on ' + name + ' District boundary');
+        }
+      } else if (kind === 'taluka') {
+        var talFilter3 = document.getElementById('map-taluka-filter');
+        if (talFilter3) talFilter3.value = name;
+        applyGISFilters();
+        zoomMapsToTaluka(name);
+        if (typeof showNotificationToast === 'function') {
+          showNotificationToast('Scope focused on ' + name + ' Taluka boundary');
+        }
+      }
+    }
+    window.onGlobalScopeChange = onGlobalScopeChange;
+
+    function onSelectGISDistrictFilter(distVal) {
+      var talEl = document.getElementById('map-taluka-filter');
+      if (talEl) talEl.value = 'all';
+      applyGISFilters();
+      zoomMapsToDistrict(distVal);
+    }
+    window.onSelectGISDistrictFilter = onSelectGISDistrictFilter;
+
+    function onSelectGISTalukaFilter(talVal) {
+      if (talVal && talVal !== 'all') {
+        var info = talukaFeatureBounds[talVal.toLowerCase()];
+        var distEl = document.getElementById('map-district-filter');
+        if (info && info.district && distEl) {
+          distEl.value = info.district;
+        }
+      }
+      applyGISFilters();
+      zoomMapsToTaluka(talVal);
+    }
+    window.onSelectGISTalukaFilter = onSelectGISTalukaFilter;
+
     // Apply GIS Filters
     function applyGISFilters() {
-      var disease = document.getElementById('map-disease-filter').value;
-      var status = document.getElementById('map-status-filter').value;
-      var district = document.getElementById('map-district-filter').value;
-      var search = document.getElementById('map-quick-search').value.toLowerCase();
+      var disease = document.getElementById('map-disease-filter') ? document.getElementById('map-disease-filter').value : 'all';
+      var status = document.getElementById('map-status-filter') ? document.getElementById('map-status-filter').value : 'all';
+      var district = document.getElementById('map-district-filter') ? document.getElementById('map-district-filter').value : 'all';
+      var taluka = document.getElementById('map-taluka-filter') ? document.getElementById('map-taluka-filter').value : 'all';
+      var search = document.getElementById('map-quick-search') ? document.getElementById('map-quick-search').value.toLowerCase() : '';
 
-      var showConfirmed = document.getElementById('layer-confirmed').checked;
-      var showSuspected = document.getElementById('layer-suspected').checked;
-      var showAI = document.getElementById('layer-ai').checked;
+      var showConfirmed = document.getElementById('layer-confirmed') ? document.getElementById('layer-confirmed').checked : true;
+      var showSuspected = document.getElementById('layer-suspected') ? document.getElementById('layer-suspected').checked : true;
+      var showAI = document.getElementById('layer-ai') ? document.getElementById('layer-ai').checked : true;
 
       var visibleCount = 0;
 
       allMarkers.forEach(function(item) {
         var matchDisease = (disease === 'all' || item.data.diseaseCode === disease);
         var matchStatus = (status === 'all' || item.data.status === status);
-        var matchDistrict = (district === 'all' || item.data.district.indexOf(district) > -1);
+        var matchDistrict = (district === 'all' || item.data.district.toLowerCase().indexOf(district.toLowerCase()) > -1);
+        var matchTaluka = (taluka === 'all' || item.data.district.toLowerCase().indexOf(taluka.toLowerCase()) > -1 || (item.data.taluka && item.data.taluka.toLowerCase().indexOf(taluka.toLowerCase()) > -1));
         var matchSearch = (search === '' || item.data.title.toLowerCase().indexOf(search) > -1 || item.data.district.toLowerCase().indexOf(search) > -1);
 
         var layerOk = true;
         if (item.data.status === 'verified' && !showConfirmed) layerOk = false;
         if (item.data.status === 'submitted' && !showSuspected) layerOk = false;
 
-        if (matchDisease && matchStatus && matchDistrict && matchSearch && layerOk) {
-          if (!fullMap.hasLayer(item.marker)) fullMap.addLayer(item.marker);
+        if (matchDisease && matchStatus && matchDistrict && matchTaluka && matchSearch && layerOk) {
+          if (fullMap && !fullMap.hasLayer(item.marker)) fullMap.addLayer(item.marker);
           visibleCount++;
         } else {
-          if (fullMap.hasLayer(item.marker)) fullMap.removeLayer(item.marker);
+          if (fullMap && fullMap.hasLayer(item.marker)) fullMap.removeLayer(item.marker);
         }
       });
 
-      document.getElementById('visible-pins-badge').innerText = visibleCount + ' Visible';
+      var badgeEl = document.getElementById('visible-pins-badge');
+      if (badgeEl) badgeEl.innerText = visibleCount + ' Visible';
     }
 
     function resetGISFilters() {
-      document.getElementById('map-disease-filter').value = 'all';
-      document.getElementById('map-risk-filter').value = 'all';
-      document.getElementById('map-status-filter').value = 'all';
-      document.getElementById('map-district-filter').value = 'all';
-      document.getElementById('map-quick-search').value = '';
-      document.getElementById('layer-confirmed').checked = true;
-      document.getElementById('layer-suspected').checked = true;
-      document.getElementById('layer-ai').checked = true;
+      if (document.getElementById('map-disease-filter')) document.getElementById('map-disease-filter').value = 'all';
+      if (document.getElementById('map-risk-filter')) document.getElementById('map-risk-filter').value = 'all';
+      if (document.getElementById('map-status-filter')) document.getElementById('map-status-filter').value = 'all';
+      if (document.getElementById('map-district-filter')) document.getElementById('map-district-filter').value = 'all';
+      if (document.getElementById('map-taluka-filter')) document.getElementById('map-taluka-filter').value = 'all';
+      if (document.getElementById('map-quick-search')) document.getElementById('map-quick-search').value = '';
+      if (document.getElementById('global-scope-select')) document.getElementById('global-scope-select').value = 'state:Maharashtra';
+      if (document.getElementById('layer-confirmed')) document.getElementById('layer-confirmed').checked = true;
+      if (document.getElementById('layer-suspected')) document.getElementById('layer-suspected').checked = true;
+      if (document.getElementById('layer-ai')) document.getElementById('layer-ai').checked = true;
       applyGISFilters();
+      resetFullMapView('clusters');
     }
 
     function toggleLayerBuffers(checked) {
@@ -4408,14 +4650,47 @@
     // INITIALIZE MAPS & GEOSPATIAL VECTOR LAYERS
     // ---------------------------------------------------------------------------
     
-    // Recenter Overview Mini-Map back to Maharashtra
-    function resetOverviewMapView() {
-      if (overviewMap) {
-        overviewMap.invalidateSize(true);
-        overviewMap.setView([18.5204, 74.2500], 8);
+    // Recenter Overview Mini-Map back to Maharashtra (Active Clusters or Full State)
+    function resetOverviewMapView(mode) {
+      if (!overviewMap) return;
+      overviewMap.closePopup();
+      overviewMap.invalidateSize(true);
+      if (mode === 'state') {
+        var stateBounds = L.latLngBounds([15.60, 72.65], [22.05, 80.90]);
+        overviewMap.flyToBounds(stateBounds, { padding: [18, 18], duration: 0.65 });
+        if (typeof showNotificationToast === 'function') {
+          showNotificationToast('✓ Overview Map recentered on Maharashtra State Boundary');
+        }
+      } else {
+        var clusterBounds = L.latLngBounds([16.55, 73.30], [20.15, 75.85]);
+        overviewMap.flyToBounds(clusterBounds, { padding: [24, 24], maxZoom: 8, duration: 0.65 });
+        if (typeof showNotificationToast === 'function') {
+          showNotificationToast('✓ Overview Map recentered on Active Surveillance Clusters');
+        }
       }
     }
     window.resetOverviewMapView = resetOverviewMapView;
+
+    // Recenter Full GIS Surveillance Map back to Maharashtra (Active Clusters or Full State)
+    function resetFullMapView(mode) {
+      if (!fullMap) return;
+      fullMap.closePopup();
+      fullMap.invalidateSize(true);
+      if (mode === 'state') {
+        var stateBounds = L.latLngBounds([15.60, 72.65], [22.05, 80.90]);
+        fullMap.flyToBounds(stateBounds, { padding: [24, 24], duration: 0.65 });
+        if (typeof showNotificationToast === 'function') {
+          showNotificationToast('✓ Full GIS Map recentered on Maharashtra State Boundary');
+        }
+      } else {
+        var clusterBounds = L.latLngBounds([16.55, 73.30], [20.15, 75.85]);
+        fullMap.flyToBounds(clusterBounds, { padding: [28, 28], maxZoom: 8, duration: 0.65 });
+        if (typeof showNotificationToast === 'function') {
+          showNotificationToast('✓ Full GIS Map recentered on Active Surveillance Clusters');
+        }
+      }
+    }
+    window.resetFullMapView = resetFullMapView;
 
     // Filter Vaccination Records by District Card
     function filterVaccinationByDistrict(district) {
@@ -4447,15 +4722,15 @@
     window.filterVaccinationByDistrict = filterVaccinationByDistrict;
 
     window.addEventListener('DOMContentLoaded', function() {
-      var centerCoords = [18.5204, 74.2500]; // Maharashtra Center Coordinates
+      var centerCoords = [18.4500, 74.3500]; // Maharashtra Surveillance Zone Center
       var defaultSource = tileSources.maptiler;
 
-      var mhBounds = L.latLngBounds([15.0, 72.0], [22.5, 81.5]);
+      var mhBounds = L.latLngBounds([14.8, 71.8], [22.8, 81.8]);
 
       // 1. Overview Tab Mini-Map
       overviewMap = L.map('overview-map', {
         zoomControl: true,
-        minZoom: 7,            // Prevents zooming out to the entire world
+        minZoom: 6,            // Allows full Maharashtra State Boundary view without world zoom
         maxZoom: 16,           // Keep within Maharashtra bounds
         maxBounds: mhBounds,
         maxBoundsViscosity: 1.0,
@@ -4468,17 +4743,30 @@
         minZoom: 6,
         maxZoom: 18,
         maxBounds: mhBounds,
-        maxBoundsViscosity: 0.9
+        maxBoundsViscosity: 0.95
       }).setView(centerCoords, 8);
       fullTileLayer = L.tileLayer(defaultSource.url, { attribution: defaultSource.attr, maxZoom: 18 }).addTo(fullMap);
 
-      // Automatically resize overviewMap whenever its container height adjusts
+      // Create dedicated Leaflet panes for Administrative Boundaries so they sit below clusters & markers
+      [overviewMap, fullMap].forEach(function(m) {
+        var sp = m.createPane('stateBoundaryPane'); sp.style.zIndex = 330; sp.style.pointerEvents = 'none';
+        var dp = m.createPane('districtBoundaryPane'); dp.style.zIndex = 340;
+        var tp = m.createPane('talukaBoundaryPane'); tp.style.zIndex = 350;
+      });
+
+      // Automatically resize overviewMap & fullMap whenever their containers adjust
       if (window.ResizeObserver) {
         var ovEl = document.getElementById('overview-map');
         if (ovEl) {
           new ResizeObserver(function() {
             if (overviewMap) overviewMap.invalidateSize();
           }).observe(ovEl);
+        }
+        var flEl = document.getElementById('full-map');
+        if (flEl) {
+          new ResizeObserver(function() {
+            if (fullMap) fullMap.invalidateSize();
+          }).observe(flEl);
         }
       }
 
@@ -4521,33 +4809,137 @@
       clusterLayers.push(c1_full);
       clusterLayers.push(c2_full);
 
-      // District Boundaries Layer (RFC 7946 GeoJSON)
-      var districtLayer = null;
+      // 1. Load Official Maharashtra State Boundary (/geo/state.json)
+      fetch('/geo/state.json')
+        .then(function(res) { return res.json(); })
+        .then(function(stateGeo) {
+          var stateStyle = {
+            pane: 'stateBoundaryPane',
+            color: '#1e293b',
+            weight: 2.6,
+            opacity: 0.85,
+            dashArray: '8, 4',
+            fillColor: '#64748b',
+            fillOpacity: 0.015,
+            interactive: false
+          };
+          boundaryLayers.overview.state = L.geoJSON(stateGeo, { style: stateStyle }).addTo(overviewMap);
+          boundaryLayers.full.state = L.geoJSON(stateGeo, { style: stateStyle }).addTo(fullMap);
+        })
+        .catch(function(err) { console.warn('Could not load /geo/state.json', err); });
+
+      // 2. Load All 35 Official Maharashtra District Boundaries (/geo/districts.json)
       fetch('/geo/districts.json')
         .then(function(res) { return res.json(); })
-        .then(function(geoData) {
-          districtLayer = L.geoJSON(geoData, {
-            style: { color: '#94a3b8', weight: 1, fillColor: 'transparent', fillOpacity: 0 },
-            onEachFeature: function(feature, layer) {
-              if (feature.properties && feature.properties.name) {
-                layer.bindTooltip(
-                  "<div style='font-family:Figtree,sans-serif;font-size:12px;padding:2px;'>" +
-                  "<strong style='color:#334155;'>" + feature.properties.name + " District</strong><br>" +
-                  "<span style='color:#555;font-size:11px;'>Active Cases: <strong>" + (feature.properties.active_cases || 0) + "</strong></span><br>" +
-                  "<span style='color:#777;font-size:11px;'>Surveillance: " + (feature.properties.surveillance_status || 'Monitored') + "</span>" +
-                  "</div>",
-                  { sticky: true }
-                );
-              }
+        .then(function(distGeo) {
+          function getDistrictStyle(feature) {
+            var risk = (feature.properties && feature.properties.risk_level) || 'low';
+            var fillCol = risk === 'critical' ? '#ef4444' : (risk === 'high' ? '#f59e0b' : '#64748b');
+            var fillOp = (risk === 'critical' || risk === 'high') ? 0.045 : 0.015;
+            return {
+              pane: 'districtBoundaryPane',
+              color: '#475569',
+              weight: 1.4,
+              opacity: 0.8,
+              dashArray: '5, 4',
+              fillColor: fillCol,
+              fillOpacity: fillOp
+            };
+          }
+          function bindDistrictFeature(feature, layer, mapRef) {
+            if (feature.properties && feature.properties.name) {
+              var dName = feature.properties.name;
+              try {
+                districtFeatureBounds[dName.toLowerCase()] = layer.getBounds();
+              } catch(e) {}
+              layer.bindTooltip(
+                "<div style='font-family:Figtree,sans-serif;font-size:12px;padding:3px;'>" +
+                "<strong style='color:#0f172a;'>" + dName + " District</strong> <span style='font-size:10px;color:#64748b;'>(Maharashtra)</span><br>" +
+                "<span style='color:#334155;font-size:11px;'>Active Cases: <strong>" + (feature.properties.active_cases || 0) + "</strong> &bull; Risk: <strong style='text-transform:uppercase;'>" + (feature.properties.risk_level || 'low') + "</strong></span><br>" +
+                "<span style='color:#64748b;font-size:10px;'>" + (feature.properties.surveillance_status || 'Routine District Surveillance') + "</span>" +
+                "</div>",
+                { sticky: true }
+              );
+              layer.on('mouseover', function() {
+                layer.setStyle({ weight: 2.4, color: '#2563eb', fillOpacity: 0.11 });
+              });
+              layer.on('mouseout', function() {
+                layer.setStyle(getDistrictStyle(feature));
+              });
+              layer.on('click', function() {
+                mapRef.flyToBounds(layer.getBounds(), { padding: [26, 26], maxZoom: 9, duration: 0.55 });
+              });
             }
-          });
-          // Not added to fullMap by default (clean cluster view)
+          }
+          boundaryLayers.overview.districts = L.geoJSON(distGeo, {
+            style: getDistrictStyle,
+            onEachFeature: function(f, l) { bindDistrictFeature(f, l, overviewMap); }
+          }).addTo(overviewMap);
 
-          // Clean overviewMap without district boundary overlays
+          boundaryLayers.full.districts = L.geoJSON(distGeo, {
+            style: getDistrictStyle,
+            onEachFeature: function(f, l) { bindDistrictFeature(f, l, fullMap); }
+          }).addTo(fullMap);
         })
-        .catch(function(err) {
-          console.warn('Could not load /geo/districts.json', err);
-        });
+        .catch(function(err) { console.warn('Could not load /geo/districts.json', err); });
+
+      // 3. Load Official Maharashtra Taluka / Tehsil Boundaries (/geo/talukas.json)
+      fetch('/geo/talukas.json')
+        .then(function(res) { return res.json(); })
+        .then(function(talGeo) {
+          function getTalukaStyle(feature) {
+            var risk = (feature.properties && feature.properties.risk_level) || 'low';
+            var stroke = risk === 'critical' ? '#b91c1c' : (risk === 'high' ? '#d97706' : '#0f766e');
+            return {
+              pane: 'talukaBoundaryPane',
+              color: stroke,
+              weight: 1.3,
+              opacity: 0.85,
+              dashArray: '2, 4',
+              fillColor: stroke,
+              fillOpacity: 0.05
+            };
+          }
+          function bindTalukaFeature(feature, layer, mapRef) {
+            if (feature.properties && feature.properties.name) {
+              var tName = feature.properties.name;
+              var dName = feature.properties.district || 'Maharashtra';
+              try {
+                talukaFeatureBounds[tName.toLowerCase()] = {
+                  bounds: layer.getBounds(),
+                  district: dName
+                };
+              } catch(e) {}
+              layer.bindTooltip(
+                "<div style='font-family:Figtree,sans-serif;font-size:12px;padding:3px;'>" +
+                "<strong style='color:#0f766e;'>" + tName + " Taluka</strong> <span style='font-size:10px;color:#475569;'>(" + dName + " District)</span><br>" +
+                "<span style='color:#1e293b;font-size:11px;'>Active Cases: <strong>" + (feature.properties.active_cases || 0) + "</strong> &bull; Vet: <strong>" + (feature.properties.vet_officer || 'Assigned') + "</strong></span><br>" +
+                "<span style='color:#64748b;font-size:10px;'>" + (feature.properties.surveillance_status || 'Monitored') + "</span>" +
+                "</div>",
+                { sticky: true }
+              );
+              layer.on('mouseover', function() {
+                layer.setStyle({ weight: 2.3, color: '#0d9488', fillOpacity: 0.16 });
+              });
+              layer.on('mouseout', function() {
+                layer.setStyle(getTalukaStyle(feature));
+              });
+              layer.on('click', function() {
+                mapRef.flyToBounds(layer.getBounds(), { padding: [32, 32], maxZoom: 11, duration: 0.55 });
+              });
+            }
+          }
+          boundaryLayers.overview.talukas = L.geoJSON(talGeo, {
+            style: getTalukaStyle,
+            onEachFeature: function(f, l) { bindTalukaFeature(f, l, overviewMap); }
+          }).addTo(overviewMap);
+
+          boundaryLayers.full.talukas = L.geoJSON(talGeo, {
+            style: getTalukaStyle,
+            onEachFeature: function(f, l) { bindTalukaFeature(f, l, fullMap); }
+          }).addTo(fullMap);
+        })
+        .catch(function(err) { console.warn('Could not load /geo/talukas.json', err); });
 
       // Add Vector Case Markers
       cases.forEach(function(c) {
