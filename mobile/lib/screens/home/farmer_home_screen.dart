@@ -147,9 +147,12 @@ class _FarmerHomeScreenState extends State<FarmerHomeScreen> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(
-                          'अलीकडील अहवाल / Recent Reports',
-                          style: AppTypography.sectionHeading,
+                        Expanded(
+                          child: Text(
+                            'अलीकडील अहवाल / Recent Reports',
+                            style: AppTypography.sectionHeading,
+                            overflow: TextOverflow.ellipsis,
+                          ),
                         ),
                         TextButton(
                           onPressed: () => widget.onNavigateTab(3),

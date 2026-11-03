@@ -46,14 +46,17 @@ class _ReportsHistoryScreenState extends State<ReportsHistoryScreen> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.sm),
                 color: AppColors.surface,
-                child: Row(
-                  children: [
-                    _buildFilterChip('all', 'सर्व / All (${allReports.length})'),
-                    const SizedBox(width: AppSpacing.sm),
-                    _buildFilterChip('pending', 'प्रलंबित / Pending'),
-                    const SizedBox(width: AppSpacing.sm),
-                    _buildFilterChip('confirmed', 'पुष्टी झालेले / Confirmed'),
-                  ],
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: [
+                      _buildFilterChip('all', 'सर्व / All (${allReports.length})'),
+                      const SizedBox(width: AppSpacing.sm),
+                      _buildFilterChip('pending', 'प्रलंबित / Pending'),
+                      const SizedBox(width: AppSpacing.sm),
+                      _buildFilterChip('confirmed', 'पुष्टी झालेले / Confirmed'),
+                    ],
+                  ),
                 ),
               ),
 
