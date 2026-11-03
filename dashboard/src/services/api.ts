@@ -17,6 +17,7 @@ import {
   mockCurrentUser 
 } from './mockData';
 import districtGeoJSON from '../data/districts.json';
+import { predictDistrictOutbreakRisk } from './outbreakModel';
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api/v1';
 
@@ -156,6 +157,7 @@ class ApiService {
     mockAlerts.unshift(newAlert);
     return newAlert;
   }
+
   // Geographic / GeoJSON Boundary Data
   async getDistrictGeoJSON(): Promise<any> {
     try {
@@ -178,8 +180,12 @@ class ApiService {
 
     return districtGeoJSON;
   }
+
+  // XGBoost Outbreak Risk Model Prediction
+  async getDistrictRiskPrediction(district: string = 'Pune') {
+    return predictDistrictOutbreakRisk(district);
+  }
 }
 
-export { districtGeoJSON };
+export { districtGeoJSON, predictDistrictOutbreakRisk };
 export const api = new ApiService();
-

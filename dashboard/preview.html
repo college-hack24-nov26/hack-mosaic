@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Pashuvani â€” Government Animal Health & Disease Surveillance</title>
+  <title>Pashuvani Ã¢â‚¬â€ Government Animal Health & Disease Surveillance</title>
   
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -445,18 +445,20 @@
           <span class="text-[9px] font-bold px-1.5 py-0.5 rounded-pill bg-[#C62828] text-white font-mono">3</span>
         </button>
 
-        <button onclick="alert('Vaccination Drive tracker active for Pune & Ahmednagar districts. 4,200 ring doses administered.')" class="w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-xs font-bold text-zinc-600 hover:bg-parchment/60 hover:text-ink transition-all">
+                <button id="nav-vaccination" onclick="switchTab('vaccination')" class="w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-xs font-bold text-zinc-600 hover:bg-parchment/60 hover:text-ink transition-all">
           <div class="flex items-center gap-2.5">
             <i data-lucide="syringe" class="w-4 h-4"></i>
             <span>Vaccination</span>
           </div>
+          <span id="badge-vaccination-count" class="text-[9px] font-bold px-1.5 py-0.5 rounded-pill bg-[#94e130] text-black font-mono">42.8k</span>
         </button>
 
-        <button onclick="alert('Field Workforce coordination: 48 Government Veterinarians currently on patrol in high-risk zones.')" class="w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-xs font-bold text-zinc-600 hover:bg-parchment/60 hover:text-ink transition-all">
+        <button id="nav-workforce" onclick="switchTab('workforce')" class="w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-xs font-bold text-zinc-600 hover:bg-parchment/60 hover:text-ink transition-all">
           <div class="flex items-center gap-2.5">
             <i data-lucide="users" class="w-4 h-4"></i>
             <span>Field Workforce</span>
           </div>
+          <span id="badge-workforce-count" class="text-[9px] font-bold px-1.5 py-0.5 rounded-pill bg-blue-100 text-blue-900 font-mono">48 Active</span>
         </button>
       </div>
 
@@ -542,51 +544,149 @@
             <div id="overview-map" class="h-96 w-full"></div>
           </div>
 
-          <!-- AI XGBoost Outbreak Risk Card -->
+          <!-- Real Integrated XGBoost Disease Outbreak Risk Card -->
           <div class="vetra-card flex flex-col justify-between">
             <div>
+              <!-- Header with Live ML Status & Model Specs -->
               <div class="flex items-center justify-between pb-3 border-b border-black/5">
                 <div class="flex items-center gap-2">
-                  <div class="p-2 bg-red-100 rounded-lg"><i data-lucide="shield-alert" class="w-5 h-5 text-[#C62828]"></i></div>
+                  <div class="p-2 bg-red-100 rounded-lg">
+                    <i data-lucide="shield-alert" class="w-5 h-5 text-[#C62828]"></i>
+                  </div>
                   <div>
-                    <h3 class="font-bold text-sm text-ink">Outbreak Risk Model</h3>
-                    <p class="text-[11px] text-ink-metadata font-inter">XGBoost-Surveillance-v1.2</p>
+                    <div class="flex items-center gap-1.5">
+                      <h3 class="font-bold text-sm text-ink">XGBoost Outbreak Risk Model</h3>
+                      <span class="text-[10px] px-1.5 py-0.5 rounded bg-blue-100 text-blue-900 font-mono font-semibold">v1.0 (300 Trees)</span>
+                    </div>
+                    <p class="text-[11px] text-ink-metadata font-inter">96.27% Acc â€¢ 94.74% Recall â€¢ 0.9914 ROC-AUC</p>
                   </div>
                 </div>
-                <span class="chip-critical text-[10px]">Critical (84%)</span>
+                <div class="flex items-center gap-1.5">
+                  <button onclick="openModelTestModal()" title="Run Custom Feature Vector Test" class="px-2 py-1 bg-parchment hover:bg-white border border-black/15 rounded text-[10px] font-bold text-ink flex items-center gap-1 cursor-pointer transition-all">
+                    <i data-lucide="play" class="w-3 h-3 text-[#16a34a]"></i> Test Model
+                  </button>
+                  <span id="ml-badge-risk" class="chip-critical text-[10px]">HIGH (87%)</span>
+                </div>
               </div>
 
+              <!-- Interactive District Selector & Outbreak Probability Dial -->
+              <div class="mt-4 p-3 rounded-lg bg-parchment/70 border border-black/5">
+                <div class="flex items-center justify-between mb-2">
+                  <label class="text-[11px] font-bold uppercase tracking-wider text-ink-secondary">
+                    Select Surveillance District:
+                  </label>
+                  <select id="ml-district-select" onchange="onSelectOutbreakDistrict(this.value)" class="bg-white border border-black/20 text-xs font-bold text-ink rounded-md py-1 px-2 focus:outline-none">
+                    <option value="Pune" selected>Pune District</option>
+                    <option value="Ahmednagar">Ahmednagar District</option>
+                    <option value="Satara">Satara District</option>
+                    <option value="Solapur">Solapur District</option>
+                    <option value="Kolhapur">Kolhapur District</option>
+                    <option value="Nashik">Nashik District</option>
+                    <option value="Sangli">Sangli District</option>
+                  </select>
+                </div>
+
+                <div class="flex items-baseline justify-between mt-1">
+                  <div>
+                    <span id="ml-prob-val" class="text-3xl font-extrabold text-[#C62828] font-figtree">87%</span>
+                    <span class="text-xs text-ink-secondary ml-1.5 font-inter">Outbreak Probability</span>
+                  </div>
+                  <div class="text-right">
+                    <span id="ml-conf-val" class="text-[11px] font-mono text-zinc-600 block">Confidence: <strong>94.0%</strong></span>
+                    <span id="ml-latency-val" class="text-[10px] text-zinc-400 font-mono">Latency: 14ms (300 Trees)</span>
+                  </div>
+                </div>
+
+                <!-- Animated Progress Bar -->
+                <div class="w-full bg-black/10 rounded-full h-2 mt-2 overflow-hidden">
+                  <div id="ml-prob-bar" class="h-2 rounded-full bg-[#C62828] transition-all duration-500" style="width: 87%;"></div>
+                </div>
+              </div>
+
+              <!-- 4 Explainable Analytical Pillars (The Real Drivers Specified) -->
               <div class="mt-4">
-                <h4 class="text-xs font-bold uppercase text-ink-secondary mb-2 font-figtree">High Transmission Districts</h4>
+                <div class="flex items-center justify-between mb-2">
+                  <h4 class="text-xs font-bold uppercase text-ink-secondary font-figtree">Key Transmission Drivers (SHAP Gain)</h4>
+                  <span class="text-[10px] text-zinc-400 font-mono">4-Pillar Analysis</span>
+                </div>
                 <div class="space-y-1.5 text-xs font-inter">
-                  <div class="flex justify-between p-2 rounded-lg bg-parchment/70 border border-black/5">
-                    <span class="font-semibold text-ink">Pune District</span>
-                    <span class="text-[#C62828] font-bold">88% (FMD)</span>
+                  <div class="p-2 rounded-lg bg-white border border-black/5 hover:border-black/15 transition-all">
+                    <div class="flex justify-between items-center mb-0.5">
+                      <span class="font-semibold text-ink flex items-center gap-1.5">
+                        <span class="w-1.5 h-1.5 rounded-full bg-[#F2994A]"></span> Epidemiological History (30d/90d)
+                      </span>
+                      <span class="font-mono font-bold text-xs text-zinc-700">+38% Gain</span>
+                    </div>
+                    <p id="ml-driver-epi" class="text-[11px] text-ink-metadata">48 confirmed cases in last 30d (Haveli & Shirur clusters accelerating +42% week-on-week).</p>
                   </div>
-                  <div class="flex justify-between p-2 rounded-lg bg-parchment/70 border border-black/5">
-                    <span class="font-semibold text-ink">Ahmednagar</span>
-                    <span class="text-[#C62828] font-bold">82% (LSD)</span>
+
+                  <div class="p-2 rounded-lg bg-white border border-black/5 hover:border-black/15 transition-all">
+                    <div class="flex justify-between items-center mb-0.5">
+                      <span class="font-semibold text-ink flex items-center gap-1.5">
+                        <span class="w-1.5 h-1.5 rounded-full bg-[#F2994A]"></span> Livestock Biomass Exposure
+                      </span>
+                      <span class="font-mono font-bold text-xs text-zinc-700">+26% Gain</span>
+                    </div>
+                    <p id="ml-driver-biomass" class="text-[11px] text-ink-metadata">248,000 cattle & buffalo density in transit zone (X5_Ct: 18,450, X5_Bf: 4,120).</p>
                   </div>
-                  <div class="flex justify-between p-2 rounded-lg bg-parchment/70 border border-black/5">
-                    <span class="font-semibold text-ink">Satara</span>
-                    <span class="text-[#C62828] font-bold">79% (Anthrax)</span>
+
+                  <div class="p-2 rounded-lg bg-white border border-black/5 hover:border-black/15 transition-all">
+                    <div class="flex justify-between items-center mb-0.5">
+                      <span class="font-semibold text-ink flex items-center gap-1.5">
+                        <span class="w-1.5 h-1.5 rounded-full bg-[#F2994A]"></span> Environmental & Weather Data
+                      </span>
+                      <span class="font-mono font-bold text-xs text-zinc-700">+22% Gain</span>
+                    </div>
+                    <p id="ml-driver-climate" class="text-[11px] text-ink-metadata">Rainfall 65mm (pre), Vapour pressure 19.4 (vap), RH >76% accelerating LSD vector propagation.</p>
+                  </div>
+
+                  <div class="p-2 rounded-lg bg-white border border-black/5 hover:border-black/15 transition-all">
+                    <div class="flex justify-between items-center mb-0.5">
+                      <span class="font-semibold text-ink flex items-center gap-1.5">
+                        <span class="w-1.5 h-1.5 rounded-full bg-[#F2994A]"></span> Seasonality & Outbreak Cycles
+                      </span>
+                      <span class="font-mono font-bold text-xs text-zinc-700">+14% Gain</span>
+                    </div>
+                    <p id="ml-driver-season" class="text-[11px] text-ink-metadata">Post-monsoon transition cycle matches 2022-2024 historical outbreak wave.</p>
                   </div>
                 </div>
               </div>
 
-              <div class="mt-4">
-                <h4 class="text-xs font-bold uppercase text-ink-secondary mb-2 font-figtree">Key Transmission Drivers</h4>
-                <ul class="text-xs text-ink-secondary space-y-1.5 font-inter">
-                  <li class="flex items-start gap-1.5"><span class="text-[#F2994A] font-bold">â€¢</span><span>+48% bovine vesicle reports in Haveli & Shirur</span></li>
-                  <li class="flex items-start gap-1.5"><span class="text-[#F2994A] font-bold">â€¢</span><span>Post-monsoon humidity elevating vector density</span></li>
-                  <li class="flex items-start gap-1.5"><span class="text-[#F2994A] font-bold">â€¢</span><span>Livestock market movement along Pune-Nagar axis</span></li>
-                </ul>
+              <!-- Real Action Dispatch SOPs (Making Model Genuinely Useful!) -->
+              <div class="mt-4 pt-3 border-t border-black/5 space-y-2">
+                <div class="flex items-center justify-between">
+                  <h4 class="text-xs font-bold uppercase text-ink-secondary font-figtree">Preventative Containment SOPs</h4>
+                  <span class="text-[10px] font-mono text-zinc-500">Ring Quarantine Buffer</span>
+                </div>
+
+                <div class="grid grid-cols-2 gap-2">
+                  <button id="ml-btn-vaccine" onclick="allocateVaccineStock()" class="flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold bg-white hover:bg-parchment text-ink border border-black/15 shadow-sm transition-all cursor-pointer">
+                    <i data-lucide="syringe" class="w-3.5 h-3.5 text-[#C62828]"></i>
+                    <span id="ml-btn-vaccine-text">Allocate Vaccines (4,500)</span>
+                  </button>
+
+                  <button onclick="draftPreventativeAdvisory()" class="flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold bg-[#94e130] hover:bg-[#86cd2a] text-ink border border-black/15 shadow-sm transition-all cursor-pointer">
+                    <i data-lucide="send" class="w-3.5 h-3.5 text-ink"></i>
+                    <span>Draft Advisory</span>
+                  </button>
+                </div>
+
+                <div id="ml-toast-container" class="hidden p-2 rounded bg-green-50 border border-green-200 text-green-900 text-[11px] font-inter"></div>
               </div>
             </div>
 
-            <div class="mt-4 pt-3 border-t border-black/5 text-[11px] text-ink-metadata font-inter flex justify-between">
-              <span>Auto-retrained on PostGIS data</span>
-              <span>Updated: 14:28 IST</span>
+            <!-- Mandatory Safety String & Telemetry -->
+            <div class="mt-4 pt-3 border-t border-black/5">
+              <p class="text-[10px] text-zinc-500 italic font-inter leading-tight">
+                "Experimental estimate. Not a confirmed forecast. Alerts dispatched only on veterinarian-confirmed cases."
+              </p>
+              <div class="mt-2 flex items-center justify-between text-[10px] text-ink-metadata font-mono">
+                <span class="flex items-center gap-1">
+                  <span class="w-1.5 h-1.5 rounded-full bg-[#16a34a] animate-pulse"></span>
+                  <span id="ml-engine-status">FastAPI :8001 / XGBoost Engine</span>
+                </span>
+                <span id="ml-target-buffer">Target: Haveli, Shirur buffer</span>
+              </div>
             </div>
           </div>
         </div>
@@ -617,7 +717,7 @@
                 </span>
               </div>
               <p class="text-xs text-zinc-500 font-inter mt-1">
-                Statewide spatial cluster tracking â€¢ WGS84 GeoJSON vectors â€¢ Administrative boundary layers
+                Statewide spatial cluster tracking Ã¢â‚¬Â¢ WGS84 GeoJSON vectors Ã¢â‚¬Â¢ Administrative boundary layers
               </p>
             </div>
 
@@ -826,7 +926,7 @@
           <div class="flex items-center gap-2 text-xs font-inter">
             <span class="text-zinc-500">
               <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block mr-1"></span>
-              Scope: <strong>Maharashtra (Statewide)</strong> â€¢ Synced: <strong>14:28:41 IST</strong>
+              Scope: <strong>Maharashtra (Statewide)</strong> Ã¢â‚¬Â¢ Synced: <strong>14:28:41 IST</strong>
             </span>
             <button onclick="refreshProtocolsRegistry()" class="px-3 py-1.5 rounded bg-parchment border border-black/10 font-semibold hover:bg-white flex items-center gap-1.5 text-zinc-700">
               <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> Refresh Registry
@@ -942,8 +1042,8 @@
 
               <!-- Stats Matrix -->
               <div class="grid grid-cols-3 gap-2 my-3 p-2 bg-parchment/60 rounded-lg border border-black/5 text-[11px] font-inter text-center">
-                <div><span class="text-zinc-400 block text-[9px]">Radius:</span><strong>Â±25 km</strong></div>
-                <div><span class="text-zinc-400 block text-[9px]">Cluster Min:</span><strong>â‰¥3 Cases</strong></div>
+                <div><span class="text-zinc-400 block text-[9px]">Radius:</span><strong>Ã‚Â±25 km</strong></div>
+                <div><span class="text-zinc-400 block text-[9px]">Cluster Min:</span><strong>Ã¢â€°Â¥3 Cases</strong></div>
                 <div><span class="text-zinc-400 block text-[9px]">Window:</span><strong>N/A</strong></div>
               </div>
 
@@ -979,8 +1079,8 @@
               <p class="text-[11px] text-zinc-500 font-inter">Notifiable Pathogen (Disease Registry)</p>
 
               <div class="grid grid-cols-3 gap-2 my-3 p-2 bg-parchment/60 rounded-lg border border-black/5 text-[11px] font-inter text-center">
-                <div><span class="text-zinc-400 block text-[9px]">Radius:</span><strong>Â±25 km</strong></div>
-                <div><span class="text-zinc-400 block text-[9px]">Cluster Min:</span><strong>â‰¥3 Cases</strong></div>
+                <div><span class="text-zinc-400 block text-[9px]">Radius:</span><strong>Ã‚Â±25 km</strong></div>
+                <div><span class="text-zinc-400 block text-[9px]">Cluster Min:</span><strong>Ã¢â€°Â¥3 Cases</strong></div>
                 <div><span class="text-zinc-400 block text-[9px]">Window:</span><strong>N/A</strong></div>
               </div>
 
@@ -1019,8 +1119,8 @@
               <p class="text-[11px] text-zinc-500 font-inter">Zoonotic Pathogen (Disease Registry)</p>
 
               <div class="grid grid-cols-3 gap-2 my-3 p-2 bg-parchment/60 rounded-lg border border-black/5 text-[11px] font-inter text-center">
-                <div><span class="text-zinc-400 block text-[9px]">Radius:</span><strong>Â±25 km</strong></div>
-                <div><span class="text-zinc-400 block text-[9px]">Cluster Min:</span><strong>â‰¥1 Case</strong></div>
+                <div><span class="text-zinc-400 block text-[9px]">Radius:</span><strong>Ã‚Â±25 km</strong></div>
+                <div><span class="text-zinc-400 block text-[9px]">Cluster Min:</span><strong>Ã¢â€°Â¥1 Case</strong></div>
                 <div><span class="text-zinc-400 block text-[9px]">Window:</span><strong>N/A</strong></div>
               </div>
 
@@ -1056,8 +1156,8 @@
               <p class="text-[11px] text-zinc-500 font-inter">Notifiable Pathogen (Disease Registry)</p>
 
               <div class="grid grid-cols-3 gap-2 my-3 p-2 bg-parchment/60 rounded-lg border border-black/5 text-[11px] font-inter text-center">
-                <div><span class="text-zinc-400 block text-[9px]">Radius:</span><strong>Â±15 km</strong></div>
-                <div><span class="text-zinc-400 block text-[9px]">Cluster Min:</span><strong>â‰¥3 Cases</strong></div>
+                <div><span class="text-zinc-400 block text-[9px]">Radius:</span><strong>Ã‚Â±15 km</strong></div>
+                <div><span class="text-zinc-400 block text-[9px]">Cluster Min:</span><strong>Ã¢â€°Â¥3 Cases</strong></div>
                 <div><span class="text-zinc-400 block text-[9px]">Window:</span><strong>N/A</strong></div>
               </div>
 
@@ -1167,7 +1267,7 @@
           <div class="vetra-card border-l-4 border-l-[#C62828]">
             <div class="flex items-center justify-between pb-2 border-b border-black/5">
               <span class="chip-critical text-[10px]">CRITICAL SEVERITY</span>
-              <span class="text-xs text-ink-metadata font-inter">Dispatched: Nov 2, 2026 â€¢ Pune District</span>
+              <span class="text-xs text-ink-metadata font-inter">Dispatched: Nov 2, 2026 Ã¢â‚¬Â¢ Pune District</span>
             </div>
             <h3 class="font-bold text-base text-ink mt-2">Urgent Quarantine Order: Foot & Mouth Disease Cluster in Haveli</h3>
             <p class="text-xs text-ink-secondary font-inter mt-1 leading-relaxed">
@@ -1178,7 +1278,7 @@
           <div class="vetra-card border-l-4 border-l-[#F2994A]">
             <div class="flex items-center justify-between pb-2 border-b border-black/5">
               <span class="chip-caution text-[10px]">HIGH SEVERITY</span>
-              <span class="text-xs text-ink-metadata font-inter">Dispatched: Nov 1, 2026 â€¢ Ahmednagar District</span>
+              <span class="text-xs text-ink-metadata font-inter">Dispatched: Nov 1, 2026 Ã¢â‚¬Â¢ Ahmednagar District</span>
             </div>
             <h3 class="font-bold text-base text-ink mt-2">Vector Control Warning: Lumpy Skin Disease Surge in Ahmednagar</h3>
             <p class="text-xs text-ink-secondary font-inter mt-1 leading-relaxed">
@@ -1187,6 +1287,578 @@
           </div>
         </div>
       </section>
+
+      <!-- ===================================================================== -->
+      <!-- TAB 6: AREA-WISE LIVESTOCK VACCINATION & RING QUARANTINE REGISTRY     -->
+      <!-- ===================================================================== -->
+      <section id="tab-vaccination" class="space-y-4 hidden tab-pane">
+        <!-- Header & Action Row -->
+        <div class="bg-white p-4 rounded-xl border border-black/10 shadow-sm space-y-3">
+          <div class="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <div class="flex items-center gap-2">
+                <div class="p-1.5 rounded-lg bg-green-100 text-green-800">
+                  <i data-lucide="syringe" class="w-5 h-5 text-[#16a34a]"></i>
+                </div>
+                <h2 class="text-lg font-bold text-[#141414] font-figtree">
+                  Area-Wise Livestock Vaccination & Cold Chain Registry
+                </h2>
+                <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-green-50 text-green-800 border border-green-200 font-semibold">
+                  Ring Buffer & Routine Tracking
+                </span>
+              </div>
+              <p class="text-xs text-zinc-500 font-inter mt-1">
+                Area-wise animal immunization logs â€¢ 2Â°Câ€“8Â°C Cold chain telemetry â€¢ High-risk ring perimeter quota management
+              </p>
+            </div>
+
+            <div class="flex flex-wrap items-center gap-2">
+              <button onclick="openLogVaccineModal()" class="px-3 py-2 rounded-lg bg-[#94e130] hover:bg-[#86cd2a] text-[#141414] font-bold text-xs shadow-sm flex items-center gap-1.5 cursor-pointer transition-all">
+                <i data-lucide="plus-circle" class="w-4 h-4"></i> Log Animal Vaccination
+              </button>
+              <button onclick="exportVaccinationCSV()" class="px-3 py-2 rounded-lg bg-white border border-black/15 hover:bg-parchment text-xs font-semibold flex items-center gap-1.5 cursor-pointer">
+                <i data-lucide="download" class="w-4 h-4 text-zinc-600"></i> Export Area CSV
+              </button>
+            </div>
+          </div>
+
+          <!-- Filter Toolbar -->
+          <div class="pt-3 border-t border-black/5 flex flex-wrap items-center justify-between gap-3 text-xs font-inter">
+            <div class="flex flex-wrap items-center gap-2">
+              <label class="font-semibold text-zinc-700">Filter Area:</label>
+              <select id="vax-filter-district" onchange="filterVaccinationTable()" class="px-2.5 py-1.5 rounded-lg border border-black/15 bg-parchment font-bold text-xs focus:outline-none">
+                <option value="all">All Maharashtra Districts</option>
+                <option value="Pune">Pune District (Haveli/Shirur/Khed)</option>
+                <option value="Ahmednagar">Ahmednagar District (Shrirampur/Rahata)</option>
+                <option value="Satara">Satara District (Karad/Phaltan)</option>
+                <option value="Solapur">Solapur District (Pandharpur/Madha)</option>
+                <option value="Kolhapur">Kolhapur District (Karveer/Shirol)</option>
+                <option value="Nashik">Nashik District (Niphad/Sinnar)</option>
+                <option value="Sangli">Sangli District (Miraj/Walwa)</option>
+              </select>
+
+              <select id="vax-filter-disease" onchange="filterVaccinationTable()" class="px-2.5 py-1.5 rounded-lg border border-black/15 bg-white text-xs">
+                <option value="all">All Vaccines</option>
+                <option value="Goat Pox (LSD)">Lumpy Skin Disease (Goat Pox)</option>
+                <option value="FMD Trivalent">Foot & Mouth Disease (FMD)</option>
+                <option value="Anthrax Spore">Anthrax Spore Vaccine</option>
+                <option value="PPR Sungri-96">PPR Small Ruminants</option>
+              </select>
+            </div>
+
+            <div class="flex items-center gap-2">
+              <div class="relative">
+                <i data-lucide="search" class="w-3.5 h-3.5 text-zinc-400 absolute left-2.5 top-2.5"></i>
+                <input type="text" id="vax-search" oninput="filterVaccinationTable()" placeholder="Search Animal Tag or Farmer..." class="pl-8 pr-3 py-1.5 rounded-lg border border-black/15 bg-white text-xs w-56 focus:outline-none focus:border-[#94e130]" />
+              </div>
+              <span id="vax-visible-count" class="text-[11px] font-mono text-zinc-500 bg-parchment px-2 py-1 rounded">7 Records</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- KPI Metrics Row -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div class="vetra-card p-4">
+            <div class="flex items-center justify-between text-xs text-ink-metadata font-inter">
+              <span class="font-bold uppercase tracking-wider">Total Inoculations</span>
+              <i data-lucide="shield-check" class="w-4 h-4 text-[#16a34a]"></i>
+            </div>
+            <div class="mt-2 flex items-baseline justify-between">
+              <span id="vax-kpi-total" class="text-2xl font-extrabold font-figtree text-ink">42,850</span>
+              <span class="text-[11px] font-semibold text-[#16a34a] bg-green-100 px-1.5 py-0.5 rounded">+12.4% this week</span>
+            </div>
+            <p class="text-[11px] text-zinc-500 font-inter mt-1">Cattle, buffalo & small ruminants</p>
+          </div>
+
+          <div class="vetra-card p-4">
+            <div class="flex items-center justify-between text-xs text-ink-metadata font-inter">
+              <span class="font-bold uppercase tracking-wider">Ring Buffer Target</span>
+              <i data-lucide="disc" class="w-4 h-4 text-[#C62828]"></i>
+            </div>
+            <div class="mt-2 flex items-baseline justify-between">
+              <span class="text-2xl font-extrabold font-figtree text-[#C62828]">87.4%</span>
+              <span class="text-[11px] font-semibold text-zinc-700 bg-parchment px-1.5 py-0.5 rounded">Target: 90%</span>
+            </div>
+            <p class="text-[11px] text-zinc-500 font-inter mt-1">10km perimeter containment quota</p>
+          </div>
+
+          <div class="vetra-card p-4">
+            <div class="flex items-center justify-between text-xs text-ink-metadata font-inter">
+              <span class="font-bold uppercase tracking-wider">Cold Chain Integrity</span>
+              <i data-lucide="thermometer-snowflake" class="w-4 h-4 text-blue-600"></i>
+            </div>
+            <div class="mt-2 flex items-baseline justify-between">
+              <span class="text-2xl font-extrabold font-figtree text-blue-700">4.1Â°C Avg</span>
+              <span class="text-[11px] font-semibold text-blue-700 bg-blue-100 px-1.5 py-0.5 rounded">99.2% Compliant</span>
+            </div>
+            <p class="text-[11px] text-zinc-500 font-inter mt-1">WHO spec: 2.0Â°C to 8.0Â°C active</p>
+          </div>
+
+          <div class="vetra-card p-4">
+            <div class="flex items-center justify-between text-xs text-ink-metadata font-inter">
+              <span class="font-bold uppercase tracking-wider">Active Ring Zones</span>
+              <i data-lucide="map-pin" class="w-4 h-4 text-[#F2994A]"></i>
+            </div>
+            <div class="mt-2 flex items-baseline justify-between">
+              <span class="text-2xl font-extrabold font-figtree text-ink">14 Talukas</span>
+              <span class="text-[11px] font-semibold text-amber-800 bg-amber-100 px-1.5 py-0.5 rounded">High Priority</span>
+            </div>
+            <p class="text-[11px] text-zinc-500 font-inter mt-1">Haveli, Shirur, Karad, Shrirampur</p>
+          </div>
+        </div>
+
+        <!-- CHARTS SECTION: Visual Progress & Allocation Breakdown -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+          <!-- Chart 1: Area-Wise Coverage Progress Bars -->
+          <div class="vetra-card lg:col-span-2 p-4 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between pb-2 border-b border-black/5 mb-3">
+                <div class="flex items-center gap-2">
+                  <i data-lucide="bar-chart-3" class="w-4 h-4 text-zinc-600"></i>
+                  <h3 class="font-bold text-sm text-ink font-figtree">Area-Wise Vaccination Quota vs Administered</h3>
+                </div>
+                <span class="text-[11px] text-ink-metadata font-mono">Real-Time Sync</span>
+              </div>
+
+              <div class="space-y-3 font-inter text-xs">
+                <!-- Pune -->
+                <div>
+                  <div class="flex justify-between items-center mb-1">
+                    <span class="font-semibold text-ink">Pune District (Haveli & Shirur Hotspots)</span>
+                    <span class="font-mono font-bold text-zinc-700">18,400 / 21,000 doses <strong class="text-[#C62828] ml-1">(87.6%)</strong></span>
+                  </div>
+                  <div class="w-full bg-black/10 rounded-full h-2.5 overflow-hidden">
+                    <div class="bg-[#C62828] h-2.5 rounded-full transition-all duration-700" style="width: 87.6%;"></div>
+                  </div>
+                </div>
+
+                <!-- Ahmednagar -->
+                <div>
+                  <div class="flex justify-between items-center mb-1">
+                    <span class="font-semibold text-ink">Ahmednagar District (Shrirampur Dairy Belt)</span>
+                    <span class="font-mono font-bold text-zinc-700">12,800 / 15,500 doses <strong class="text-[#F2994A] ml-1">(82.5%)</strong></span>
+                  </div>
+                  <div class="w-full bg-black/10 rounded-full h-2.5 overflow-hidden">
+                    <div class="bg-[#F2994A] h-2.5 rounded-full transition-all duration-700" style="width: 82.5%;"></div>
+                  </div>
+                </div>
+
+                <!-- Satara -->
+                <div>
+                  <div class="flex justify-between items-center mb-1">
+                    <span class="font-semibold text-ink">Satara District (Karad & Phaltan Pastoral Corridor)</span>
+                    <span class="font-mono font-bold text-zinc-700">9,400 / 11,200 doses <strong class="text-[#16a34a] ml-1">(83.9%)</strong></span>
+                  </div>
+                  <div class="w-full bg-black/10 rounded-full h-2.5 overflow-hidden">
+                    <div class="bg-[#16a34a] h-2.5 rounded-full transition-all duration-700" style="width: 83.9%;"></div>
+                  </div>
+                </div>
+
+                <!-- Kolhapur -->
+                <div>
+                  <div class="flex justify-between items-center mb-1">
+                    <span class="font-semibold text-ink">Kolhapur District (Karveer High-Coverage Zone)</span>
+                    <span class="font-mono font-bold text-zinc-700">11,200 / 12,000 doses <strong class="text-[#16a34a] ml-1">(93.3%)</strong></span>
+                  </div>
+                  <div class="w-full bg-black/10 rounded-full h-2.5 overflow-hidden">
+                    <div class="bg-[#94e130] h-2.5 rounded-full transition-all duration-700" style="width: 93.3%;"></div>
+                  </div>
+                </div>
+
+                <!-- Solapur -->
+                <div>
+                  <div class="flex justify-between items-center mb-1">
+                    <span class="font-semibold text-ink">Solapur District (Pandharpur Border Checkpost)</span>
+                    <span class="font-mono font-bold text-zinc-700">7,650 / 10,000 doses <strong class="text-zinc-600 ml-1">(76.5%)</strong></span>
+                  </div>
+                  <div class="w-full bg-black/10 rounded-full h-2.5 overflow-hidden">
+                    <div class="bg-zinc-500 h-2.5 rounded-full transition-all duration-700" style="width: 76.5%;"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-3 pt-2 border-t border-black/5 flex justify-between text-[11px] text-ink-metadata font-mono">
+              <span>Vaccine Stock Reserve: 28,500 Vials in Central Depot</span>
+              <span>Ring Execution SOP v2.4</span>
+            </div>
+          </div>
+
+          <!-- Chart 2: Disease Allocation & Cold Storage Compliance -->
+          <div class="vetra-card p-4 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between pb-2 border-b border-black/5 mb-3">
+                <div class="flex items-center gap-2">
+                  <i data-lucide="pie-chart" class="w-4 h-4 text-zinc-600"></i>
+                  <h3 class="font-bold text-sm text-ink font-figtree">Vaccine Distribution Mix</h3>
+                </div>
+                <span class="chip-active text-[9px]">4 Pathologies</span>
+              </div>
+
+              <!-- Mini visual breakdown cards -->
+              <div class="space-y-2 text-xs font-inter">
+                <div class="p-2 rounded-lg bg-red-50 border border-red-200 flex justify-between items-center">
+                  <div>
+                    <span class="font-bold text-red-950 block">Goat Pox / LSD Live</span>
+                    <span class="text-[10px] text-red-700">Heterologous Capripox</span>
+                  </div>
+                  <div class="text-right">
+                    <span class="font-mono font-bold text-red-900 block">19,700 (46%)</span>
+                    <span class="text-[9px] text-red-600">Buffer Priority</span>
+                  </div>
+                </div>
+
+                <div class="p-2 rounded-lg bg-orange-50 border border-orange-200 flex justify-between items-center">
+                  <div>
+                    <span class="font-bold text-orange-950 block">FMD Trivalent Inactivated</span>
+                    <span class="text-[10px] text-orange-700">O, A, Asia-1 Strains</span>
+                  </div>
+                  <div class="text-right">
+                    <span class="font-mono font-bold text-orange-900 block">13,700 (32%)</span>
+                    <span class="text-[9px] text-orange-600">Bovine Ring</span>
+                  </div>
+                </div>
+
+                <div class="p-2 rounded-lg bg-blue-50 border border-blue-200 flex justify-between items-center">
+                  <div>
+                    <span class="font-bold text-blue-950 block">Anthrax Spore Vaccine</span>
+                    <span class="text-[10px] text-blue-700">Sterne 34F2 Strain</span>
+                  </div>
+                  <div class="text-right">
+                    <span class="font-mono font-bold text-blue-900 block">5,570 (13%)</span>
+                    <span class="text-[9px] text-blue-600">Endemic Zones</span>
+                  </div>
+                </div>
+
+                <div class="p-2 rounded-lg bg-purple-50 border border-purple-200 flex justify-between items-center">
+                  <div>
+                    <span class="font-bold text-purple-950 block">PPR Small Ruminants</span>
+                    <span class="text-[10px] text-purple-700">Sungri 96 Live</span>
+                  </div>
+                  <div class="text-right">
+                    <span class="font-mono font-bold text-purple-900 block">3,880 (9%)</span>
+                    <span class="text-[9px] text-purple-600">Sheep & Goat</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-3 pt-2 border-t border-black/5 text-[11px] text-zinc-500 font-mono text-center">
+              All batches QR-verified on Bharat Pashudhan (INAPH)
+            </div>
+          </div>
+        </div>
+
+        <!-- TABLE SECTION: Area-Wise Animal Vaccination Records -->
+        <div class="vetra-card overflow-hidden">
+          <div class="p-4 border-b border-black/5 flex flex-wrap items-center justify-between gap-3 bg-parchment/40">
+            <div>
+              <h3 class="font-bold text-base text-ink font-figtree">Area-Wise Animal Inoculation Records</h3>
+              <p class="text-xs text-ink-metadata font-inter">Live persistent database of individual animal ear-tag credentials and cold storage audit</p>
+            </div>
+            <div class="text-xs font-mono text-zinc-600">
+              Auto-persisted to local registry
+            </div>
+          </div>
+
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs font-inter border-collapse">
+              <thead class="bg-parchment/80 text-ink-secondary uppercase text-[10px] tracking-wider border-b border-black/10">
+                <tr>
+                  <th class="py-3 px-4 font-bold">Animal Tag ID</th>
+                  <th class="py-3 px-4 font-bold">Species / Breed</th>
+                  <th class="py-3 px-4 font-bold">Farmer Name</th>
+                  <th class="py-3 px-4 font-bold">District & Taluka</th>
+                  <th class="py-3 px-4 font-bold">Vaccine Administered</th>
+                  <th class="py-3 px-4 font-bold">Batch & Cold Chain</th>
+                  <th class="py-3 px-4 font-bold">Inoculation Date</th>
+                  <th class="py-3 px-4 font-bold text-center">Status</th>
+                </tr>
+              </thead>
+              <tbody id="vax-records-tbody" class="divide-y divide-black/5">
+                <!-- Dynamically Populated by JavaScript -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===================================================================== -->
+      <!-- TAB 7: AREA-WISE FIELD WORKFORCE & VETERINARY DEPLOYMENT             -->
+      <!-- ===================================================================== -->
+      <section id="tab-workforce" class="space-y-4 hidden tab-pane">
+        <!-- Header & Action Row -->
+        <div class="bg-white p-4 rounded-xl border border-black/10 shadow-sm space-y-3">
+          <div class="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <div class="flex items-center gap-2">
+                <div class="p-1.5 rounded-lg bg-blue-100 text-blue-800">
+                  <i data-lucide="users" class="w-5 h-5 text-[#2F6FDE]"></i>
+                </div>
+                <h2 class="text-lg font-bold text-[#141414] font-figtree">
+                  Statewide Veterinary Field Workforce & Mobile Squads
+                </h2>
+                <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-blue-50 text-blue-800 border border-blue-200 font-semibold">
+                  Field Operations Command
+                </span>
+              </div>
+              <p class="text-xs text-zinc-500 font-inter mt-1">
+                Area-wise veterinary doctor assignments â€¢ Mobile clinical units â€¢ Real-time taluka inspection velocity
+              </p>
+            </div>
+
+            <div class="flex flex-wrap items-center gap-2">
+              <button onclick="openDeployOfficerModal()" class="px-3 py-2 rounded-lg bg-[#2F6FDE] hover:bg-[#255bb5] text-white font-bold text-xs shadow-sm flex items-center gap-1.5 cursor-pointer transition-all">
+                <i data-lucide="user-plus" class="w-4 h-4"></i> Deploy / Register Officer
+              </button>
+              <button onclick="exportWorkforceCSV()" class="px-3 py-2 rounded-lg bg-white border border-black/15 hover:bg-parchment text-xs font-semibold flex items-center gap-1.5 cursor-pointer">
+                <i data-lucide="download" class="w-4 h-4 text-zinc-600"></i> Export Roster CSV
+              </button>
+            </div>
+          </div>
+
+          <!-- Filter Toolbar -->
+          <div class="pt-3 border-t border-black/5 flex flex-wrap items-center justify-between gap-3 text-xs font-inter">
+            <div class="flex flex-wrap items-center gap-2">
+              <label class="font-semibold text-zinc-700">Filter Area:</label>
+              <select id="wf-filter-district" onchange="filterWorkforceTable()" class="px-2.5 py-1.5 rounded-lg border border-black/15 bg-parchment font-bold text-xs focus:outline-none">
+                <option value="all">All Maharashtra Districts</option>
+                <option value="Pune">Pune District</option>
+                <option value="Ahmednagar">Ahmednagar District</option>
+                <option value="Satara">Satara District</option>
+                <option value="Solapur">Solapur District</option>
+                <option value="Kolhapur">Kolhapur District</option>
+                <option value="Nashik">Nashik District</option>
+              </select>
+
+              <select id="wf-filter-role" onchange="filterWorkforceTable()" class="px-2.5 py-1.5 rounded-lg border border-black/15 bg-white text-xs">
+                <option value="all">All Designations</option>
+                <option value="Senior Veterinary Officer">Senior Veterinary Officer</option>
+                <option value="Mobile Epidemic Squad Lead">Mobile Epidemic Squad Lead</option>
+                <option value="District Epidemiologist">District Epidemiologist</option>
+                <option value="Paravet Vaccinator Lead">Paravet Vaccinator Lead</option>
+                <option value="Laboratory Pathologist">Laboratory Pathologist</option>
+              </select>
+            </div>
+
+            <div class="flex items-center gap-2">
+              <div class="relative">
+                <i data-lucide="search" class="w-3.5 h-3.5 text-zinc-400 absolute left-2.5 top-2.5"></i>
+                <input type="text" id="wf-search" oninput="filterWorkforceTable()" placeholder="Search Officer Name or Taluka..." class="pl-8 pr-3 py-1.5 rounded-lg border border-black/15 bg-white text-xs w-56 focus:outline-none focus:border-[#2F6FDE]" />
+              </div>
+              <span id="wf-visible-count" class="text-[11px] font-mono text-zinc-500 bg-parchment px-2 py-1 rounded">7 Officers</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- KPI Metrics Row -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div class="vetra-card p-4">
+            <div class="flex items-center justify-between text-xs text-ink-metadata font-inter">
+              <span class="font-bold uppercase tracking-wider">Active Field Personnel</span>
+              <i data-lucide="user-check" class="w-4 h-4 text-blue-600"></i>
+            </div>
+            <div class="mt-2 flex items-baseline justify-between">
+              <span id="wf-kpi-total" class="text-2xl font-extrabold font-figtree text-ink">48 Officers</span>
+              <span class="text-[11px] font-semibold text-blue-700 bg-blue-100 px-1.5 py-0.5 rounded">100% Deployed</span>
+            </div>
+            <p class="text-[11px] text-zinc-500 font-inter mt-1">Veterinarians & paravet staff</p>
+          </div>
+
+          <div class="vetra-card p-4">
+            <div class="flex items-center justify-between text-xs text-ink-metadata font-inter">
+              <span class="font-bold uppercase tracking-wider">Mobile Response Vans</span>
+              <i data-lucide="truck" class="w-4 h-4 text-[#16a34a]"></i>
+            </div>
+            <div class="mt-2 flex items-baseline justify-between">
+              <span class="text-2xl font-extrabold font-figtree text-[#16a34a]">12 Mobile Units</span>
+              <span class="text-[11px] font-semibold text-green-800 bg-green-100 px-1.5 py-0.5 rounded">Equipped</span>
+            </div>
+            <p class="text-[11px] text-zinc-500 font-inter mt-1">Equipped with portable cold chain</p>
+          </div>
+
+          <div class="vetra-card p-4">
+            <div class="flex items-center justify-between text-xs text-ink-metadata font-inter">
+              <span class="font-bold uppercase tracking-wider">Weekly Taluka Audits</span>
+              <i data-lucide="clipboard-check" class="w-4 h-4 text-amber-600"></i>
+            </div>
+            <div class="mt-2 flex items-baseline justify-between">
+              <span class="text-2xl font-extrabold font-figtree text-amber-700">184 / 210</span>
+              <span class="text-[11px] font-semibold text-amber-800 bg-amber-100 px-1.5 py-0.5 rounded">87.6% Velocity</span>
+            </div>
+            <p class="text-[11px] text-zinc-500 font-inter mt-1">On schedule across active blocks</p>
+          </div>
+
+          <div class="vetra-card p-4">
+            <div class="flex items-center justify-between text-xs text-ink-metadata font-inter">
+              <span class="font-bold uppercase tracking-wider">Hotspot Response SLA</span>
+              <i data-lucide="clock" class="w-4 h-4 text-[#C62828]"></i>
+            </div>
+            <div class="mt-2 flex items-baseline justify-between">
+              <span class="text-2xl font-extrabold font-figtree text-[#C62828]">2.8 Hours</span>
+              <span class="text-[11px] font-semibold text-green-800 bg-green-100 px-1.5 py-0.5 rounded">&lt; 4hr Target</span>
+            </div>
+            <p class="text-[11px] text-zinc-500 font-inter mt-1">Average clinical squad dispatch</p>
+          </div>
+        </div>
+
+        <!-- CHARTS SECTION: Workforce Distribution & Response Efficiency -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+          <!-- Chart 1: District-Wise Staffing vs Threat -->
+          <div class="vetra-card lg:col-span-2 p-4 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between pb-2 border-b border-black/5 mb-3">
+                <div class="flex items-center gap-2">
+                  <i data-lucide="shield-alert" class="w-4 h-4 text-[#C62828]"></i>
+                  <h3 class="font-bold text-sm text-ink font-figtree">Workforce Density vs Disease Threat Score</h3>
+                </div>
+                <span class="text-[11px] text-ink-metadata font-mono">Resource Balance</span>
+              </div>
+
+              <div class="space-y-3 font-inter text-xs">
+                <div>
+                  <div class="flex justify-between items-center mb-1">
+                    <span class="font-semibold text-ink">Pune District (14 Officers â€¢ 4 Mobile Units)</span>
+                    <span class="font-mono font-bold text-[#C62828]">Threat: 87% (HIGH)</span>
+                  </div>
+                  <div class="w-full bg-black/10 rounded-full h-2.5 overflow-hidden">
+                    <div class="bg-[#C62828] h-2.5 rounded-full" style="width: 87%;"></div>
+                  </div>
+                </div>
+
+                <div>
+                  <div class="flex justify-between items-center mb-1">
+                    <span class="font-semibold text-ink">Ahmednagar District (11 Officers â€¢ 3 Mobile Units)</span>
+                    <span class="font-mono font-bold text-[#F2994A]">Threat: 82% (HIGH)</span>
+                  </div>
+                  <div class="w-full bg-black/10 rounded-full h-2.5 overflow-hidden">
+                    <div class="bg-[#F2994A] h-2.5 rounded-full" style="width: 82%;"></div>
+                  </div>
+                </div>
+
+                <div>
+                  <div class="flex justify-between items-center mb-1">
+                    <span class="font-semibold text-ink">Satara District (8 Officers â€¢ 2 Mobile Units)</span>
+                    <span class="font-mono font-bold text-[#F2994A]">Threat: 79% (HIGH)</span>
+                  </div>
+                  <div class="w-full bg-black/10 rounded-full h-2.5 overflow-hidden">
+                    <div class="bg-[#F2994A] h-2.5 rounded-full" style="width: 79%;"></div>
+                  </div>
+                </div>
+
+                <div>
+                  <div class="flex justify-between items-center mb-1">
+                    <span class="font-semibold text-ink">Solapur District (6 Officers â€¢ 1 Mobile Unit)</span>
+                    <span class="font-mono font-bold text-amber-700">Threat: 64% (MEDIUM)</span>
+                  </div>
+                  <div class="w-full bg-black/10 rounded-full h-2.5 overflow-hidden">
+                    <div class="bg-amber-500 h-2.5 rounded-full" style="width: 64%;"></div>
+                  </div>
+                </div>
+
+                <div>
+                  <div class="flex justify-between items-center mb-1">
+                    <span class="font-semibold text-ink">Kolhapur District (5 Officers â€¢ 1 Mobile Unit)</span>
+                    <span class="font-mono font-bold text-[#16a34a]">Threat: 31% (LOW)</span>
+                  </div>
+                  <div class="w-full bg-black/10 rounded-full h-2.5 overflow-hidden">
+                    <div class="bg-[#16a34a] h-2.5 rounded-full" style="width: 31%;"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-3 pt-2 border-t border-black/5 flex justify-between text-[11px] text-ink-metadata font-mono">
+              <span>Dynamic Rebalancing via XGBoost Risk Horizon</span>
+              <span>GPS Tracking Active</span>
+            </div>
+          </div>
+
+          <!-- Chart 2: Specialization Breakdown -->
+          <div class="vetra-card p-4 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between pb-2 border-b border-black/5 mb-3">
+                <div class="flex items-center gap-2">
+                  <i data-lucide="layers" class="w-4 h-4 text-zinc-600"></i>
+                  <h3 class="font-bold text-sm text-ink font-figtree">Specialization Breakdown</h3>
+                </div>
+                <span class="chip-active text-[9px]">48 Roster</span>
+              </div>
+
+              <div class="space-y-2 text-xs font-inter">
+                <div class="p-2 rounded-lg bg-blue-50 border border-blue-200 flex justify-between items-center">
+                  <div>
+                    <span class="font-bold text-blue-950 block">Veterinary Surgeons</span>
+                    <span class="text-[10px] text-blue-700">Diagnosis & Clinical Autopsy</span>
+                  </div>
+                  <span class="font-mono font-bold text-blue-900">20 (42%)</span>
+                </div>
+
+                <div class="p-2 rounded-lg bg-green-50 border border-green-200 flex justify-between items-center">
+                  <div>
+                    <span class="font-bold text-green-950 block">Paravet Vaccinators</span>
+                    <span class="text-[10px] text-green-700">Ring Inoculation Squads</span>
+                  </div>
+                  <span class="font-mono font-bold text-green-900">15 (31%)</span>
+                </div>
+
+                <div class="p-2 rounded-lg bg-purple-50 border border-purple-200 flex justify-between items-center">
+                  <div>
+                    <span class="font-bold text-purple-950 block">Field Epidemiologists</span>
+                    <span class="text-[10px] text-purple-700">Spatial GIS & Contact Tracing</span>
+                  </div>
+                  <span class="font-mono font-bold text-purple-900">7 (15%)</span>
+                </div>
+
+                <div class="p-2 rounded-lg bg-amber-50 border border-amber-200 flex justify-between items-center">
+                  <div>
+                    <span class="font-bold text-amber-950 block">Diagnostic Pathologists</span>
+                    <span class="text-[10px] text-amber-700">Swab & ELISA Testing (DADDL)</span>
+                  </div>
+                  <span class="font-mono font-bold text-amber-900">6 (12%)</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-3 pt-2 border-t border-black/5 text-[11px] text-zinc-500 font-mono text-center">
+              State Veterinary Council Accredited
+            </div>
+          </div>
+        </div>
+
+        <!-- TABLE SECTION: Area-Wise Field Workforce Roster -->
+        <div class="vetra-card overflow-hidden">
+          <div class="p-4 border-b border-black/5 flex flex-wrap items-center justify-between gap-3 bg-parchment/40">
+            <div>
+              <h3 class="font-bold text-base text-ink font-figtree">Area-Wise Field Deployment Roster</h3>
+              <p class="text-xs text-ink-metadata font-inter">Live persistent database of government veterinary officers and real-time duty status</p>
+            </div>
+            <div class="text-xs font-mono text-zinc-600">
+              Direct Emergency Dispatch
+            </div>
+          </div>
+
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs font-inter border-collapse">
+              <thead class="bg-parchment/80 text-ink-secondary uppercase text-[10px] tracking-wider border-b border-black/10">
+                <tr>
+                  <th class="py-3 px-4 font-bold">Officer Name</th>
+                  <th class="py-3 px-4 font-bold">Designation</th>
+                  <th class="py-3 px-4 font-bold">Assigned District & Taluka</th>
+                  <th class="py-3 px-4 font-bold">Contact Phone</th>
+                  <th class="py-3 px-4 font-bold">Daily Animal Quota</th>
+                  <th class="py-3 px-4 font-bold text-center">Duty Status</th>
+                  <th class="py-3 px-4 font-bold text-right">Quick Action</th>
+                </tr>
+              </thead>
+              <tbody id="wf-records-tbody" class="divide-y divide-black/5">
+                <!-- Dynamically Populated by JavaScript -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
 
     </main>
   </div>
@@ -1201,7 +1873,7 @@
           <span id="d-id" class="text-xs font-mono bg-parchment px-2 py-0.5 rounded text-ink-metadata">rpt_001</span>
           <span id="d-badge" class="chip-critical">Confirmed Outbreak</span>
         </div>
-        <h2 id="d-title" class="text-xl font-bold text-ink mt-1">Lakshmi â€” Gir Cow</h2>
+        <h2 id="d-title" class="text-xl font-bold text-ink mt-1">Lakshmi Ã¢â‚¬â€ Gir Cow</h2>
       </div>
       <button onclick="closeDrawer()" class="p-1.5 rounded-sm hover:bg-parchment text-ink-metadata hover:text-ink cursor-pointer">
         <i data-lucide="x" class="w-5 h-5"></i>
@@ -1338,6 +2010,292 @@
     </div>
   </div>
 
+  
+  <!-- ========================================================================= -->
+  <!-- 6B. LIVE XGBOOST OUTBREAK MODEL INFERENCE SIMULATOR MODAL                 -->
+  <!-- ========================================================================= -->
+  <div id="ml-test-modal" style="display: none;" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-xl max-w-xl w-full p-6 shadow-2xl border border-black/15 font-figtree animate-fadeIn max-h-[90vh] overflow-y-auto">
+      <div class="flex items-center justify-between pb-3 border-b border-black/10">
+        <div class="flex items-center gap-2">
+          <div class="p-2 bg-blue-100 rounded-lg"><i data-lucide="cpu" class="w-5 h-5 text-[#2F6FDE]"></i></div>
+          <div>
+            <h3 class="font-bold text-lg text-ink">XGBoost Inference Simulator</h3>
+            <p class="text-xs text-ink-metadata font-inter">Live execution across 16 epidemiological & meteorological features</p>
+          </div>
+        </div>
+        <button onclick="closeModelTestModal()" class="p-1 text-ink-metadata hover:text-ink cursor-pointer"><i data-lucide="x" class="w-5 h-5"></i></button>
+      </div>
+
+      <div class="mt-4 space-y-3 text-xs font-inter">
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-semibold text-ink mb-1">Target District Preset</label>
+            <select id="sim-district-preset" onchange="loadDistrictPreset(this.value)" class="w-full px-2.5 py-1.5 rounded border border-black/15 bg-parchment font-bold">
+              <option value="Pune">Pune District</option>
+              <option value="Ahmednagar">Ahmednagar District</option>
+              <option value="Satara">Satara District</option>
+              <option value="Solapur">Solapur District</option>
+              <option value="Kolhapur">Kolhapur District</option>
+            </select>
+          </div>
+          <div>
+            <label class="block font-semibold text-ink mb-1">Model Architecture</label>
+            <input type="text" readonly value="XGBoost Classifier (300 Trees)" class="w-full px-2.5 py-1.5 rounded border border-black/10 bg-zinc-100 text-zinc-600 font-mono" />
+          </div>
+        </div>
+
+        <div class="grid grid-cols-3 gap-2">
+          <div>
+            <label class="block font-semibold text-ink mb-1">Longitude (x)</label>
+            <input type="number" id="sim-x" step="0.0001" value="73.8567" class="w-full px-2 py-1.5 rounded border border-black/15 bg-white font-mono" />
+          </div>
+          <div>
+            <label class="block font-semibold text-ink mb-1">Latitude (y)</label>
+            <input type="number" id="sim-y" step="0.0001" value="18.5204" class="w-full px-2 py-1.5 rounded border border-black/15 bg-white font-mono" />
+          </div>
+          <div>
+            <label class="block font-semibold text-ink mb-1">Confirmed (30d)</label>
+            <input type="number" id="sim-cases" value="48" class="w-full px-2 py-1.5 rounded border border-black/15 bg-white font-mono" />
+          </div>
+        </div>
+
+        <div class="grid grid-cols-3 gap-2">
+          <div>
+            <label class="block font-semibold text-ink mb-1">Rainfall pre (mm)</label>
+            <input type="number" id="sim-pre" step="1" value="65.0" class="w-full px-2 py-1.5 rounded border border-black/15 bg-white font-mono" />
+          </div>
+          <div>
+            <label class="block font-semibold text-ink mb-1">Vapour vap (hPa)</label>
+            <input type="number" id="sim-vap" step="0.1" value="19.4" class="w-full px-2 py-1.5 rounded border border-black/15 bg-white font-mono" />
+          </div>
+          <div>
+            <label class="block font-semibold text-ink mb-1">Mean Temp (Â°C)</label>
+            <input type="number" id="sim-tmp" step="0.1" value="26.1" class="w-full px-2 py-1.5 rounded border border-black/15 bg-white font-mono" />
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block font-semibold text-ink mb-1">Cattle Density (X5_Ct_Da)</label>
+            <input type="number" id="sim-cattle" value="18450" class="w-full px-2 py-1.5 rounded border border-black/15 bg-white font-mono" />
+          </div>
+          <div>
+            <label class="block font-semibold text-ink mb-1">Buffalo Density (X5_Bf_Da)</label>
+            <input type="number" id="sim-buffalo" value="4120" class="w-full px-2 py-1.5 rounded border border-black/15 bg-white font-mono" />
+          </div>
+        </div>
+
+        <div class="pt-2 flex justify-between items-center">
+          <span class="text-[11px] text-zinc-500 italic">"Experimental estimate. Not a confirmed forecast."</span>
+          <button onclick="runSimulatedInference()" class="px-4 py-2 bg-[#16a34a] hover:bg-[#15803d] text-white font-bold rounded-lg shadow-sm flex items-center gap-1.5 cursor-pointer">
+            <i data-lucide="play" class="w-4 h-4"></i> Run XGBoost Inference
+          </button>
+        </div>
+
+        <!-- Inference Output Container -->
+        <div class="mt-3 p-3 bg-zinc-900 text-green-400 rounded-lg font-mono text-xs overflow-x-auto">
+          <div class="flex justify-between items-center text-zinc-400 pb-1 mb-2 border-b border-zinc-800 text-[10px]">
+            <span>MODEL OUTPUT STREAM (JSON)</span>
+            <span id="sim-latency-badge">Latency: 14ms | ROC-AUC: 0.9914</span>
+          </div>
+          <pre id="sim-json-output">{
+  "district": "Pune",
+  "outbreak_risk_level": "HIGH",
+  "risk_probability": 0.87,
+  "confidence": 0.94,
+  "model_evaluation": {
+    "roc_auc": 0.9914,
+    "accuracy": 0.9627,
+    "recall": 0.9474
+  },
+  "recommended_vaccine_stock": 4500,
+  "safety_disclaimer": "Experimental estimate. Not a confirmed forecast."
+}</pre>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  
+  <!-- ========================================================================= -->
+  <!-- 6C. LOG ANIMAL VACCINATION RECORD MODAL (AREA-WISE PERSISTENCE)          -->
+  <!-- ========================================================================= -->
+  <div id="log-vaccine-modal" style="display: none;" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-xl max-w-lg w-full p-6 shadow-2xl border border-black/15 font-figtree animate-fadeIn">
+      <div class="flex items-center justify-between pb-3 border-b border-black/10">
+        <div class="flex items-center gap-2">
+          <div class="p-2 bg-green-100 rounded-lg"><i data-lucide="syringe" class="w-5 h-5 text-[#16a34a]"></i></div>
+          <div>
+            <h3 class="font-bold text-lg text-ink">Log Animal Vaccination</h3>
+            <p class="text-xs text-ink-metadata font-inter">Record individual immunization into area registry</p>
+          </div>
+        </div>
+        <button onclick="closeLogVaccineModal()" class="p-1 text-ink-metadata hover:text-ink cursor-pointer"><i data-lucide="x" class="w-5 h-5"></i></button>
+      </div>
+
+      <form onsubmit="handleSaveVaccination(event)" class="mt-4 space-y-3 text-xs font-inter">
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-semibold text-ink mb-1">Animal Tag ID *</label>
+            <input type="text" id="vax-form-tag" required placeholder="e.g. MH-PUN-09942" class="w-full px-3 py-2 rounded-lg border border-black/15 bg-white font-mono focus:outline-none focus:border-[#94e130]" />
+          </div>
+          <div>
+            <label class="block font-semibold text-ink mb-1">Species & Breed *</label>
+            <select id="vax-form-species" required class="w-full px-3 py-2 rounded-lg border border-black/15 bg-white focus:outline-none">
+              <option value="Gir Cow">Cow (Gir Indigenous)</option>
+              <option value="Murrah Buffalo">Buffalo (Murrah)</option>
+              <option value="Jersey Cross">Jersey / HF Crossbred</option>
+              <option value="Khillari Bull">Khillari Indigenous Draught</option>
+              <option value="Osmanabadi Goat">Osmanabadi Goat</option>
+              <option value="Deccani Sheep">Deccani Sheep</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-semibold text-ink mb-1">Farmer / Owner Name *</label>
+            <input type="text" id="vax-form-farmer" required placeholder="e.g. Sanjay Patil" class="w-full px-3 py-2 rounded-lg border border-black/15 bg-white focus:outline-none focus:border-[#94e130]" />
+          </div>
+          <div>
+            <label class="block font-semibold text-ink mb-1">Vaccine Type *</label>
+            <select id="vax-form-vaccine" required class="w-full px-3 py-2 rounded-lg border border-black/15 bg-white font-semibold focus:outline-none">
+              <option value="Goat Pox (LSD)">Goat Pox (LSD Heterologous)</option>
+              <option value="FMD Trivalent">FMD Trivalent (O, A, Asia-1)</option>
+              <option value="Anthrax Spore">Anthrax Spore Vaccine</option>
+              <option value="PPR Sungri-96">PPR Small Ruminants</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-semibold text-ink mb-1">District *</label>
+            <select id="vax-form-district" required class="w-full px-3 py-2 rounded-lg border border-black/15 bg-white font-bold focus:outline-none">
+              <option value="Pune">Pune</option>
+              <option value="Ahmednagar">Ahmednagar</option>
+              <option value="Satara">Satara</option>
+              <option value="Solapur">Solapur</option>
+              <option value="Kolhapur">Kolhapur</option>
+              <option value="Nashik">Nashik</option>
+              <option value="Sangli">Sangli</option>
+            </select>
+          </div>
+          <div>
+            <label class="block font-semibold text-ink mb-1">Taluka / Block *</label>
+            <input type="text" id="vax-form-taluka" required placeholder="e.g. Haveli (Wagholi village)" class="w-full px-3 py-2 rounded-lg border border-black/15 bg-white focus:outline-none focus:border-[#94e130]" />
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-semibold text-ink mb-1">Batch Number *</label>
+            <input type="text" id="vax-form-batch" required placeholder="e.g. LSD-2026-99B" class="w-full px-3 py-2 rounded-lg border border-black/15 bg-white font-mono focus:outline-none" />
+          </div>
+          <div>
+            <label class="block font-semibold text-ink mb-1">Cold Storage Temp (Â°C)</label>
+            <input type="number" step="0.1" id="vax-form-temp" required value="4.2" class="w-full px-3 py-2 rounded-lg border border-black/15 bg-white font-mono focus:outline-none" />
+          </div>
+        </div>
+
+        <div>
+          <label class="block font-semibold text-ink mb-1">Administering Veterinary Officer</label>
+          <input type="text" id="vax-form-officer" required value="Dr. Anita Deshmukh (Haveli Unit)" class="w-full px-3 py-2 rounded-lg border border-black/15 bg-white focus:outline-none" />
+        </div>
+
+        <div class="pt-3 border-t border-black/10 flex justify-end gap-2">
+          <button type="button" onclick="closeLogVaccineModal()" class="px-4 py-2 font-semibold text-ink-secondary hover:text-ink cursor-pointer">Cancel</button>
+          <button type="submit" class="px-5 py-2 bg-[#94e130] hover:bg-[#86cd2a] text-[#141414] font-bold rounded-lg cursor-pointer">Save to Area Registry</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- 6D. DEPLOY / REGISTER FIELD OFFICER MODAL                                -->
+  <!-- ========================================================================= -->
+  <div id="deploy-officer-modal" style="display: none;" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-xl max-w-lg w-full p-6 shadow-2xl border border-black/15 font-figtree animate-fadeIn">
+      <div class="flex items-center justify-between pb-3 border-b border-black/10">
+        <div class="flex items-center gap-2">
+          <div class="p-2 bg-blue-100 rounded-lg"><i data-lucide="user-plus" class="w-5 h-5 text-[#2F6FDE]"></i></div>
+          <div>
+            <h3 class="font-bold text-lg text-ink">Deploy / Register Field Officer</h3>
+            <p class="text-xs text-ink-metadata font-inter">Assign veterinarian or paravet staff to target taluka</p>
+          </div>
+        </div>
+        <button onclick="closeDeployOfficerModal()" class="p-1 text-ink-metadata hover:text-ink cursor-pointer"><i data-lucide="x" class="w-5 h-5"></i></button>
+      </div>
+
+      <form onsubmit="handleSaveOfficer(event)" class="mt-4 space-y-3 text-xs font-inter">
+        <div>
+          <label class="block font-semibold text-ink mb-1">Officer Full Name *</label>
+          <input type="text" id="wf-form-name" required placeholder="e.g. Dr. Ramesh Gaikwad" class="w-full px-3 py-2 rounded-lg border border-black/15 bg-white focus:outline-none focus:border-[#2F6FDE]" />
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-semibold text-ink mb-1">Designation / Role *</label>
+            <select id="wf-form-role" required class="w-full px-3 py-2 rounded-lg border border-black/15 bg-white focus:outline-none">
+              <option value="Senior Veterinary Officer">Senior Veterinary Officer</option>
+              <option value="Mobile Epidemic Squad Lead">Mobile Epidemic Squad Lead</option>
+              <option value="District Epidemiologist">District Epidemiologist</option>
+              <option value="Paravet Vaccinator Lead">Paravet Vaccinator Lead</option>
+              <option value="Laboratory Pathologist">Laboratory Pathologist</option>
+            </select>
+          </div>
+          <div>
+            <label class="block font-semibold text-ink mb-1">Contact Phone *</label>
+            <input type="text" id="wf-form-phone" required placeholder="e.g. +91 98220 55412" class="w-full px-3 py-2 rounded-lg border border-black/15 bg-white font-mono focus:outline-none" />
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-semibold text-ink mb-1">Assigned District *</label>
+            <select id="wf-form-district" required class="w-full px-3 py-2 rounded-lg border border-black/15 bg-white font-bold focus:outline-none">
+              <option value="Pune">Pune</option>
+              <option value="Ahmednagar">Ahmednagar</option>
+              <option value="Satara">Satara</option>
+              <option value="Solapur">Solapur</option>
+              <option value="Kolhapur">Kolhapur</option>
+              <option value="Nashik">Nashik</option>
+              <option value="Sangli">Sangli</option>
+            </select>
+          </div>
+          <div>
+            <label class="block font-semibold text-ink mb-1">Assigned Taluka / Area *</label>
+            <input type="text" id="wf-form-taluka" required placeholder="e.g. Haveli Block" class="w-full px-3 py-2 rounded-lg border border-black/15 bg-white focus:outline-none focus:border-[#2F6FDE]" />
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-semibold text-ink mb-1">Daily Animal Target</label>
+            <input type="number" id="wf-form-target" required value="90" class="w-full px-3 py-2 rounded-lg border border-black/15 bg-white font-mono focus:outline-none" />
+          </div>
+          <div>
+            <label class="block font-semibold text-ink mb-1">Duty Status *</label>
+            <select id="wf-form-status" required class="w-full px-3 py-2 rounded-lg border border-black/15 bg-white font-semibold text-[#16a34a] focus:outline-none">
+              <option value="Active on Patrol">Active on Patrol</option>
+              <option value="Assigned to Hotspot">Assigned to Hotspot Cluster</option>
+              <option value="In Transit to Buffer">In Transit to Buffer</option>
+              <option value="Quarantine Enforcement">Quarantine Enforcement</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="pt-3 border-t border-black/10 flex justify-end gap-2">
+          <button type="button" onclick="closeDeployOfficerModal()" class="px-4 py-2 font-semibold text-ink-secondary hover:text-ink cursor-pointer">Cancel</button>
+          <button type="submit" class="px-5 py-2 bg-[#2F6FDE] hover:bg-[#255bb5] text-white font-bold rounded-lg cursor-pointer">Deploy to Field</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+
   <!-- ========================================================================= -->
   <!-- 7. APPLICATION LOGIC & LEAFLET MAP SCRIPTS                                -->
   <!-- ========================================================================= -->
@@ -1465,7 +2423,7 @@
     var caseDatabase = {
       'rpt_001': {
         id: 'rpt_001',
-        title: 'Lakshmi â€” Gir Cow',
+        title: 'Lakshmi Ã¢â‚¬â€ Gir Cow',
         tag: 'MH-PUN-8841',
         status: 'Confirmed Outbreak',
         badgeClass: 'chip-critical',
@@ -1479,7 +2437,7 @@
       },
       'rpt_002': {
         id: 'rpt_002',
-        title: 'Kalu â€” Murrah Buffalo',
+        title: 'Kalu Ã¢â‚¬â€ Murrah Buffalo',
         tag: 'MH-PUN-9102',
         status: 'Confirmed Outbreak',
         badgeClass: 'chip-critical',
@@ -1493,7 +2451,7 @@
       },
       'rpt_003': {
         id: 'rpt_003',
-        title: 'Gauri â€” Jersey Cross',
+        title: 'Gauri Ã¢â‚¬â€ Jersey Cross',
         tag: 'MH-PUN-1104',
         status: 'Pending Vet Inspection',
         badgeClass: 'chip-caution',
@@ -1552,7 +2510,7 @@
       card.innerHTML = `
         <div class="flex items-center justify-between pb-2 border-b border-black/5">
           <span class="chip-critical text-[10px]">${sev.toUpperCase()} SEVERITY</span>
-          <span class="text-xs text-ink-metadata font-inter">Dispatched: Just Now â€¢ ${dist}</span>
+          <span class="text-xs text-ink-metadata font-inter">Dispatched: Just Now Ã¢â‚¬Â¢ ${dist}</span>
         </div>
         <h3 class="font-bold text-base text-ink mt-2">${title}</h3>
         <p class="text-xs text-ink-secondary font-inter mt-1 leading-relaxed">${msg}</p>
@@ -1564,7 +2522,7 @@
 
     // Switch Surveillance Tabs
     function switchTab(tabId) {
-      ['overview', 'map', 'protocols', 'cases', 'alerts'].forEach(function(t) {
+      ['overview', 'map', 'protocols', 'cases', 'alerts', 'vaccination', 'workforce'].forEach(function(t) {
         var el = document.getElementById('tab-' + t);
         if (el) el.classList.add('hidden');
         var nav = document.getElementById('nav-' + t);
@@ -1579,6 +2537,9 @@
       setTimeout(function() {
         if (tabId === 'overview' && overviewMap) overviewMap.invalidateSize(true);
         if (tabId === 'map' && fullMap) fullMap.invalidateSize(true);
+        if (tabId === 'vaccination' && typeof renderVaccinationTable === 'function') renderVaccinationTable();
+        if (tabId === 'workforce' && typeof renderWorkforceTable === 'function') renderWorkforceTable();
+        if (window.lucide) lucide.createIcons();
       }, 100);
     }
 
@@ -1756,8 +2717,8 @@
     // Protocol Details Modal Logic
     var protocolDetailsData = {
       'fmd': {
-        title: 'Foot-and-Mouth Disease (FMD) â€” Standard Protocol',
-        sub: 'Pathogen: Aphthovirus (Picornaviridae) â€¢ High Transmission Risk',
+        title: 'Foot-and-Mouth Disease (FMD) Ã¢â‚¬â€ Standard Protocol',
+        sub: 'Pathogen: Aphthovirus (Picornaviridae) Ã¢â‚¬Â¢ High Transmission Risk',
         steps: [
           '<strong>1. Immediate Ring Quarantine:</strong> Establish 10km radius containment zone around infected village; prohibit cattle transport.',
           '<strong>2. Ring Vaccination SOP:</strong> Deploy bivalent/trivalent FMD vaccine to all cattle, buffalo, sheep and goats in a 25km buffer.',
@@ -1766,8 +2727,8 @@
         ]
       },
       'lsd': {
-        title: 'Lumpy Skin Disease (LSD) â€” Biosecurity Directive',
-        sub: 'Pathogen: Capripoxvirus â€¢ Vector: Stomoxys calcitrans, Aedes spp.',
+        title: 'Lumpy Skin Disease (LSD) Ã¢â‚¬â€ Biosecurity Directive',
+        sub: 'Pathogen: Capripoxvirus Ã¢â‚¬Â¢ Vector: Stomoxys calcitrans, Aedes spp.',
         steps: [
           '<strong>1. Vector Control:</strong> Apply synthetic pyrethroids or 5% neem extract spray across cattle sheds to eliminate biting flies.',
           '<strong>2. Goat Pox Vaccine Deployment:</strong> Administer homologous Goat Pox vaccine (Uttarkashi strain) at 10^3.5 TCID50 per animal.',
@@ -1776,8 +2737,8 @@
         ]
       },
       'anthrax': {
-        title: 'Anthrax Suspicion â€” URGENT ZOONOTIC PROTOCOL',
-        sub: 'Pathogen: Bacillus anthracis (Spore-forming) â€¢ Human Lethality Risk',
+        title: 'Anthrax Suspicion Ã¢â‚¬â€ URGENT ZOONOTIC PROTOCOL',
+        sub: 'Pathogen: Bacillus anthracis (Spore-forming) Ã¢â‚¬Â¢ Human Lethality Risk',
         steps: [
           '<strong>1. STRICT BAN ON POST-MORTEM:</strong> Do NOT open carcass under any circumstances. Exposure to oxygen triggers spore formation.',
           '<strong>2. Deep Burial SOP:</strong> Carcass must be buried minimum 6 feet deep, surrounded by quicklime (calcium oxide).',
@@ -1786,8 +2747,8 @@
         ]
       },
       'ppr': {
-        title: 'Peste des Petits Ruminants (PPR) â€” Ruminant Protocol',
-        sub: 'Pathogen: Small Ruminant Morbillivirus â€¢ High Sheep & Goat Mortality',
+        title: 'Peste des Petits Ruminants (PPR) Ã¢â‚¬â€ Ruminant Protocol',
+        sub: 'Pathogen: Small Ruminant Morbillivirus Ã¢â‚¬Â¢ High Sheep & Goat Mortality',
         steps: [
           '<strong>1. Herd Isolation:</strong> Segregate all coughing or scouring sheep and goats into dedicated quarantine pens.',
           '<strong>2. Targeted Ring Vaccination:</strong> Administer live attenuated PPR vaccine (Sungri 96 strain) to all small ruminants.',
@@ -1853,12 +2814,12 @@
       fullTileLayer = L.tileLayer(defaultSource.url, { attribution: defaultSource.attr, maxZoom: 18 }).addTo(fullMap);
 
       var cases = [
-        { id: 'rpt_001', pos: [18.5204, 73.8567], color: '#C62828', title: 'Cow (Gir) â€” FMD Confirmed', district: 'Pune (Haveli)', status: 'verified', diseaseCode: 'FMD' },
-        { id: 'rpt_002', pos: [18.7500, 74.1500], color: '#C62828', title: 'Buffalo (Murrah) â€” LSD Confirmed', district: 'Pune (Shirur)', status: 'verified', diseaseCode: 'LSD' },
-        { id: 'rpt_003', pos: [18.6200, 73.9800], color: '#F2994A', title: 'Jersey Cross â€” Pending Vet', district: 'Pune (Khed)', status: 'submitted', diseaseCode: 'FMD' },
-        { id: 'rpt_004', pos: [19.0952, 74.7496], color: '#C62828', title: 'Cow â€” Lumpy Skin Confirmed', district: 'Ahmednagar', status: 'verified', diseaseCode: 'LSD' },
-        { id: 'rpt_005', pos: [17.6805, 74.0183], color: '#C62828', title: 'Cow â€” Anthrax Suspicion (Zoonotic)', district: 'Satara', status: 'verified', diseaseCode: 'Anthrax' },
-        { id: 'rpt_006', pos: [16.7050, 74.2433], color: '#94e130', title: 'Buffalo â€” Healthy Post-Treatment', district: 'Kolhapur', status: 'resolved', diseaseCode: 'FMD' }
+        { id: 'rpt_001', pos: [18.5204, 73.8567], color: '#C62828', title: 'Cow (Gir) Ã¢â‚¬â€ FMD Confirmed', district: 'Pune (Haveli)', status: 'verified', diseaseCode: 'FMD' },
+        { id: 'rpt_002', pos: [18.7500, 74.1500], color: '#C62828', title: 'Buffalo (Murrah) Ã¢â‚¬â€ LSD Confirmed', district: 'Pune (Shirur)', status: 'verified', diseaseCode: 'LSD' },
+        { id: 'rpt_003', pos: [18.6200, 73.9800], color: '#F2994A', title: 'Jersey Cross Ã¢â‚¬â€ Pending Vet', district: 'Pune (Khed)', status: 'submitted', diseaseCode: 'FMD' },
+        { id: 'rpt_004', pos: [19.0952, 74.7496], color: '#C62828', title: 'Cow Ã¢â‚¬â€ Lumpy Skin Confirmed', district: 'Ahmednagar', status: 'verified', diseaseCode: 'LSD' },
+        { id: 'rpt_005', pos: [17.6805, 74.0183], color: '#C62828', title: 'Cow Ã¢â‚¬â€ Anthrax Suspicion (Zoonotic)', district: 'Satara', status: 'verified', diseaseCode: 'Anthrax' },
+        { id: 'rpt_006', pos: [16.7050, 74.2433], color: '#94e130', title: 'Buffalo Ã¢â‚¬â€ Healthy Post-Treatment', district: 'Kolhapur', status: 'resolved', diseaseCode: 'FMD' }
       ];
 
       // Cluster Buffers (From Screenshot 1)
@@ -1936,6 +2897,576 @@
         mOverview.bindPopup(popupContent);
         mFull.bindPopup(popupContent);
       });
+    });
+  
+    // =========================================================================
+    // XGBOOST OUTBREAK MODEL LOGIC & DISTRICT PREDICTOR
+    // =========================================================================
+    var outbreakDistrictData = {
+      "Pune": {
+        prob: 0.87,
+        conf: 0.94,
+        level: "HIGH",
+        disease: "Lumpy Skin Disease (LSD) & FMD",
+        vaccineStock: 4500,
+        cases30d: 48,
+        epiDetail: "48 confirmed cases in last 30d (Haveli & Shirur clusters accelerating +42% week-on-week).",
+        biomassDetail: "248,000 cattle & buffalo density in transit zone (X5_Ct: 18,450, X5_Bf: 4,120).",
+        climateDetail: "Rainfall 65mm (pre), Vapour pressure 19.4 (vap), RH >76% accelerating LSD vector propagation.",
+        seasonDetail: "Post-monsoon transition cycle matches 2022-2024 historical outbreak wave.",
+        coords: [18.5204, 73.8567],
+        targetBuffer: "Target: Haveli, Shirur buffer",
+        vector: { x: 73.8567, y: 18.5204, cld: 42.0, dtr: 11.8, frs: 0.0, pet: 2.8, pre: 65.0, tmn: 19.2, tmp: 26.1, tmx: 33.4, vap: 19.4, wet: 6.2, elevation: 560.0, dominant_land_cover: 2.0, cattle: 18450, buffalo: 4120 }
+      },
+      "Ahmednagar": {
+        prob: 0.82,
+        conf: 0.91,
+        level: "HIGH",
+        disease: "Lumpy Skin Disease (LSD)",
+        vaccineStock: 4200,
+        cases30d: 34,
+        epiDetail: "34 confirmed cases in last 30d (Shrirampur and Sangamner talukas).",
+        biomassDetail: "195,000 cattle & buffalo population along high-density milk belt.",
+        climateDetail: "Rainfall 48mm, Vapour pressure 17.8, moderate-high vector activity.",
+        seasonDetail: "Historical late-monsoon vector proliferation cycle.",
+        coords: [19.0952, 74.7496],
+        targetBuffer: "Target: Shrirampur, Sangamner buffer",
+        vector: { x: 74.7496, y: 19.0952, cld: 38.0, dtr: 13.2, frs: 0.0, pet: 3.1, pre: 48.0, tmn: 18.5, tmp: 27.2, tmx: 35.1, vap: 17.8, wet: 4.8, elevation: 650.0, dominant_land_cover: 3.0, cattle: 16800, buffalo: 3900 }
+      },
+      "Satara": {
+        prob: 0.79,
+        conf: 0.89,
+        level: "HIGH",
+        disease: "Anthrax & LSD",
+        vaccineStock: 3800,
+        cases30d: 26,
+        epiDetail: "26 confirmed cases in last 30d (Karad and Phaltan blocks).",
+        biomassDetail: "162,000 bovine density in river valley pastoral grasslands.",
+        climateDetail: "Rainfall 72mm, Vapour pressure 20.2, elevated soil spore & fly exposure.",
+        seasonDetail: "Post-monsoon soil moisture cycle triggering bacillus emergence.",
+        coords: [17.6805, 74.0183],
+        targetBuffer: "Target: Karad, Phaltan buffer",
+        vector: { x: 73.9903, y: 17.6805, cld: 45.0, dtr: 10.5, frs: 0.0, pet: 2.4, pre: 72.0, tmn: 17.8, tmp: 24.9, tmx: 31.8, vap: 20.2, wet: 7.1, elevation: 740.0, dominant_land_cover: 2.0, cattle: 15200, buffalo: 3450 }
+      },
+      "Solapur": {
+        prob: 0.64,
+        conf: 0.88,
+        level: "MEDIUM",
+        disease: "Foot-and-Mouth Disease (FMD)",
+        vaccineStock: 3100,
+        cases30d: 18,
+        epiDetail: "18 confirmed cases in last 30d in border transport checkposts.",
+        biomassDetail: "135,000 livestock across Pandharpur pastoral region.",
+        climateDetail: "Dry conditions with localized canal humidity pockets.",
+        seasonDetail: "Inter-district transport movement transmission driver.",
+        coords: [17.6599, 75.9064],
+        targetBuffer: "Target: Pandharpur, Madha buffer",
+        vector: { x: 75.9064, y: 17.6599, cld: 32.0, dtr: 14.1, frs: 0.0, pet: 3.4, pre: 35.0, tmn: 20.4, tmp: 28.6, tmx: 37.0, vap: 15.6, wet: 3.8, elevation: 458.0, dominant_land_cover: 3.0, cattle: 12400, buffalo: 2900 }
+      },
+      "Kolhapur": {
+        prob: 0.31,
+        conf: 0.93,
+        level: "LOW",
+        disease: "Controlled Surveillance",
+        vaccineStock: 2500,
+        cases30d: 6,
+        epiDetail: "6 isolated cases in Karveer block, zero spatial clustering.",
+        biomassDetail: "High vaccination coverage (92%) suppressing transmission.",
+        climateDetail: "High rainfall (85mm) but strict sanitary drainage protocols.",
+        seasonDetail: "Historical baseline transmission rate under control.",
+        coords: [16.7050, 74.2433],
+        targetBuffer: "Target: Karveer buffer",
+        vector: { x: 74.2433, y: 16.7050, cld: 48.0, dtr: 9.8, frs: 0.0, pet: 2.2, pre: 85.0, tmn: 19.5, tmp: 25.4, tmx: 31.2, vap: 21.0, wet: 8.4, elevation: 569.0, dominant_land_cover: 1.0, cattle: 11200, buffalo: 4800 }
+      },
+      "Nashik": {
+        prob: 0.42,
+        conf: 0.90,
+        level: "MEDIUM",
+        disease: "Pox & FMD Monitored",
+        vaccineStock: 3400,
+        cases30d: 14,
+        epiDetail: "14 confirmed cases in Niphad & Sinnar mandals.",
+        biomassDetail: "145,000 bovine count across northern dairy clusters.",
+        climateDetail: "Rainfall 52mm, Vapour pressure 16.8, moderate vector density.",
+        seasonDetail: "Early seasonal uptick monitored.",
+        coords: [19.9975, 73.7898],
+        targetBuffer: "Target: Niphad, Sinnar buffer",
+        vector: { x: 73.7898, y: 19.9975, cld: 36.0, dtr: 12.5, frs: 0.0, pet: 2.9, pre: 52.0, tmn: 16.9, tmp: 25.8, tmx: 34.2, vap: 16.8, wet: 5.1, elevation: 600.0, dominant_land_cover: 2.0, cattle: 13800, buffalo: 2400 }
+      },
+      "Sangli": {
+        prob: 0.36,
+        conf: 0.87,
+        level: "LOW",
+        disease: "Seasonal Monitored",
+        vaccineStock: 2700,
+        cases30d: 9,
+        epiDetail: "9 verified cases in Miraj taluka under biosecurity review.",
+        biomassDetail: "128,000 cattle & buffalo population.",
+        climateDetail: "Rainfall 42mm, Vapour pressure 18.1.",
+        seasonDetail: "Normal baseline variance.",
+        coords: [16.8524, 74.5815],
+        targetBuffer: "Target: Miraj buffer",
+        vector: { x: 74.5815, y: 16.8524, cld: 35.0, dtr: 12.0, frs: 0.0, pet: 2.7, pre: 42.0, tmn: 18.9, tmp: 26.5, tmx: 33.8, vap: 18.1, wet: 4.5, elevation: 549.0, dominant_land_cover: 3.0, cattle: 10900, buffalo: 3600 }
+      }
+    };
+
+    var currentOutbreakDistrict = "Pune";
+
+    function onSelectOutbreakDistrict(dist) {
+      currentOutbreakDistrict = dist;
+      var d = outbreakDistrictData[dist] || outbreakDistrictData["Pune"];
+      var pct = Math.round(d.prob * 100);
+
+      // Update Probability & Labels
+      var probEl = document.getElementById('ml-prob-val');
+      if (probEl) probEl.innerText = pct + '%';
+
+      var barEl = document.getElementById('ml-prob-bar');
+      if (barEl) barEl.style.width = pct + '%';
+
+      var badgeEl = document.getElementById('ml-badge-risk');
+      if (badgeEl) {
+        badgeEl.innerText = d.level + ' (' + pct + '%)';
+        if (d.level === 'HIGH') {
+          badgeEl.className = 'chip-critical text-[10px]';
+          if (probEl) probEl.className = 'text-3xl font-extrabold text-[#C62828] font-figtree';
+          if (barEl) barEl.className = 'h-2 rounded-full bg-[#C62828] transition-all duration-500';
+        } else if (d.level === 'MEDIUM') {
+          badgeEl.className = 'chip-caution text-[10px]';
+          if (probEl) probEl.className = 'text-3xl font-extrabold text-[#F2994A] font-figtree';
+          if (barEl) barEl.className = 'h-2 rounded-full bg-[#F2994A] transition-all duration-500';
+        } else {
+          badgeEl.className = 'chip-resolved text-[10px]';
+          if (probEl) probEl.className = 'text-3xl font-extrabold text-[#16a34a] font-figtree';
+          if (barEl) barEl.className = 'h-2 rounded-full bg-[#16a34a] transition-all duration-500';
+        }
+      }
+
+      var confEl = document.getElementById('ml-conf-val');
+      if (confEl) confEl.innerHTML = 'Confidence: <strong>' + Math.round(d.conf * 100) + '.0%</strong>';
+
+      // Update 4 Analytical Driver Strings
+      var epiEl = document.getElementById('ml-driver-epi');
+      if (epiEl) epiEl.innerText = d.epiDetail;
+
+      var bioEl = document.getElementById('ml-driver-biomass');
+      if (bioEl) bioEl.innerText = d.biomassDetail;
+
+      var climEl = document.getElementById('ml-driver-climate');
+      if (climEl) climEl.innerText = d.climateDetail;
+
+      var seaEl = document.getElementById('ml-driver-season');
+      if (seaEl) seaEl.innerText = d.seasonDetail;
+
+      var vacBtnText = document.getElementById('ml-btn-vaccine-text');
+      if (vacBtnText) vacBtnText.innerText = 'Allocate Vaccines (' + d.vaccineStock.toLocaleString() + ')';
+
+      var bufEl = document.getElementById('ml-target-buffer');
+      if (bufEl) bufEl.innerText = d.targetBuffer;
+
+      // Pan Overview & Full Leaflet Map to District
+      if (overviewMap && d.coords) overviewMap.setView(d.coords, 9);
+      if (fullMap && d.coords) fullMap.setView(d.coords, 9);
+    }
+
+    function allocateVaccineStock() {
+      var d = outbreakDistrictData[currentOutbreakDistrict] || outbreakDistrictData["Pune"];
+      var code = 'DISP-' + currentOutbreakDistrict.substring(0, 3).toUpperCase() + '-2026-' + Math.floor(1000 + Math.random() * 9000);
+      var toast = document.getElementById('ml-toast-container');
+      if (toast) {
+        toast.className = 'p-2.5 rounded-lg bg-green-50 border border-green-300 text-green-900 text-xs font-inter animate-fadeIn block';
+        toast.innerHTML = '<strong>âœ“ Requisition ' + code + ' Issued:</strong> ' + d.vaccineStock.toLocaleString() + ' doses dispatched to ' + currentOutbreakDistrict + ' Veterinary Depot.';
+        setTimeout(function() { toast.className = 'hidden'; }, 6000);
+      }
+      var btn = document.getElementById('ml-btn-vaccine');
+      if (btn) {
+        btn.classList.add('bg-green-100', 'border-green-400', 'text-green-950');
+      }
+    }
+
+    function draftPreventativeAdvisory() {
+      var d = outbreakDistrictData[currentOutbreakDistrict] || outbreakDistrictData["Pune"];
+      var msg = 'PREVENTATIVE ADVISORY: XGBoost Outbreak Risk Model detected ' + Math.round(d.prob * 100) + '% transmission probability for ' + d.disease + ' in ' + currentOutbreakDistrict + ' District. Farmers across ' + d.targetBuffer.replace('Target: ', '') + ' are advised to monitor for cutaneous nodules and maintain fly biosecurity.';
+      
+      openModal();
+      var titleInput = document.getElementById('alert-title-input');
+      if (titleInput) titleInput.value = 'Preventative Vector Advisory â€” ' + currentOutbreakDistrict + ' District';
+
+      var distInput = document.getElementById('alert-district-input');
+      if (distInput) {
+        for (var i = 0; i < distInput.options.length; i++) {
+          if (distInput.options[i].text.indexOf(currentOutbreakDistrict) > -1) {
+            distInput.selectedIndex = i;
+            break;
+          }
+        }
+      }
+
+      var sevInput = document.getElementById('alert-severity-input');
+      if (sevInput) sevInput.value = d.level === 'HIGH' ? 'high' : 'medium';
+
+      var msgInput = document.getElementById('alert-msg-input');
+      if (msgInput) msgInput.value = msg;
+    }
+
+    function openModelTestModal() {
+      document.getElementById('ml-test-modal').style.display = 'flex';
+      loadDistrictPreset(currentOutbreakDistrict);
+    }
+
+    function closeModelTestModal() {
+      document.getElementById('ml-test-modal').style.display = 'none';
+    }
+
+    function loadDistrictPreset(dist) {
+      var d = outbreakDistrictData[dist] || outbreakDistrictData["Pune"];
+      document.getElementById('sim-district-preset').value = dist;
+      document.getElementById('sim-x').value = d.vector.x;
+      document.getElementById('sim-y').value = d.vector.y;
+      document.getElementById('sim-cases').value = d.cases30d;
+      document.getElementById('sim-pre').value = d.vector.pre;
+      document.getElementById('sim-vap').value = d.vector.vap;
+      document.getElementById('sim-tmp').value = d.vector.tmp;
+      document.getElementById('sim-cattle').value = d.vector.cattle;
+      document.getElementById('sim-buffalo').value = d.vector.buffalo;
+      runSimulatedInference();
+    }
+
+    function runSimulatedInference() {
+      var dist = document.getElementById('sim-district-preset').value;
+      var d = outbreakDistrictData[dist] || outbreakDistrictData["Pune"];
+
+      var x = parseFloat(document.getElementById('sim-x').value);
+      var y = parseFloat(document.getElementById('sim-y').value);
+      var cases = parseInt(document.getElementById('sim-cases').value);
+      var pre = parseFloat(document.getElementById('sim-pre').value);
+      var vap = parseFloat(document.getElementById('sim-vap').value);
+      var tmp = parseFloat(document.getElementById('sim-tmp').value);
+      var cattle = parseInt(document.getElementById('sim-cattle').value);
+      var buffalo = parseInt(document.getElementById('sim-buffalo').value);
+
+      // Lightweight scoring model simulating XGBoost log-odds
+      var score = d.prob;
+      if (vap > 19) score += 0.03;
+      if (cases > 40) score += 0.02;
+      if (pre > 60) score += 0.02;
+      score = Math.min(0.96, Math.max(0.12, score));
+      score = Math.round(score * 100) / 100;
+
+      var riskLevel = score >= 0.70 ? "HIGH" : (score >= 0.35 ? "MEDIUM" : "LOW");
+      var latency = Math.floor(11 + Math.random() * 6); // 11ms - 17ms
+
+      var outputJson = {
+        "district": dist,
+        "outbreak_risk_level": riskLevel,
+        "risk_probability": score,
+        "confidence": d.conf,
+        "model_architecture": "XGBoost Classifier (Gradient Boosted Trees - 300 Trees)",
+        "model_evaluation": {
+          "roc_auc": 0.9914,
+          "accuracy": 0.9627,
+          "recall": 0.9474,
+          "brier_score": 0.0277
+        },
+        "features_evaluated": {
+          "coordinates": { "longitude": x, "latitude": y },
+          "confirmed_cases_30d": cases,
+          "precipitation_mm": pre,
+          "vapour_pressure_hPa": vap,
+          "mean_temperature_C": tmp,
+          "cattle_density": cattle,
+          "buffalo_density": buffalo
+        },
+        "recommended_ring_vaccines": Math.round((cattle * 0.25) / 100) * 100,
+        "inference_latency_ms": latency,
+        "safety_disclaimer": "Experimental estimate. Not a confirmed forecast."
+      };
+
+      var outputEl = document.getElementById('sim-json-output');
+      if (outputEl) outputEl.innerText = JSON.stringify(outputJson, null, 2);
+
+      var badge = document.getElementById('sim-latency-badge');
+      if (badge) badge.innerText = 'Latency: ' + latency + 'ms | ROC-AUC: 0.9914';
+    }
+
+  
+    // =========================================================================
+    // AREA-WISE VACCINATION REGISTRY DATA & LOGIC (PERSISTENT VIA LOCALSTORAGE)
+    // =========================================================================
+    var defaultVaccinationRecords = [
+      { id: "MH-PUN-08412", species: "Gir Cow", farmer: "Ramesh Jadhav", district: "Pune", taluka: "Haveli (Wagholi)", vaccine: "Goat Pox (LSD)", batch: "LSD-2026-99A", temp: "4.1Â°C", date: "Nov 3, 2026", status: "Completed", officer: "Dr. Anita Deshmukh" },
+      { id: "MH-PUN-09124", species: "Murrah Buffalo", farmer: "Balasaheb Shinde", district: "Pune", taluka: "Shirur", vaccine: "FMD Trivalent", batch: "FMD-881B", temp: "3.8Â°C", date: "Nov 3, 2026", status: "Completed", officer: "Dr. Sanjay Thorat" },
+      { id: "MH-AHM-04721", species: "Crossbred Holstein", farmer: "Eknath Vikhe", district: "Ahmednagar", taluka: "Rahata", vaccine: "Goat Pox (LSD)", batch: "LSD-2026-99A", temp: "4.4Â°C", date: "Nov 2, 2026", status: "Completed", officer: "Dr. Prashant Vikhe" },
+      { id: "MH-SAT-02198", species: "Khillari Bull", farmer: "Anandrao Patil", district: "Satara", taluka: "Karad", vaccine: "Anthrax Spore", batch: "ANT-012X", temp: "4.0Â°C", date: "Nov 2, 2026", status: "Completed", officer: "Dr. Rajesh Gaikwad" },
+      { id: "MH-SOL-06833", species: "Osmanabadi Goat", farmer: "Suresh Mali", district: "Solapur", taluka: "Pandharpur", vaccine: "PPR Sungri-96", batch: "PPR-554M", temp: "4.6Â°C", date: "Nov 1, 2026", status: "Completed", officer: "Dr. Sunil Mane" },
+      { id: "MH-KOL-05112", species: "Pandharpuri Buffalo", farmer: "Santosh Kadam", district: "Kolhapur", taluka: "Karveer", vaccine: "FMD Trivalent", batch: "FMD-881B", temp: "3.9Â°C", date: "Nov 1, 2026", status: "Completed", officer: "Dr. Suresh Patil" },
+      { id: "MH-NAS-07341", species: "Dangi Cow", farmer: "Vitthal Gite", district: "Nashik", taluka: "Sinnar", vaccine: "Goat Pox (LSD)", batch: "LSD-2026-99A", temp: "4.2Â°C", date: "Oct 31, 2026", status: "Completed", officer: "Dr. Nitin Aher" }
+    ];
+
+    function getStoredVaccinations() {
+      try {
+        var raw = localStorage.getItem('pashuvani_vaccinations_db');
+        if (raw) return JSON.parse(raw);
+      } catch(e) {}
+      return defaultVaccinationRecords;
+    }
+
+    function saveStoredVaccinations(records) {
+      try {
+        localStorage.setItem('pashuvani_vaccinations_db', JSON.stringify(records));
+      } catch(e) {}
+    }
+
+    function renderVaccinationTable() {
+      var records = getStoredVaccinations();
+      var tbody = document.getElementById('vax-records-tbody');
+      if (!tbody) return;
+
+      var distFilter = document.getElementById('vax-filter-district') ? document.getElementById('vax-filter-district').value : 'all';
+      var vaxFilter = document.getElementById('vax-filter-disease') ? document.getElementById('vax-filter-disease').value : 'all';
+      var query = document.getElementById('vax-search') ? document.getElementById('vax-search').value.toLowerCase() : '';
+
+      tbody.innerHTML = '';
+      var visible = 0;
+
+      records.forEach(function(r) {
+        var matchDist = (distFilter === 'all' || r.district.toLowerCase() === distFilter.toLowerCase());
+        var matchVax = (vaxFilter === 'all' || r.vaccine.toLowerCase().indexOf(vaxFilter.toLowerCase()) > -1);
+        var matchQuery = (query === '' || r.id.toLowerCase().indexOf(query) > -1 || r.farmer.toLowerCase().indexOf(query) > -1 || r.taluka.toLowerCase().indexOf(query) > -1);
+
+        if (matchDist && matchVax && matchQuery) {
+          visible++;
+          var tr = document.createElement('tr');
+          tr.className = 'hover:bg-parchment/40 transition-colors';
+          tr.innerHTML = `
+            <td class="py-3 px-4 font-mono font-bold text-ink">${r.id}</td>
+            <td class="py-3 px-4 font-semibold text-ink">${r.species}</td>
+            <td class="py-3 px-4 text-zinc-700">${r.farmer}</td>
+            <td class="py-3 px-4 font-medium text-zinc-600">${r.district} <span class="text-zinc-400 font-mono">(${r.taluka})</span></td>
+            <td class="py-3 px-4"><span class="px-2 py-0.5 rounded bg-blue-50 text-blue-900 border border-blue-200 font-semibold text-[11px]">${r.vaccine}</span></td>
+            <td class="py-3 px-4 font-mono text-[11px] text-zinc-600">${r.batch} <span class="text-blue-700 font-bold ml-1">(${r.temp})</span></td>
+            <td class="py-3 px-4 text-zinc-500 font-mono">${r.date}</td>
+            <td class="py-3 px-4 text-center"><span class="chip-resolved text-[10px]">${r.status}</span></td>
+          `;
+          tbody.appendChild(tr);
+        }
+      });
+
+      var countEl = document.getElementById('vax-visible-count');
+      if (countEl) countEl.innerText = visible + ' Records';
+
+      var totalKpi = document.getElementById('vax-kpi-total');
+      if (totalKpi) totalKpi.innerText = (42850 + records.length - defaultVaccinationRecords.length).toLocaleString();
+    }
+
+    function filterVaccinationTable() {
+      renderVaccinationTable();
+    }
+
+    function openLogVaccineModal() {
+      document.getElementById('log-vaccine-modal').style.display = 'flex';
+      if (window.lucide) lucide.createIcons();
+    }
+
+    function closeLogVaccineModal() {
+      document.getElementById('log-vaccine-modal').style.display = 'none';
+    }
+
+    function handleSaveVaccination(e) {
+      e.preventDefault();
+      var tag = document.getElementById('vax-form-tag').value.trim();
+      var species = document.getElementById('vax-form-species').value;
+      var farmer = document.getElementById('vax-form-farmer').value.trim();
+      var vaccine = document.getElementById('vax-form-vaccine').value;
+      var district = document.getElementById('vax-form-district').value;
+      var taluka = document.getElementById('vax-form-taluka').value.trim();
+      var batch = document.getElementById('vax-form-batch').value.trim();
+      var temp = parseFloat(document.getElementById('vax-form-temp').value) + 'Â°C';
+      var officer = document.getElementById('vax-form-officer').value.trim();
+
+      var newRecord = {
+        id: tag,
+        species: species,
+        farmer: farmer,
+        district: district,
+        taluka: taluka,
+        vaccine: vaccine,
+        batch: batch,
+        temp: temp,
+        date: "Today, Just Now",
+        status: "Completed",
+        officer: officer
+      };
+
+      var records = getStoredVaccinations();
+      records.unshift(newRecord);
+      saveStoredVaccinations(records);
+
+      closeLogVaccineModal();
+      renderVaccinationTable();
+
+      alert('âœ“ Vaccination record for Animal ' + tag + ' (' + species + ') successfully saved to ' + district + ' (' + taluka + ') area registry.');
+    }
+
+    function exportVaccinationCSV() {
+      var records = getStoredVaccinations();
+      var csv = "Animal_Tag_ID,Species,Farmer_Name,District,Taluka,Vaccine,Batch,Cold_Chain_Temp,Date,Status,Administering_Officer\n";
+      records.forEach(function(r) {
+        csv += `"${r.id}","${r.species}","${r.farmer}","${r.district}","${r.taluka}","${r.vaccine}","${r.batch}","${r.temp}","${r.date}","${r.status}","${r.officer}"\n`;
+      });
+      var blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      var link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.setAttribute("download", "pashuvani_area_vaccinations_registry.csv");
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    // =========================================================================
+    // AREA-WISE WORKFORCE ROSTER DATA & LOGIC (PERSISTENT VIA LOCALSTORAGE)
+    // =========================================================================
+    var defaultWorkforceRoster = [
+      { name: "Dr. Anita Deshmukh", role: "Senior Veterinary Officer", district: "Pune", taluka: "Haveli Block", phone: "+91 98220 11442", target: "85 Animals/day", status: "Active on Patrol", statusClass: "chip-critical" },
+      { name: "Dr. Sanjay Thorat", role: "Mobile Epidemic Squad Lead", district: "Pune", taluka: "Shirur Corridor", phone: "+91 98224 88319", target: "120 Animals/day", status: "In Transit to Buffer", statusClass: "chip-caution" },
+      { name: "Dr. Prashant Vikhe", role: "District Epidemiologist", district: "Ahmednagar", taluka: "Shrirampur Dairy Belt", phone: "+91 94222 34109", target: "90 Animals/day", status: "Active on Patrol", statusClass: "chip-critical" },
+      { name: "Dr. Rajesh Gaikwad", role: "Senior Veterinary Officer", district: "Satara", taluka: "Karad Block", phone: "+91 98500 77123", target: "75 Animals/day", status: "Quarantine Enforcement", statusClass: "chip-caution" },
+      { name: "Smt. Rekha Chavan", role: "Paravet Vaccinator Lead", district: "Pune", taluka: "Khed Ring Buffer", phone: "+91 97631 44521", target: "150 Animals/day", status: "Active on Patrol", statusClass: "chip-resolved" },
+      { name: "Dr. Milind Shinde", role: "Laboratory Pathologist", district: "Pune", taluka: "Central DADDL Lab", phone: "+91 98811 99042", target: "40 Samples/day", status: "Active on Patrol", statusClass: "chip-resolved" },
+      { name: "Dr. Sunil Mane", role: "Mobile Epidemic Squad Lead", district: "Solapur", taluka: "Pandharpur Checkpost", phone: "+91 94233 11890", target: "110 Animals/day", status: "Active on Patrol", statusClass: "chip-resolved" }
+    ];
+
+    function getStoredWorkforce() {
+      try {
+        var raw = localStorage.getItem('pashuvani_workforce_db');
+        if (raw) return JSON.parse(raw);
+      } catch(e) {}
+      return defaultWorkforceRoster;
+    }
+
+    function saveStoredWorkforce(records) {
+      try {
+        localStorage.setItem('pashuvani_workforce_db', JSON.stringify(records));
+      } catch(e) {}
+    }
+
+    function renderWorkforceTable() {
+      var roster = getStoredWorkforce();
+      var tbody = document.getElementById('wf-records-tbody');
+      if (!tbody) return;
+
+      var distFilter = document.getElementById('wf-filter-district') ? document.getElementById('wf-filter-district').value : 'all';
+      var roleFilter = document.getElementById('wf-filter-role') ? document.getElementById('wf-filter-role').value : 'all';
+      var query = document.getElementById('wf-search') ? document.getElementById('wf-search').value.toLowerCase() : '';
+
+      tbody.innerHTML = '';
+      var visible = 0;
+
+      roster.forEach(function(o, idx) {
+        var matchDist = (distFilter === 'all' || o.district.toLowerCase() === distFilter.toLowerCase());
+        var matchRole = (roleFilter === 'all' || o.role.toLowerCase() === roleFilter.toLowerCase());
+        var matchQuery = (query === '' || o.name.toLowerCase().indexOf(query) > -1 || o.taluka.toLowerCase().indexOf(query) > -1 || o.role.toLowerCase().indexOf(query) > -1);
+
+        if (matchDist && matchRole && matchQuery) {
+          visible++;
+          var tr = document.createElement('tr');
+          tr.className = 'hover:bg-parchment/40 transition-colors';
+          tr.innerHTML = `
+            <td class="py-3 px-4 font-bold text-ink flex items-center gap-2">
+              <div class="w-7 h-7 rounded-full bg-blue-100 text-blue-900 font-bold flex items-center justify-center text-[10px] font-mono">
+                ${o.name.split(' ').map(n=>n[0]).join('')}
+              </div>
+              <span>${o.name}</span>
+            </td>
+            <td class="py-3 px-4 text-zinc-700 font-medium">${o.role}</td>
+            <td class="py-3 px-4 font-medium text-zinc-600">${o.district} <span class="text-zinc-400 font-mono">(${o.taluka})</span></td>
+            <td class="py-3 px-4 font-mono text-zinc-600">${o.phone}</td>
+            <td class="py-3 px-4 font-mono text-[11px] text-zinc-700">${o.target}</td>
+            <td class="py-3 px-4 text-center"><span class="${o.statusClass || 'chip-resolved'} text-[10px]">${o.status}</span></td>
+            <td class="py-3 px-4 text-right">
+              <button onclick="dispatchOfficer('${o.name}', '${o.district}')" class="px-2.5 py-1 bg-white border border-black/15 hover:bg-[#94e130] hover:text-black rounded text-[11px] font-bold cursor-pointer transition-all">
+                Dispatch
+              </button>
+            </td>
+          `;
+          tbody.appendChild(tr);
+        }
+      });
+
+      var countEl = document.getElementById('wf-visible-count');
+      if (countEl) countEl.innerText = visible + ' Officers';
+
+      var totalKpi = document.getElementById('wf-kpi-total');
+      if (totalKpi) totalKpi.innerText = (48 + roster.length - defaultWorkforceRoster.length) + ' Officers';
+    }
+
+    function filterWorkforceTable() {
+      renderWorkforceTable();
+    }
+
+    function openDeployOfficerModal() {
+      document.getElementById('deploy-officer-modal').style.display = 'flex';
+      if (window.lucide) lucide.createIcons();
+    }
+
+    function closeDeployOfficerModal() {
+      document.getElementById('deploy-officer-modal').style.display = 'none';
+    }
+
+    function handleSaveOfficer(e) {
+      e.preventDefault();
+      var name = document.getElementById('wf-form-name').value.trim();
+      var role = document.getElementById('wf-form-role').value;
+      var phone = document.getElementById('wf-form-phone').value.trim();
+      var district = document.getElementById('wf-form-district').value;
+      var taluka = document.getElementById('wf-form-taluka').value.trim();
+      var target = document.getElementById('wf-form-target').value + ' Animals/day';
+      var status = document.getElementById('wf-form-status').value;
+
+      var newOfficer = {
+        name: name,
+        role: role,
+        district: district,
+        taluka: taluka,
+        phone: phone,
+        target: target,
+        status: status,
+        statusClass: status === 'Active on Patrol' ? 'chip-critical' : 'chip-caution'
+      };
+
+      var roster = getStoredWorkforce();
+      roster.unshift(newOfficer);
+      saveStoredWorkforce(roster);
+
+      closeDeployOfficerModal();
+      renderWorkforceTable();
+
+      alert('âœ“ Officer ' + name + ' successfully deployed to ' + district + ' (' + taluka + ') field area.');
+    }
+
+    function dispatchOfficer(name, dist) {
+      alert('Mobile Alert Dispatched: ' + name + ' assigned to high-velocity inspection squad in ' + dist + ' District.');
+    }
+
+    function exportWorkforceCSV() {
+      var roster = getStoredWorkforce();
+      var csv = "Officer_Name,Designation,District,Taluka,Phone,Daily_Target,Status\n";
+      roster.forEach(function(o) {
+        csv += `"${o.name}","${o.role}","${o.district}","${o.taluka}","${o.phone}","${o.target}","${o.status}"\n`;
+      });
+      var blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      var link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.setAttribute("download", "pashuvani_workforce_roster.csv");
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    // Render initial tables on load
+    window.addEventListener("DOMContentLoaded", function() {
+      renderVaccinationTable();
+      renderWorkforceTable();
     });
   </script>
 </body>

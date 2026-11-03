@@ -50,3 +50,7 @@ ml/datasets/images/
 data/uploads/
 data/postgres/
 
+
+# Local tools and agents
+.agent/
+.tools/

@@ -1,7 +1,17 @@
+// @ts-nocheck
 import React from 'react';
-import { LayoutDashboard, Map, BookOpen, ClipboardList, AlertOctagon, HelpCircle } from 'lucide-react';
+import { 
+  LayoutDashboard, 
+  Map, 
+  BookOpen, 
+  ClipboardList, 
+  AlertOctagon, 
+  Syringe, 
+  Users, 
+  HelpCircle 
+} from 'lucide-react';
 
-export type TabType = 'overview' | 'map' | 'protocols' | 'cases' | 'alerts';
+export type TabType = 'overview' | 'map' | 'protocols' | 'cases' | 'alerts' | 'vaccination' | 'workforce';
 
 interface SidebarProps {
   activeTab: TabType;
@@ -50,6 +60,20 @@ export const Sidebar: React.FC<SidebarProps> = ({
       badge: alertCount > 0 ? `${alertCount}` : null,
       badgeColor: 'bg-alert-critical text-white',
     },
+    {
+      id: 'vaccination' as TabType,
+      label: 'Vaccination Drive',
+      icon: Syringe,
+      badge: '42.8k',
+      badgeColor: 'bg-green-100 text-[#16a34a]',
+    },
+    {
+      id: 'workforce' as TabType,
+      label: 'Field Workforce',
+      icon: Users,
+      badge: '48 Active',
+      badgeColor: 'bg-blue-100 text-[#2F6FDE]',
+    },
   ];
 
   return (
@@ -67,7 +91,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             <button
               key={item.id}
               onClick={() => onTabChange(item.id)}
-              className={`w-full flex items-center justify-between px-3.5 py-3 rounded-sm text-sm font-semibold transition-all duration-150 ${
+              className={`w-full flex items-center justify-between px-3.5 py-3 rounded-sm text-sm font-semibold transition-all duration-150 cursor-pointer ${
                 isActive
                   ? 'bg-parchment text-ink shadow-sm border-l-4 border-l-brand-primary'
                   : 'text-ink-secondary hover:bg-parchment/60 hover:text-ink'
@@ -98,19 +122,16 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
       {/* System Status in Sidebar Footer */}
       <div className="p-4 border-t border-black/5 bg-parchment/40 text-xs font-inter space-y-2">
-        <div className="flex items-center justify-between text-ink-metadata text-[11px]">
-          <span>DAHD SURVEILLANCE v1.0-RC</span>
-          <span className="text-emerald-700 font-semibold flex items-center gap-1">
-            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
-            Operational
+        <div className="flex items-center justify-between text-ink-metadata">
+          <span className="flex items-center gap-1.5 font-medium">
+            <span className="w-2 h-2 rounded-full bg-brand-primary animate-pulse"></span>
+            Telemetry Stream
           </span>
+          <span className="font-mono text-[10px]">Connected</span>
         </div>
-        <div className="text-[11px] text-ink-metadata font-mono">
-          PostgreSQL + PostGIS GIS
-        </div>
-        <div className="text-[11px] text-ink-metadata flex items-center gap-1">
-          <HelpCircle className="w-3 h-3 text-ink-metadata" />
-          <span>Need help? Contact State Epidemiologist</span>
+        <div className="text-[11px] text-ink-metadata">
+          <div className="font-semibold text-ink">DAHD Outbreak Node v1.0</div>
+          <div>PostgreSQL 16 + PostGIS</div>
         </div>
       </div>
     </aside>

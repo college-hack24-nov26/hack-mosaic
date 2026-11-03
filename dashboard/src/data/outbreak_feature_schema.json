@@ -1,0 +1,153 @@
+﻿{
+  "model_name": "PashuWani_Outbreak_Risk_XGBoost",
+  "version": "1.0.0",
+  "features": [
+    {
+      "name": "x",
+      "type": "float",
+      "description": "Longitude coordinate"
+    },
+    {
+      "name": "y",
+      "type": "float",
+      "description": "Latitude coordinate"
+    },
+    {
+      "name": "cld",
+      "type": "float",
+      "description": "Cloud cover percentage"
+    },
+    {
+      "name": "dtr",
+      "type": "float",
+      "description": "Diurnal temperature range"
+    },
+    {
+      "name": "frs",
+      "type": "float",
+      "description": "Frost day frequency"
+    },
+    {
+      "name": "pet",
+      "type": "float",
+      "description": "Potential evapotranspiration"
+    },
+    {
+      "name": "pre",
+      "type": "float",
+      "description": "Precipitation / rainfall (mm)"
+    },
+    {
+      "name": "tmn",
+      "type": "float",
+      "description": "Minimum temperature (C)"
+    },
+    {
+      "name": "tmp",
+      "type": "float",
+      "description": "Mean temperature (C)"
+    },
+    {
+      "name": "tmx",
+      "type": "float",
+      "description": "Maximum temperature (C)"
+    },
+    {
+      "name": "vap",
+      "type": "float",
+      "description": "Vapour pressure"
+    },
+    {
+      "name": "wet",
+      "type": "float",
+      "description": "Wet day frequency"
+    },
+    {
+      "name": "elevation",
+      "type": "float",
+      "description": "Elevation above sea level (m)"
+    },
+    {
+      "name": "dominant_land_cover",
+      "type": "float",
+      "description": "Land cover classification category"
+    },
+    {
+      "name": "X5_Ct_2010_Da",
+      "type": "float",
+      "description": "Cattle population density indicator"
+    },
+    {
+      "name": "X5_Bf_2010_Da",
+      "type": "float",
+      "description": "Buffalo population density indicator"
+    }
+  ],
+  "target": "outbreak_probability",
+  "evaluation": {
+    "roc_auc": 0.9913557800428017,
+    "accuracy": 0.9627091312235436,
+    "brier_score": 0.027662256732583046,
+    "classification_report": {
+      "0": {
+        "precision": 0.9924385633270322,
+        "recall": 0.9648518263266712,
+        "f1-score": 0.9784507862550961,
+        "support": 4353.0
+      },
+      "1": {
+        "precision": 0.7901234567901234,
+        "recall": 0.9473684210526315,
+        "f1-score": 0.8616305160807779,
+        "support": 608.0
+      },
+      "accuracy": 0.9627091312235436,
+      "macro avg": {
+        "precision": 0.8912810100585777,
+        "recall": 0.9561101236896514,
+        "f1-score": 0.920040651167937,
+        "support": 4961.0
+      },
+      "weighted avg": {
+        "precision": 0.9676436460171268,
+        "recall": 0.9627091312235436,
+        "f1-score": 0.9641337686646938,
+        "support": 4961.0
+      }
+    },
+    "confusion_matrix": [
+      [
+        4200,
+        153
+      ],
+      [
+        32,
+        576
+      ]
+    ]
+  },
+  "feature_importance_gain": {
+    "frs": 289.7330627441406,
+    "x": 224.0575714111328,
+    "X5_Ct_2010_Da": 71.99114990234375,
+    "dominant_land_cover": 66.03564453125,
+    "dtr": 61.4969482421875,
+    "y": 53.80680847167969,
+    "pet": 45.9521369934082,
+    "tmn": 42.574317932128906,
+    "vap": 29.283580780029297,
+    "wet": 21.71938705444336,
+    "pre": 20.071775436401367,
+    "X5_Bf_2010_Da": 19.92460823059082,
+    "cld": 19.03414535522461,
+    "elevation": 18.141300201416016,
+    "tmp": 16.601022720336914,
+    "tmx": 16.507604598999023
+  },
+  "risk_thresholds": {
+    "LOW": "< 0.35",
+    "MEDIUM": "0.35 - 0.70",
+    "HIGH": ">= 0.70"
+  },
+  "disclaimer": "Experimental epidemiological outbreak estimation. Not an official regulatory declaration."
+}

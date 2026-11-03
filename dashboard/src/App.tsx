@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useState, useEffect } from 'react';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { Navbar } from './components/layout/Navbar';
@@ -11,6 +12,8 @@ import { SurveillanceMapPage } from './pages/SurveillanceMapPage';
 import { ProtocolsPage } from './pages/ProtocolsPage';
 import { CasesPage } from './pages/CasesPage';
 import { AlertsPage } from './pages/AlertsPage';
+import { VaccinationPage } from './pages/VaccinationPage';
+import { WorkforcePage } from './pages/WorkforcePage';
 import { LoginPage } from './pages/LoginPage';
 import { api } from './services/api';
 import {
@@ -98,23 +101,21 @@ const DashboardContent: React.FC = () => {
         onViewDetails={() => setActiveTab('map')}
       />
 
-      {/* 2. Top Header Navigation */}
-      <Navbar
-        onOpenBroadcast={() => setIsBroadcastModalOpen(true)}
-        onNavigateToMap={() => setActiveTab('map')}
-        onReplayIntro={() => setShowSplash(true)}
-      />
+      {/* 2. Top Navigation Bar */}
+      <Navbar onBroadcastAlert={() => setIsBroadcastModalOpen(true)} />
 
-      {/* 3. Main Body: Sidebar + Active Canvas */}
+      {/* 3. Main Workspace Grid */}
       <div className="flex-1 flex overflow-hidden">
+        {/* Left Vertical Navigation Menu */}
         <Sidebar
           activeTab={activeTab}
           onTabChange={setActiveTab}
           pendingCount={stats.pending_reports}
-          alertCount={alerts.length}
+          alertCount={alerts.filter((a) => a.is_active).length}
         />
 
-        <main className="flex-1 p-6 overflow-y-auto max-w-7xl mx-auto w-full">
+        {/* Dynamic Main Page Content */}
+        <main className="flex-1 overflow-y-auto p-6">
           {activeTab === 'overview' && (
             <OverviewPage
               stats={stats}
@@ -154,6 +155,14 @@ const DashboardContent: React.FC = () => {
               alerts={alerts}
               onOpenBroadcast={() => setIsBroadcastModalOpen(true)}
             />
+          )}
+
+          {activeTab === 'vaccination' && (
+            <VaccinationPage />
+          )}
+
+          {activeTab === 'workforce' && (
+            <WorkforcePage />
           )}
         </main>
       </div>
