@@ -979,34 +979,36 @@
           <div class="vetra-card flex flex-col justify-between">
             <div>
               <!-- Header with Live ML Status & Model Specs -->
-              <div class="flex items-center justify-between pb-3 border-b border-black/5">
-                <div class="flex items-center gap-2">
-                  <div class="p-2 bg-red-100 rounded-lg">
-                    <i data-lucide="shield-alert" class="w-5 h-5 text-[#C62828]"></i>
-                  </div>
-                  <div>
-                    <div class="flex items-center gap-1.5">
-                      <h3 class="font-bold text-sm text-ink">XGBoost Outbreak Risk Model</h3>
-                      <span class="text-[10px] px-1.5 py-0.5 rounded bg-blue-100 text-blue-900 font-mono font-semibold">v1.0 (300 Trees)</span>
+              <div class="pb-3 border-b border-black/5 space-y-2.5">
+                <div class="flex items-start justify-between gap-2">
+                  <div class="flex items-center gap-2.5 min-w-0">
+                    <div class="p-2 bg-red-100 rounded-lg shrink-0">
+                      <i data-lucide="shield-alert" class="w-5 h-5 text-[#C62828]"></i>
                     </div>
-                    <p class="text-[11px] text-ink-metadata font-inter">96.27% Acc &bull; 94.74% Recall &bull; 0.9914 ROC-AUC</p>
+                    <div class="min-w-0">
+                      <h3 class="font-bold text-sm text-ink leading-tight whitespace-nowrap">XGBoost Outbreak Risk Model</h3>
+                      <p class="text-[11px] text-ink-metadata font-inter mt-0.5 whitespace-nowrap">96.27% Acc &bull; 94.74% Recall &bull; 0.9914 ROC-AUC</p>
+                    </div>
                   </div>
+                  <span id="ml-badge-risk" class="chip-critical text-[10px] whitespace-nowrap shrink-0">HIGH (87%)</span>
                 </div>
-                <div class="flex items-center gap-1.5">
-                  <button onclick="openModelTestModal(); setTimeout(function(){ if(window.trainAndCalibrateOnLiveDB) window.trainAndCalibrateOnLiveDB(); }, 120);" title="Calibrate on Live PostGIS DB & Run FastAPI :8001" class="px-2 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded text-[10px] font-bold flex items-center gap-1 cursor-pointer transition-all shadow-2xs">
-                    <span>⚡ Calibrate DB</span>
-                  </button>
-                  <button onclick="openModelTestModal()" title="Run Custom Feature Vector Test" class="px-2 py-1 bg-parchment hover:bg-white border border-black/15 rounded text-[10px] font-bold text-ink flex items-center gap-1 cursor-pointer transition-all">
-                    <i data-lucide="play" class="w-3 h-3 text-[#16a34a]"></i> Simulator
-                  </button>
-                  <span id="ml-badge-risk" class="chip-critical text-[10px]">HIGH (87%)</span>
+                <div class="flex items-center justify-between gap-2 pt-0.5">
+                  <span class="text-[10px] px-2 py-0.5 rounded bg-blue-100 text-blue-900 font-mono font-semibold whitespace-nowrap">v1.0 (180 Trees)</span>
+                  <div class="flex items-center gap-1.5 shrink-0">
+                    <button onclick="openModelTestModal(); setTimeout(function(){ if(window.trainAndCalibrateOnLiveDB) window.trainAndCalibrateOnLiveDB(); }, 120);" title="Calibrate on Live PostGIS DB & Run FastAPI :8001" class="px-2.5 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded text-[10px] font-bold flex items-center gap-1 cursor-pointer transition-all shadow-2xs whitespace-nowrap">
+                      <span>⚡ Calibrate DB</span>
+                    </button>
+                    <button onclick="openModelTestModal()" title="Run Custom Feature Vector Test" class="px-2.5 py-1 bg-parchment hover:bg-white border border-black/15 rounded text-[10px] font-bold text-ink flex items-center gap-1 cursor-pointer transition-all whitespace-nowrap">
+                      <i data-lucide="play" class="w-3 h-3 text-[#16a34a]"></i> Simulator
+                    </button>
+                  </div>
                 </div>
               </div>
 
               <!-- Interactive District Selector & Outbreak Probability Dial -->
               <div class="mt-4 p-3 rounded-lg bg-parchment/70 border border-black/5">
-                <div class="flex items-center justify-between mb-2">
-                  <label class="text-[11px] font-bold uppercase tracking-wider text-ink-secondary">
+                <div class="flex items-center justify-between gap-2 mb-2">
+                  <label class="text-[11px] font-bold uppercase tracking-wider text-ink-secondary whitespace-nowrap">
                     Select Surveillance District:
                   </label>
                   <select id="ml-district-select" onchange="onSelectOutbreakDistrict(this.value)" class="bg-white border border-black/20 text-xs font-bold text-ink rounded-md py-1 px-2 focus:outline-none">
@@ -1020,14 +1022,14 @@
                   </select>
                 </div>
 
-                <div class="flex items-baseline justify-between mt-1">
-                  <div>
-                    <span id="ml-prob-val" class="text-3xl font-extrabold text-[#C62828] font-figtree">87%</span>
-                    <span class="text-xs text-ink-secondary ml-1.5 font-inter">Outbreak Probability</span>
+                <div class="flex items-baseline justify-between gap-2 mt-1">
+                  <div class="flex items-baseline gap-1.5">
+                    <span id="ml-prob-val" class="text-3xl font-extrabold text-[#C62828] font-figtree leading-none">87%</span>
+                    <span class="text-xs text-ink-secondary font-inter whitespace-nowrap">Outbreak Probability</span>
                   </div>
-                  <div class="text-right">
-                    <span id="ml-conf-val" class="text-[11px] font-mono text-zinc-600 block">Confidence: <strong>94.0%</strong></span>
-                    <span id="ml-latency-val" class="text-[10px] text-zinc-400 font-mono">Latency: 14ms (300 Trees)</span>
+                  <div class="text-right shrink-0">
+                    <span id="ml-conf-val" class="text-[11px] font-mono text-zinc-600 block whitespace-nowrap">Confidence: <strong>94.0%</strong></span>
+                    <span id="ml-latency-val" class="text-[10px] text-zinc-400 font-mono block whitespace-nowrap">Latency: 14ms (180 Trees)</span>
                   </div>
                 </div>
 
@@ -1476,8 +1478,8 @@
 
               <!-- Stats Matrix -->
               <div class="grid grid-cols-3 gap-2 my-3 p-2 bg-parchment/60 rounded-lg border border-black/5 text-[11px] font-inter text-center">
-                <div><span class="text-zinc-400 block text-[9px]">Radius:</span><strong>Ã‚Â±25 km</strong></div>
-                <div><span class="text-zinc-400 block text-[9px]">Cluster Min:</span><strong>Ã¢â€°Â¥3 Cases</strong></div>
+                <div><span class="text-zinc-400 block text-[9px]">Radius:</span><strong>&plusmn;25 km</strong></div>
+                <div><span class="text-zinc-400 block text-[9px]">Cluster Min:</span><strong>&ge;3 Cases</strong></div>
                 <div><span class="text-zinc-400 block text-[9px]">Window:</span><strong>N/A</strong></div>
               </div>
 
@@ -1513,8 +1515,8 @@
               <p class="text-[11px] text-zinc-500 font-inter">Notifiable Pathogen (Disease Registry)</p>
 
               <div class="grid grid-cols-3 gap-2 my-3 p-2 bg-parchment/60 rounded-lg border border-black/5 text-[11px] font-inter text-center">
-                <div><span class="text-zinc-400 block text-[9px]">Radius:</span><strong>Ã‚Â±25 km</strong></div>
-                <div><span class="text-zinc-400 block text-[9px]">Cluster Min:</span><strong>Ã¢â€°Â¥3 Cases</strong></div>
+                <div><span class="text-zinc-400 block text-[9px]">Radius:</span><strong>&plusmn;25 km</strong></div>
+                <div><span class="text-zinc-400 block text-[9px]">Cluster Min:</span><strong>&ge;3 Cases</strong></div>
                 <div><span class="text-zinc-400 block text-[9px]">Window:</span><strong>N/A</strong></div>
               </div>
 
@@ -1553,8 +1555,8 @@
               <p class="text-[11px] text-zinc-500 font-inter">Zoonotic Pathogen (Disease Registry)</p>
 
               <div class="grid grid-cols-3 gap-2 my-3 p-2 bg-parchment/60 rounded-lg border border-black/5 text-[11px] font-inter text-center">
-                <div><span class="text-zinc-400 block text-[9px]">Radius:</span><strong>Ã‚Â±25 km</strong></div>
-                <div><span class="text-zinc-400 block text-[9px]">Cluster Min:</span><strong>Ã¢â€°Â¥1 Case</strong></div>
+                <div><span class="text-zinc-400 block text-[9px]">Radius:</span><strong>&plusmn;25 km</strong></div>
+                <div><span class="text-zinc-400 block text-[9px]">Cluster Min:</span><strong>&ge;1 Case</strong></div>
                 <div><span class="text-zinc-400 block text-[9px]">Window:</span><strong>N/A</strong></div>
               </div>
 
@@ -1590,8 +1592,8 @@
               <p class="text-[11px] text-zinc-500 font-inter">Notifiable Pathogen (Disease Registry)</p>
 
               <div class="grid grid-cols-3 gap-2 my-3 p-2 bg-parchment/60 rounded-lg border border-black/5 text-[11px] font-inter text-center">
-                <div><span class="text-zinc-400 block text-[9px]">Radius:</span><strong>Ã‚Â±15 km</strong></div>
-                <div><span class="text-zinc-400 block text-[9px]">Cluster Min:</span><strong>Ã¢â€°Â¥3 Cases</strong></div>
+                <div><span class="text-zinc-400 block text-[9px]">Radius:</span><strong>&plusmn;15 km</strong></div>
+                <div><span class="text-zinc-400 block text-[9px]">Cluster Min:</span><strong>&ge;3 Cases</strong></div>
                 <div><span class="text-zinc-400 block text-[9px]">Window:</span><strong>N/A</strong></div>
               </div>
 
@@ -3548,7 +3550,7 @@
           </div>
           <div>
             <label class="block font-semibold text-ink mb-1">Model Architecture</label>
-            <input type="text" readonly value="XGBoost Classifier (300 Trees)" class="w-full px-2.5 py-1.5 rounded border border-black/10 bg-zinc-100 text-zinc-600 font-mono" />
+            <input type="text" readonly value="XGBoost Classifier (180 Trees)" class="w-full px-2.5 py-1.5 rounded border border-black/10 bg-zinc-100 text-zinc-600 font-mono" />
           </div>
         </div>
 
@@ -4704,16 +4706,16 @@
       if (badgeEl) {
         badgeEl.innerText = d.level + ' (' + pct + '%)';
         if (d.level === 'HIGH') {
-          badgeEl.className = 'chip-critical text-[10px]';
-          if (probEl) probEl.className = 'text-3xl font-extrabold text-[#C62828] font-figtree';
+          badgeEl.className = 'chip-critical text-[10px] whitespace-nowrap shrink-0';
+          if (probEl) probEl.className = 'text-3xl font-extrabold text-[#C62828] font-figtree leading-none';
           if (barEl) barEl.className = 'h-2 rounded-full bg-[#C62828] transition-all duration-500';
         } else if (d.level === 'MEDIUM') {
-          badgeEl.className = 'chip-caution text-[10px]';
-          if (probEl) probEl.className = 'text-3xl font-extrabold text-[#F2994A] font-figtree';
+          badgeEl.className = 'chip-caution text-[10px] whitespace-nowrap shrink-0';
+          if (probEl) probEl.className = 'text-3xl font-extrabold text-[#F2994A] font-figtree leading-none';
           if (barEl) barEl.className = 'h-2 rounded-full bg-[#F2994A] transition-all duration-500';
         } else {
-          badgeEl.className = 'chip-resolved text-[10px]';
-          if (probEl) probEl.className = 'text-3xl font-extrabold text-[#16a34a] font-figtree';
+          badgeEl.className = 'chip-resolved text-[10px] whitespace-nowrap shrink-0';
+          if (probEl) probEl.className = 'text-3xl font-extrabold text-[#16a34a] font-figtree leading-none';
           if (barEl) barEl.className = 'h-2 rounded-full bg-[#16a34a] transition-all duration-500';
         }
       }
@@ -4751,7 +4753,7 @@
       var toast = document.getElementById('ml-toast-container');
       if (toast) {
         toast.className = 'p-2.5 rounded-lg bg-green-50 border border-green-300 text-green-900 text-xs font-inter animate-fadeIn block';
-        toast.innerHTML = '<strong>âœ“ Requisition ' + code + ' Issued:</strong> ' + d.vaccineStock.toLocaleString() + ' doses dispatched to ' + currentOutbreakDistrict + ' Veterinary Depot.';
+        toast.innerHTML = '<strong>&#10003; Requisition ' + code + ' Issued:</strong> ' + d.vaccineStock.toLocaleString() + ' doses dispatched to ' + currentOutbreakDistrict + ' Veterinary Depot.';
         setTimeout(function() { toast.className = 'hidden'; }, 6000);
       }
       var btn = document.getElementById('ml-btn-vaccine');
@@ -4766,7 +4768,7 @@
       
       openModal();
       var titleInput = document.getElementById('alert-title-input');
-      if (titleInput) titleInput.value = 'Preventative Vector Advisory &mdash; ' + currentOutbreakDistrict + ' District';
+      if (titleInput) titleInput.value = 'Preventative Vector Advisory - ' + currentOutbreakDistrict + ' District';
 
       var distInput = document.getElementById('alert-district-input');
       if (distInput) {
@@ -4837,7 +4839,7 @@
         "outbreak_risk_level": riskLevel,
         "risk_probability": score,
         "confidence": d.conf,
-        "model_architecture": "XGBoost Classifier (Gradient Boosted Trees - 300 Trees)",
+        "model_architecture": "XGBoost Classifier (Gradient Boosted Trees - 180 Trees)",
         "model_evaluation": {
           "roc_auc": 0.9914,
           "accuracy": 0.9627,
@@ -5013,7 +5015,7 @@
       closeLogVaccineModal();
       renderVaccinationTable();
 
-      alert('âœ“ Vaccination record for Animal ' + tag + ' (' + species + ') successfully saved to ' + district + ' (' + taluka + ') area registry.');
+      alert('✓ Vaccination record for Animal ' + tag + ' (' + species + ') successfully saved to ' + district + ' (' + taluka + ') area registry.');
     }
 
     function exportVaccinationCSV() {
@@ -5149,7 +5151,7 @@
       closeDeployOfficerModal();
       renderWorkforceTable();
 
-      alert('âœ“ Officer ' + name + ' successfully deployed to ' + district + ' (' + taluka + ') field area.');
+      alert('✓ Officer ' + name + ' successfully deployed to ' + district + ' (' + taluka + ') field area.');
     }
 
     function dispatchOfficer(name, dist) {
@@ -5237,7 +5239,7 @@
 
         // Title Row
         xml += '   <Row ss:Height="24" ss:StyleID="TitleStyle">\n' +
-          '    <Cell ss:MergeAcross="' + Math.max(1, (s.headers.length - 1)) + '"><Data ss:Type="String">PASHUVANI SURVEILLANCE &mdash; ' + escapeXmlSpreadsheet(s.title || s.name) + '</Data></Cell>\n' +
+          '    <Cell ss:MergeAcross="' + Math.max(1, (s.headers.length - 1)) + '"><Data ss:Type="String">PASHUVANI SURVEILLANCE - ' + escapeXmlSpreadsheet(s.title || s.name) + '</Data></Cell>\n' +
           '   </Row>\n';
 
         // Metadata Subtitle Row
