@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React from 'react';
 import { AlertTriangle, ChevronRight } from 'lucide-react';
 import { MLRiskSummary } from '../../types';

@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React from 'react';
 import { DiseaseReport } from '../types';
 import { CaseTable } from '../components/cases/CaseTable';

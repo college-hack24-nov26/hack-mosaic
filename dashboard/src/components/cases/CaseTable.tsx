@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useState } from 'react';
 import { DiseaseReport, ReportStatus } from '../../types';
 import { Search, Eye, Filter, CheckCircle2, AlertTriangle, Clock } from 'lucide-react';

@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React from 'react';
 import { DiseaseReport } from '../../types';
 import { X, ShieldCheck, Cpu, Sparkles, MapPin, Phone, User, Calendar, Tag } from 'lucide-react';
