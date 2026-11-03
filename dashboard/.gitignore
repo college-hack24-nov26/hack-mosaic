@@ -1,0 +1,23 @@
+# Logs
+*.log
+
+# Dependencies
+node_modules/
+
+# Production build outputs
+dist/
+build/
+.vite/
+coverage/
+
+# Local env files
+.env
+.env.local
+.env.*.local
+.env.development
+.env.production
+!.env.example
+
+# OS files
+.DS_Store
+Thumbs.db

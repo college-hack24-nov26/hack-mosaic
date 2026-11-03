@@ -1,0 +1,1942 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pashuvani â€” Government Animal Health & Disease Surveillance</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Google Fonts: Figtree & Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Leaflet CSS & JS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            parchment: '#f4eee5',
+            ink: '#141414',
+            'ink-secondary': '#4e4d4c',
+            'ink-metadata': '#737373',
+            'brand-primary': '#94e130',
+            'brand-hover': '#82c927',
+            'alert-critical': '#C62828',
+            'caution-amber': '#F2994A',
+            'vet-accent': '#2F6FDE',
+            'surface-card': '#ffffff',
+            'border-hairline': '#a1a1a1',
+          },
+          fontFamily: {
+            figtree: ['Figtree', 'sans-serif'],
+            inter: ['Inter', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          borderRadius: {
+            sm: '8px',
+            md: '12px',
+            lg: '20px',
+            pill: '9999px'
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body { 
+      background-color: #f4eee5; 
+      color: #141414; 
+      font-family: 'Figtree', sans-serif;
+      overflow-x: hidden;
+    }
+
+    /* ========================================================================= */
+    /* NETFLIX-STYLE CINEMATIC INTRO SPLASH                                      */
+    /* ========================================================================= */
+    #netflix-splash {
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(circle at center, #111417 0%, #060708 100%);
+      z-index: 99999;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+      overflow: hidden;
+    }
+
+    /* Ambient Cinema Light Rays */
+    .cinema-glow {
+      position: absolute;
+      width: 700px;
+      height: 700px;
+      background: radial-gradient(circle, rgba(148, 225, 48, 0.18) 0%, rgba(47, 111, 222, 0.08) 40%, rgba(6, 7, 8, 0) 70%);
+      border-radius: 50%;
+      filter: blur(80px);
+      animation: cinemaPulse 3s ease-in-out infinite alternate;
+      pointer-events: none;
+    }
+    @keyframes cinemaPulse {
+      0% { transform: scale(0.85); opacity: 0.5; }
+      100% { transform: scale(1.2); opacity: 0.95; }
+    }
+
+    /* Vertical Light Streak like Netflix Ribbon */
+    .light-streak {
+      position: absolute;
+      width: 3px;
+      height: 100vh;
+      background: linear-gradient(180deg, transparent, rgba(148, 225, 48, 0.8), rgba(47, 111, 222, 0.9), transparent);
+      filter: blur(2px);
+      animation: streakPass 2s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+      opacity: 0;
+    }
+    @keyframes streakPass {
+      0% { transform: scaleY(0) translateY(-50%); opacity: 0; }
+      40% { opacity: 1; transform: scaleY(1) translateY(0); }
+      100% { opacity: 0; transform: scaleY(1.4) translateY(20%); }
+    }
+
+    /* Cinematic Logo Zoom */
+    .netflix-reveal {
+      animation: netflixZoom 2.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    @keyframes netflixZoom {
+      0% { transform: scale(0.65) translateY(30px); opacity: 0; filter: blur(14px); letter-spacing: -2px; }
+      40% { opacity: 1; filter: blur(0px); }
+      75% { transform: scale(1.03) translateY(-2px); letter-spacing: 4px; }
+      100% { transform: scale(1) translateY(0); letter-spacing: 2px; }
+    }
+
+    /* Glowing Brand Letters */
+    .glowing-letter {
+      display: inline-block;
+      text-shadow: 0 0 25px rgba(148, 225, 48, 0.7), 0 0 50px rgba(148, 225, 48, 0.3);
+      animation: letterGlow 1.8s ease-in-out infinite alternate;
+    }
+    @keyframes letterGlow {
+      0% { text-shadow: 0 0 15px rgba(148, 225, 48, 0.4); }
+      100% { text-shadow: 0 0 35px rgba(148, 225, 48, 0.9), 0 0 65px rgba(47, 111, 222, 0.4); }
+    }
+
+    /* Progress bar */
+    .splash-progress-bar {
+      height: 2px;
+      background: linear-gradient(90deg, #94e130, #2F6FDE);
+      width: 0%;
+      animation: splashProgress 2.8s linear forwards;
+    }
+    @keyframes splashProgress {
+      0% { width: 0%; }
+      100% { width: 100%; }
+    }
+
+    /* Dissolve effect when entering app */
+    .splash-dissolve {
+      opacity: 0 !important;
+      transform: scale(1.1) !important;
+      pointer-events: none !important;
+    }
+
+    /* ========================================================================= */
+    /* VETRA DESIGN SYSTEM UTILITIES                                             */
+    /* ========================================================================= */
+    .tab-pane {
+      animation: tabFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    @keyframes tabFadeIn {
+      from { opacity: 0; transform: translateY(5px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Buttons */
+    .btn-primary {
+      height: 42px; padding: 0 18px; background-color: #94e130; color: #141414;
+      font-weight: 700; border-radius: 8px; display: inline-flex; align-items: center; gap: 8px;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1); box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+      font-family: 'Figtree', sans-serif;
+    }
+    .btn-primary:hover { 
+      background-color: #82c927; 
+      transform: translateY(-1px);
+      box-shadow: 0 4px 14px rgba(148, 225, 48, 0.4);
+    }
+    .btn-primary:active { transform: translateY(0); scale: 0.98; }
+
+    /* Chips */
+    .chip-critical {
+      display: inline-flex; align-items: center; gap: 4px; padding: 2px 10px; border-radius: 9999px;
+      background-color: #C62828; color: #ffffff; font-size: 11px; font-weight: 700;
+    }
+    .chip-caution {
+      display: inline-flex; align-items: center; gap: 4px; padding: 2px 10px; border-radius: 9999px;
+      background-color: rgba(242, 153, 74, 0.15); border: 1px solid rgba(242, 153, 74, 0.45);
+      color: #141414; font-size: 11px; font-weight: 700;
+    }
+    .chip-healthy {
+      display: inline-flex; align-items: center; gap: 4px; padding: 2px 10px; border-radius: 9999px;
+      background-color: rgba(148, 225, 48, 0.2); border: 1px solid #94e130;
+      color: #141414; font-size: 11px; font-weight: 700;
+    }
+
+    /* Vetra Card */
+    .vetra-card {
+      background-color: #ffffff; border-radius: 12px; border: 1px solid rgba(0,0,0,0.08);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.03); padding: 20px;
+      transition: all 0.2s ease;
+    }
+    .vetra-card:hover {
+      box-shadow: 0 6px 16px rgba(0,0,0,0.06);
+    }
+
+    /* Leaflet Customization */
+    .leaflet-container { 
+      font-family: 'Figtree', sans-serif !important; 
+      border-radius: 12px; 
+      background: #e5ebf0 !important;
+      width: 100%;
+      height: 100%;
+    }
+    .leaflet-popup-content-wrapper {
+      background: #ffffff !important;
+      color: #141414 !important;
+      border-radius: 10px !important;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18) !important;
+      padding: 4px !important;
+      border: 1px solid rgba(0,0,0,0.08);
+    }
+    .leaflet-popup-tip { background: #ffffff !important; }
+
+    /* Drawer Transition */
+    .drawer-open {
+      transform: translateX(0) !important;
+      box-shadow: -8px 0 35px rgba(0,0,0,0.25) !important;
+    }
+
+    /* Segmented Control Buttons */
+    .seg-btn {
+      padding: 5px 12px; font-size: 11px; font-weight: 700; border-radius: 6px;
+      transition: all 0.15s ease; cursor: pointer; display: inline-flex; align-items: center; gap: 4px;
+    }
+    .seg-btn-active {
+      background-color: #ffffff; color: #141414; box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+    }
+    .seg-btn-inactive {
+      background-color: transparent; color: #737373;
+    }
+    .seg-btn-inactive:hover { color: #141414; }
+
+    /* Pulse animation for live indicators */
+    @keyframes liveDot {
+      0% { transform: scale(0.95); opacity: 0.8; }
+      50% { transform: scale(1.3); opacity: 1; }
+      100% { transform: scale(0.95); opacity: 0.8; }
+    }
+    .live-dot {
+      animation: liveDot 1.6s infinite ease-in-out;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+  <!-- ========================================================================= -->
+  <!-- 1. NETFLIX-STYLE CINEMATIC LOGO INTRO PAGE                                -->
+  <!-- ========================================================================= -->
+  <div id="netflix-splash">
+    <div class="cinema-glow"></div>
+    <div class="light-streak" style="left: 48%;"></div>
+    <div class="light-streak" style="left: 52%; animation-delay: 0.3s;"></div>
+
+    <div class="relative z-10 flex flex-col items-center text-center px-6 max-w-xl netflix-reveal">
+      <!-- Iconic Animated Brand Emblem -->
+      <div class="relative mb-6">
+        <div class="w-24 h-24 rounded-2xl bg-gradient-to-tr from-[#94e130] to-[#b6f756] flex items-center justify-center shadow-[0_0_50px_rgba(148,225,48,0.65)] transform hover:scale-105 transition-transform duration-300">
+          <i data-lucide="shield-alert" class="w-14 h-14 text-[#141414] stroke-[2.4]"></i>
+        </div>
+        <div class="absolute -bottom-2 -right-2 w-8 h-8 rounded-full bg-[#2F6FDE] flex items-center justify-center text-white border-2 border-[#060708] shadow-md">
+          <i data-lucide="activity" class="w-4 h-4 stroke-[2.5]"></i>
+        </div>
+      </div>
+
+      <!-- Glowing Netflix-Style Typography -->
+      <h1 class="text-4xl sm:text-6xl font-black text-white font-figtree tracking-wider uppercase mb-1">
+        <span class="glowing-letter">PASHUVANI</span>
+      </h1>
+      <p class="text-xs uppercase tracking-[0.35em] font-bold text-[#94e130] font-inter">
+        National Livestock Disease & Outbreak Surveillance Network
+      </p>
+
+      <!-- Diagnostic Boot Telemetry Feed (Authentic Government System Vibe) -->
+      <div class="mt-8 bg-white/5 border border-white/10 rounded-xl p-4 font-mono text-[11px] text-zinc-400 space-y-1.5 w-full text-left shadow-2xl backdrop-blur-md">
+        <div class="flex items-center justify-between pb-1.5 border-b border-white/5 text-[10px] uppercase text-zinc-500 font-bold">
+          <span>System Diagnostic Feed</span>
+          <span class="text-[#94e130]">v1.0-RC ONLINE</span>
+        </div>
+        <div class="flex items-center justify-between">
+          <span class="flex items-center gap-1.5">
+            <span class="w-1.5 h-1.5 rounded-full bg-[#94e130]"></span> PostGIS RFC 7946 GeoJSON Stream:
+          </span>
+          <span class="text-[#94e130] font-bold">CONNECTED</span>
+        </div>
+        <div class="flex items-center justify-between">
+          <span class="flex items-center gap-1.5">
+            <span class="w-1.5 h-1.5 rounded-full bg-[#94e130]"></span> MobileNetV3 Edge Inference Engine:
+          </span>
+          <span class="text-[#94e130] font-bold">INITIALIZED</span>
+        </div>
+        <div class="flex items-center justify-between">
+          <span class="flex items-center gap-1.5">
+            <span class="w-1.5 h-1.5 rounded-full bg-[#94e130]"></span> XGBoost Epidemic Hotspot Classifier:
+          </span>
+          <span class="text-[#94e130] font-bold">ACTIVE (84% CONF)</span>
+        </div>
+        <div class="flex items-center justify-between">
+          <span class="flex items-center gap-1.5">
+            <span class="w-1.5 h-1.5 rounded-full bg-[#2F6FDE]"></span> Jurisdiction:
+          </span>
+          <span class="text-white font-semibold">Maharashtra (Statewide)</span>
+        </div>
+      </div>
+
+      <!-- Action Buttons + Audio Toggle -->
+      <div class="mt-7 flex flex-wrap items-center justify-center gap-3">
+        <button onclick="dismissNetflixSplash()" class="px-7 py-3 bg-[#94e130] text-[#141414] font-black text-xs uppercase tracking-widest rounded-lg shadow-[0_0_25px_rgba(148,225,48,0.5)] hover:bg-[#82c927] transition-all flex items-center gap-2 active:scale-95 cursor-pointer">
+          <span>Enter Surveillance Console</span>
+          <i data-lucide="arrow-right" class="w-4 h-4 stroke-[3]"></i>
+        </button>
+        <button onclick="playTaDumSound()" class="px-4 py-3 bg-white/10 hover:bg-white/20 text-white font-bold text-xs uppercase tracking-wider rounded-lg transition-all flex items-center gap-2 border border-white/15" title="Play Cinematic Ta-Dum Sound">
+          <i data-lucide="volume-2" class="w-4 h-4 text-[#94e130]"></i>
+          <span>Play Ta-Dum</span>
+        </button>
+      </div>
+
+      <!-- Progress bar -->
+      <div class="w-64 bg-white/10 h-1 rounded-full mt-6 overflow-hidden">
+        <div class="splash-progress-bar"></div>
+      </div>
+      <span class="text-[10px] text-zinc-500 mt-2 font-inter">Auto-launching in 2.8 seconds...</span>
+    </div>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- 2. TOP TELEMETRY BAR (Directly from User Reference Image 1)               -->
+  <!-- ========================================================================= -->
+  <header class="w-full bg-white border-b border-black/10 px-5 py-2 flex flex-wrap items-center justify-between text-xs font-inter z-30 shadow-sm sticky top-0">
+    <div class="flex items-center gap-4">
+      <!-- Brand & GOV badge -->
+      <div class="flex items-center gap-2.5">
+        <div class="w-8 h-8 rounded-lg bg-[#94e130] flex items-center justify-center shadow-sm">
+          <i data-lucide="shield-alert" class="w-5 h-5 text-[#141414] stroke-[2.5]"></i>
+        </div>
+        <div>
+          <div class="flex items-center gap-1.5">
+            <span class="font-extrabold text-sm text-[#141414] tracking-tight font-figtree">PASHUVANI</span>
+            <span class="text-[9px] uppercase font-bold px-1.5 py-0.2 bg-black/5 rounded text-zinc-700">GOV</span>
+          </div>
+          <div class="text-[9px] text-zinc-500 -mt-0.5 font-medium">Government Animal Health & Disease Surveillance</div>
+        </div>
+      </div>
+
+      <!-- Location Scope Selector Dropdown -->
+      <div class="hidden sm:flex items-center gap-1.5 bg-parchment/80 border border-black/10 px-3 py-1 rounded text-xs">
+        <i data-lucide="map-pin" class="w-3.5 h-3.5 text-zinc-500"></i>
+        <span>Scope: <strong>Maharashtra (Statewide)</strong></span>
+        <i data-lucide="chevron-down" class="w-3 h-3 text-zinc-500"></i>
+      </div>
+
+      <!-- Live Telemetry Status Badge -->
+      <div class="hidden md:flex items-center gap-1.5 px-2.5 py-0.5 rounded bg-emerald-50 text-emerald-800 border border-emerald-200 text-[11px] font-semibold">
+        <span class="w-2 h-2 rounded-full bg-emerald-500 live-dot"></span>
+        <span class="tracking-wide">LIVE TELEMETRY</span>
+      </div>
+
+      <!-- Live IST Clock -->
+      <div class="hidden lg:flex items-center gap-1.5 text-zinc-600 font-mono text-[11px]" id="live-ist-clock">
+        14:28:52 IST
+      </div>
+    </div>
+
+    <!-- Right Controls: Threat Warning + User Officer + Replay Intro -->
+    <div class="flex items-center gap-3">
+      <!-- 3 High/Crit Threats Badge -->
+      <button onclick="switchTab('map')" class="flex items-center gap-1.5 bg-red-50 text-[#C62828] border border-red-200 px-3 py-1 rounded font-bold text-xs cursor-pointer hover:bg-red-100 transition-colors">
+        <i data-lucide="alert-triangle" class="w-3.5 h-3.5 text-[#C62828]"></i>
+        <span>3 HIGH/CRIT THREATS</span>
+      </button>
+
+      <!-- User Profile Badge (Dr. Vikram Deshmukh) -->
+      <div class="flex items-center gap-2 pl-3 border-l border-black/10">
+        <div class="text-right">
+          <div class="font-bold text-xs text-[#141414]">Dr. Vikram Deshmukh</div>
+          <div class="text-[9px] text-zinc-500 uppercase font-semibold">GOVERNMENT_OFFICER</div>
+        </div>
+        <div class="w-8 h-8 rounded-full bg-blue-50 border border-blue-200 flex items-center justify-center text-[#2F6FDE]">
+          <i data-lucide="user" class="w-4 h-4"></i>
+        </div>
+      </div>
+
+      <!-- Replay Intro Button -->
+      <button onclick="replayNetflixSplash()" class="p-1.5 rounded hover:bg-parchment text-zinc-500 hover:text-black transition-colors" title="Replay Netflix Cinematic Intro">
+        <i data-lucide="film" class="w-4 h-4"></i>
+      </button>
+    </div>
+  </header>
+
+  <!-- ========================================================================= -->
+  <!-- 3. BODY: SIDEBAR + MAIN CONTENT WORKSPACE                                 -->
+  <!-- ========================================================================= -->
+  <div class="flex-1 flex overflow-hidden">
+    
+    <!-- LEFT SIDEBAR (Directly matching Reference Image 1 & 2) -->
+    <aside class="w-60 bg-white border-r border-black/10 flex flex-col justify-between shrink-0 p-3 min-h-[calc(100vh-3.5rem)] select-none">
+      <div class="space-y-1 text-xs font-figtree">
+        <div class="text-[10px] font-bold uppercase tracking-wider text-zinc-400 px-3 py-1.5">
+          Surveillance Modules
+        </div>
+        
+        <button id="nav-overview" onclick="switchTab('overview')" class="w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-xs font-bold transition-all bg-parchment text-ink shadow-sm border-l-4 border-l-[#94e130]">
+          <div class="flex items-center gap-2.5">
+            <i data-lucide="layout-dashboard" class="w-4 h-4 text-ink"></i>
+            <span>Overview</span>
+          </div>
+        </button>
+
+        <button id="nav-map" onclick="switchTab('map')" class="w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-xs font-bold text-zinc-600 hover:bg-parchment/60 hover:text-ink transition-all">
+          <div class="flex items-center gap-2.5">
+            <i data-lucide="map" class="w-4 h-4"></i>
+            <span>Surveillance Map</span>
+          </div>
+          <span class="text-[9px] font-bold px-1.5 py-0.5 rounded-pill bg-[#94e130]/30 text-ink">GIS</span>
+        </button>
+
+        <button id="nav-protocols" onclick="switchTab('protocols')" class="w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-xs font-bold text-zinc-600 hover:bg-parchment/60 hover:text-ink transition-all">
+          <div class="flex items-center gap-2.5">
+            <i data-lucide="book-open" class="w-4 h-4"></i>
+            <span>Protocols</span>
+          </div>
+          <span class="text-[9px] font-bold px-1.5 py-0.5 rounded-pill bg-blue-100 text-[#2F6FDE]">5 Path</span>
+        </button>
+
+        <button id="nav-cases" onclick="switchTab('cases')" class="w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-xs font-bold text-zinc-600 hover:bg-parchment/60 hover:text-ink transition-all">
+          <div class="flex items-center gap-2.5">
+            <i data-lucide="file-text" class="w-4 h-4"></i>
+            <span>Reports & Cases</span>
+          </div>
+          <span class="text-[9px] font-bold px-1.5 py-0.5 rounded-pill bg-[#F2994A] text-ink font-mono">24</span>
+        </button>
+
+        <button id="nav-alerts" onclick="switchTab('alerts')" class="w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-xs font-bold text-zinc-600 hover:bg-parchment/60 hover:text-ink transition-all">
+          <div class="flex items-center gap-2.5">
+            <i data-lucide="alert-octagon" class="w-4 h-4"></i>
+            <span>Alerts</span>
+          </div>
+          <span class="text-[9px] font-bold px-1.5 py-0.5 rounded-pill bg-[#C62828] text-white font-mono">3</span>
+        </button>
+
+        <button onclick="alert('Vaccination Drive tracker active for Pune & Ahmednagar districts. 4,200 ring doses administered.')" class="w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-xs font-bold text-zinc-600 hover:bg-parchment/60 hover:text-ink transition-all">
+          <div class="flex items-center gap-2.5">
+            <i data-lucide="syringe" class="w-4 h-4"></i>
+            <span>Vaccination</span>
+          </div>
+        </button>
+
+        <button onclick="alert('Field Workforce coordination: 48 Government Veterinarians currently on patrol in high-risk zones.')" class="w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-xs font-bold text-zinc-600 hover:bg-parchment/60 hover:text-ink transition-all">
+          <div class="flex items-center gap-2.5">
+            <i data-lucide="users" class="w-4 h-4"></i>
+            <span>Field Workforce</span>
+          </div>
+        </button>
+      </div>
+
+      <!-- Footer from Reference Screenshot 1 & 2 -->
+      <div class="p-3 bg-parchment/70 rounded-lg border border-black/5 text-[10px] font-mono text-zinc-600 space-y-0.5">
+        <div class="font-bold text-[#141414] uppercase">DAHD SURVEILLANCE v1.0-RC</div>
+        <div class="text-[9px] text-zinc-500">PostgreSQL + PostGIS GIS</div>
+      </div>
+    </aside>
+
+    <!-- MAIN ACTIVE VIEW CANVAS -->
+    <main class="flex-1 p-5 overflow-y-auto max-w-7xl mx-auto w-full">
+
+      <!-- ===================================================================== -->
+      <!-- TAB 1: OVERVIEW PAGE                                                  -->
+      <!-- ===================================================================== -->
+      <section id="tab-overview" class="space-y-6 tab-pane">
+        <div class="flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <h1 class="text-2xl font-bold text-ink">District Surveillance Overview</h1>
+            <p class="text-sm text-ink-secondary font-inter">Live epidemiological indicators, risk models, and veterinary verifications across Maharashtra</p>
+          </div>
+          <button onclick="openModal()" class="btn-primary text-xs">
+            <i data-lucide="bell" class="w-4 h-4"></i>
+            <span>Broadcast Outbreak Alert</span>
+          </button>
+        </div>
+
+        <!-- 4 Top Overview KPI Cards -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div class="vetra-card flex items-center justify-between cursor-pointer" onclick="switchTab('cases')">
+            <div>
+              <span class="text-xs font-semibold uppercase tracking-wider text-ink-secondary">Total Reports</span>
+              <div class="text-3xl font-extrabold text-ink mt-1 font-figtree">168</div>
+              <span class="text-xs text-ink-metadata font-inter">Statewide field logs</span>
+            </div>
+            <div class="p-3 bg-black/5 rounded-lg"><i data-lucide="clipboard-list" class="w-6 h-6 text-ink"></i></div>
+          </div>
+
+          <div class="vetra-card flex items-center justify-between border-l-4 border-l-[#C62828] cursor-pointer" onclick="switchTab('map')">
+            <div>
+              <span class="text-xs font-semibold uppercase tracking-wider text-[#C62828]">Confirmed Outbreaks</span>
+              <div class="text-3xl font-extrabold text-[#C62828] mt-1 font-figtree">112</div>
+              <span class="text-xs text-ink-metadata font-inter">Verified by Field Vets</span>
+            </div>
+            <div class="p-3 bg-red-50 rounded-lg"><i data-lucide="alert-circle" class="w-6 h-6 text-[#C62828]"></i></div>
+          </div>
+
+          <div class="vetra-card flex items-center justify-between border-l-4 border-l-[#F2994A] cursor-pointer" onclick="switchTab('cases')">
+            <div>
+              <span class="text-xs font-semibold uppercase tracking-wider text-[#F2994A]">Pending Review</span>
+              <div class="text-3xl font-extrabold text-ink mt-1 font-figtree">24</div>
+              <span class="text-xs text-ink-metadata font-inter">Awaiting Diagnosis</span>
+            </div>
+            <div class="p-3 bg-orange-50 rounded-lg"><i data-lucide="clock" class="w-6 h-6 text-[#F2994A]"></i></div>
+          </div>
+
+          <div class="vetra-card flex items-center justify-between border-l-4 border-l-[#94e130]">
+            <div>
+              <span class="text-xs font-semibold uppercase tracking-wider text-emerald-800">Resolved Cases</span>
+              <div class="text-3xl font-extrabold text-ink mt-1 font-figtree">32</div>
+              <span class="text-xs text-ink-metadata font-inter">Treated & Quarantined</span>
+            </div>
+            <div class="p-3 bg-emerald-50 rounded-lg"><i data-lucide="check-circle-2" class="w-6 h-6 text-emerald-800"></i></div>
+          </div>
+        </div>
+
+        <!-- Overview Map Preview & XGBoost Intelligence Card -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div class="lg:col-span-2 vetra-card p-0 overflow-hidden relative">
+            <div class="p-4 border-b border-black/10 flex items-center justify-between bg-white">
+              <div>
+                <h3 class="font-bold text-base text-ink flex items-center gap-2">
+                  <span class="w-2.5 h-2.5 rounded-full bg-[#C62828] animate-pulse"></span>
+                  Active Geographic Disease Clusters
+                </h3>
+                <p class="text-xs text-ink-metadata font-inter">PostGIS spatial cluster tracking & WGS84 GeoJSON stream</p>
+              </div>
+              <button onclick="switchTab('map')" class="text-xs font-bold text-ink hover:underline flex items-center gap-1">
+                Open Full GIS Canvas <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+              </button>
+            </div>
+            <div id="overview-map" class="h-96 w-full"></div>
+          </div>
+
+          <!-- AI XGBoost Outbreak Risk Card -->
+          <div class="vetra-card flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between pb-3 border-b border-black/5">
+                <div class="flex items-center gap-2">
+                  <div class="p-2 bg-red-100 rounded-lg"><i data-lucide="shield-alert" class="w-5 h-5 text-[#C62828]"></i></div>
+                  <div>
+                    <h3 class="font-bold text-sm text-ink">Outbreak Risk Model</h3>
+                    <p class="text-[11px] text-ink-metadata font-inter">XGBoost-Surveillance-v1.2</p>
+                  </div>
+                </div>
+                <span class="chip-critical text-[10px]">Critical (84%)</span>
+              </div>
+
+              <div class="mt-4">
+                <h4 class="text-xs font-bold uppercase text-ink-secondary mb-2 font-figtree">High Transmission Districts</h4>
+                <div class="space-y-1.5 text-xs font-inter">
+                  <div class="flex justify-between p-2 rounded-lg bg-parchment/70 border border-black/5">
+                    <span class="font-semibold text-ink">Pune District</span>
+                    <span class="text-[#C62828] font-bold">88% (FMD)</span>
+                  </div>
+                  <div class="flex justify-between p-2 rounded-lg bg-parchment/70 border border-black/5">
+                    <span class="font-semibold text-ink">Ahmednagar</span>
+                    <span class="text-[#C62828] font-bold">82% (LSD)</span>
+                  </div>
+                  <div class="flex justify-between p-2 rounded-lg bg-parchment/70 border border-black/5">
+                    <span class="font-semibold text-ink">Satara</span>
+                    <span class="text-[#C62828] font-bold">79% (Anthrax)</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="mt-4">
+                <h4 class="text-xs font-bold uppercase text-ink-secondary mb-2 font-figtree">Key Transmission Drivers</h4>
+                <ul class="text-xs text-ink-secondary space-y-1.5 font-inter">
+                  <li class="flex items-start gap-1.5"><span class="text-[#F2994A] font-bold">â€¢</span><span>+48% bovine vesicle reports in Haveli & Shirur</span></li>
+                  <li class="flex items-start gap-1.5"><span class="text-[#F2994A] font-bold">â€¢</span><span>Post-monsoon humidity elevating vector density</span></li>
+                  <li class="flex items-start gap-1.5"><span class="text-[#F2994A] font-bold">â€¢</span><span>Livestock market movement along Pune-Nagar axis</span></li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="mt-4 pt-3 border-t border-black/5 text-[11px] text-ink-metadata font-inter flex justify-between">
+              <span>Auto-retrained on PostGIS data</span>
+              <span>Updated: 14:28 IST</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===================================================================== -->
+      <!-- TAB 2: LIVE GIS EPIDEMIOLOGICAL SURVEILLANCE MAP                      -->
+      <!-- Directly matching User Reference Image 1                              -->
+      <!-- ===================================================================== -->
+      <section id="tab-map" class="space-y-3 hidden tab-pane">
+        
+        <!-- Header & Action Row from Screenshot 1 -->
+        <div class="bg-white p-4 rounded-xl border border-black/10 shadow-sm space-y-3">
+          <div class="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <div class="flex items-center gap-2">
+                <button onclick="switchTab('overview')" class="text-xs font-semibold px-2.5 py-1 rounded bg-parchment border border-black/10 hover:bg-white flex items-center gap-1">
+                  <i data-lucide="chevron-left" class="w-3.5 h-3.5"></i> Overview
+                </button>
+                <div class="p-1 rounded bg-blue-50 text-[#2F6FDE]">
+                  <i data-lucide="map" class="w-4 h-4"></i>
+                </div>
+                <h2 class="text-base font-bold text-[#141414] font-figtree">
+                  Live GIS Epidemiological Surveillance Map
+                </h2>
+                <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-blue-50 text-[#2F6FDE] border border-blue-200 font-semibold">
+                  PostGIS RFC 7946 Stream
+                </span>
+              </div>
+              <p class="text-xs text-zinc-500 font-inter mt-1">
+                Statewide spatial cluster tracking â€¢ WGS84 GeoJSON vectors â€¢ Administrative boundary layers
+              </p>
+            </div>
+
+            <!-- View Options & Export Actions from Screenshot 1 -->
+            <div class="flex items-center gap-2 text-xs font-inter">
+              <button id="view-mode-map" onclick="toggleGISViewMode('map')" class="px-3 py-1.5 rounded-lg bg-white border border-black/20 font-bold shadow-sm flex items-center gap-1.5 text-[#141414]">
+                <i data-lucide="map-pin" class="w-3.5 h-3.5 text-[#2F6FDE]"></i> Spatial Map View
+              </button>
+              <button id="view-mode-table" onclick="toggleGISViewMode('table')" class="px-3 py-1.5 rounded-lg bg-parchment/60 border border-black/10 text-zinc-600 hover:text-black flex items-center gap-1.5">
+                <i data-lucide="table" class="w-3.5 h-3.5"></i> Accessible Table (WCAG)
+              </button>
+              <button onclick="exportGISData()" class="px-3 py-1.5 rounded-lg bg-parchment/60 border border-black/10 text-zinc-600 hover:text-black flex items-center gap-1.5">
+                <i data-lucide="download" class="w-3.5 h-3.5"></i> Export GIS (CSV)
+              </button>
+              <button onclick="refreshGIS()" class="px-3 py-1.5 rounded-lg bg-parchment/60 border border-black/10 text-zinc-600 hover:text-black flex items-center gap-1.5">
+                <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> Sync
+              </button>
+            </div>
+          </div>
+
+          <!-- GIS FILTERS ROW (From Reference Image 1) -->
+          <div class="pt-3 border-t border-black/5 flex flex-wrap items-center justify-between gap-3 text-xs font-inter">
+            <div class="flex flex-wrap items-center gap-2.5">
+              <span class="font-bold text-[#141414] uppercase text-[11px] flex items-center gap-1">
+                <i data-lucide="filter" class="w-3.5 h-3.5 text-zinc-500"></i> GIS FILTERS
+              </span>
+
+              <div class="flex items-center gap-1.5 bg-parchment px-2.5 py-1 rounded-md border border-black/10">
+                <span class="text-zinc-500 text-[11px]">Disease:</span>
+                <select id="map-disease-filter" onchange="applyGISFilters()" class="bg-transparent font-semibold focus:outline-none cursor-pointer text-xs">
+                  <option value="all">All Diseases</option>
+                  <option value="FMD">Foot-and-Mouth (FMD)</option>
+                  <option value="LSD">Lumpy Skin Disease (LSD)</option>
+                  <option value="Anthrax">Anthrax Suspicion</option>
+                  <option value="PPR">Peste des Petits (PPR)</option>
+                  <option value="Brucellosis">Brucellosis</option>
+                </select>
+              </div>
+
+              <div class="flex items-center gap-1.5 bg-parchment px-2.5 py-1 rounded-md border border-black/10">
+                <span class="text-zinc-500 text-[11px]">Risk:</span>
+                <select id="map-risk-filter" onchange="applyGISFilters()" class="bg-transparent font-semibold focus:outline-none cursor-pointer text-xs">
+                  <option value="all">ALL Risk Levels</option>
+                  <option value="critical">Critical</option>
+                  <option value="high">High</option>
+                  <option value="medium">Medium</option>
+                </select>
+              </div>
+
+              <div class="flex items-center gap-1.5 bg-parchment px-2.5 py-1 rounded-md border border-black/10">
+                <span class="text-zinc-500 text-[11px]">Status:</span>
+                <select id="map-status-filter" onchange="applyGISFilters()" class="bg-transparent font-semibold focus:outline-none cursor-pointer text-xs">
+                  <option value="all">ALL Statuses</option>
+                  <option value="verified">Verified</option>
+                  <option value="submitted">Suspected</option>
+                  <option value="resolved">Resolved</option>
+                </select>
+              </div>
+
+              <div class="flex items-center gap-1.5 bg-parchment px-2.5 py-1 rounded-md border border-black/10">
+                <span class="text-zinc-500 text-[11px]">District:</span>
+                <select id="map-district-filter" onchange="applyGISFilters()" class="bg-transparent font-semibold focus:outline-none cursor-pointer text-xs">
+                  <option value="all">Maharashtra (Statewide)</option>
+                  <option value="Pune">Pune District</option>
+                  <option value="Ahmednagar">Ahmednagar</option>
+                  <option value="Satara">Satara</option>
+                  <option value="Solapur">Solapur</option>
+                  <option value="Kolhapur">Kolhapur</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Search & Visible Counter from Screenshot 1 -->
+            <div class="flex items-center gap-2">
+              <div class="relative">
+                <i data-lucide="search" class="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-zinc-400"></i>
+                <input type="text" id="map-quick-search" oninput="applyGISFilters()" placeholder="Search cluster or tag..." class="pl-8 pr-3 py-1 text-xs rounded-md border border-black/15 bg-parchment font-inter focus:outline-none w-48" />
+              </div>
+              <button onclick="resetGISFilters()" class="text-zinc-500 hover:text-black flex items-center gap-1 text-xs">
+                <i data-lucide="rotate-ccw" class="w-3 h-3"></i> Reset
+              </button>
+              <span class="px-2.5 py-0.5 rounded bg-blue-50 text-[#2F6FDE] font-bold text-[11px] border border-blue-200" id="visible-pins-badge">
+                6 Visible
+              </span>
+            </div>
+          </div>
+
+          <!-- ACTIVE LAYERS & BOUNDARIES ROW (From Reference Image 1) -->
+          <div class="pt-2.5 border-t border-black/5 flex flex-wrap items-center justify-between text-xs font-inter text-zinc-700">
+            <div class="flex flex-wrap items-center gap-3 sm:gap-4">
+              <span class="font-bold text-[#141414] text-[11px]">Active Layers:</span>
+              
+              <label class="flex items-center gap-1.5 cursor-pointer select-none">
+                <input type="checkbox" checked id="layer-buffers" onchange="toggleLayerBuffers(this.checked)" class="accent-[#94e130] rounded">
+                <span>Cluster Risk Buffers</span>
+              </label>
+
+              <label class="flex items-center gap-1.5 cursor-pointer select-none">
+                <input type="checkbox" checked id="layer-confirmed" onchange="applyGISFilters()" class="accent-[#C62828] rounded">
+                <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-sm bg-[#C62828]"></span> Confirmed Cases</span>
+              </label>
+
+              <label class="flex items-center gap-1.5 cursor-pointer select-none">
+                <input type="checkbox" checked id="layer-suspected" onchange="applyGISFilters()" class="accent-[#F2994A] rounded">
+                <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-sm bg-[#F2994A]"></span> Suspected Cases</span>
+              </label>
+
+              <label class="flex items-center gap-1.5 cursor-pointer select-none">
+                <input type="checkbox" checked id="layer-ai" onchange="applyGISFilters()" class="accent-[#2F6FDE] rounded">
+                <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-[#2F6FDE]"></span> AI Preliminary Signals</span>
+              </label>
+
+              <label class="flex items-center gap-1.5 cursor-pointer select-none">
+                <input type="checkbox" id="layer-kde" onchange="toggleKDE(this.checked)" class="accent-zinc-700 rounded">
+                <span>Spatial Intensity (KDE)</span>
+              </label>
+
+              <span class="text-zinc-300">|</span>
+
+              <span class="font-bold text-[#141414] text-[11px]">Boundaries:</span>
+              <label class="flex items-center gap-1 cursor-pointer select-none">
+                <input type="checkbox" checked class="accent-zinc-800 rounded">
+                <span>State</span>
+              </label>
+              <label class="flex items-center gap-1 cursor-pointer select-none">
+                <input type="checkbox" checked class="accent-zinc-800 rounded">
+                <span>Districts</span>
+              </label>
+              <label class="flex items-center gap-1 cursor-pointer select-none">
+                <input type="checkbox" class="accent-zinc-800 rounded">
+                <span>Talukas</span>
+              </label>
+            </div>
+
+            <!-- Base Map Tile Switcher (OpenStreetMap / MapTiler / Satellite) -->
+            <div class="flex items-center gap-1 bg-parchment p-0.5 rounded-lg border border-black/10 mt-2 sm:mt-0">
+              <button id="full-tile-osm" onclick="setTileLayer('osm')" class="seg-btn seg-btn-active">
+                <i data-lucide="compass" class="w-3 h-3 text-emerald-600"></i> OpenStreetMap
+              </button>
+              <button id="full-tile-maptiler" onclick="setTileLayer('maptiler')" class="seg-btn seg-btn-inactive">
+                <i data-lucide="map" class="w-3 h-3 text-blue-600"></i> MapTiler
+              </button>
+              <button id="full-tile-satellite" onclick="setTileLayer('satellite')" class="seg-btn seg-btn-inactive">
+                <i data-lucide="globe" class="w-3 h-3 text-amber-600"></i> Satellite
+              </button>
+            </div>
+        </div>
+
+        <!-- Fullscreen Leaflet Map Area -->
+        <div id="gis-map-canvas-container" class="vetra-card p-0 overflow-hidden relative shadow-md" style="min-height: 600px;">
+          <div id="full-map" style="height: 600px; width: 100%;"></div>
+
+          <!-- Loading overlay indicator when re-syncing -->
+          <div id="gis-loading-overlay" style="display: none;" class="absolute inset-0 bg-white/75 backdrop-blur-xs z-30 flex flex-col items-center justify-center">
+            <div class="w-10 h-10 border-4 border-[#2F6FDE] border-t-transparent rounded-full animate-spin"></div>
+            <span class="text-xs font-bold text-[#141414] mt-3 font-figtree">Loading spatial epidemiological vectors...</span>
+          </div>
+        </div>
+
+        <!-- Accessible WCAG Table View (Toggled by "Accessible Table" Button) -->
+        <div id="gis-table-view-container" style="display: none;" class="vetra-card p-0 overflow-hidden">
+          <div class="p-4 border-b border-black/10 bg-white flex justify-between items-center">
+            <span class="font-bold text-sm text-ink">WCAG Accessible Outbreak Spatial Records</span>
+            <span class="text-xs text-zinc-500 font-mono">Standard GeoJSON Attributes</span>
+          </div>
+          <table class="w-full text-left font-inter text-xs">
+            <thead class="bg-parchment text-[11px] uppercase font-bold text-ink-secondary">
+              <tr>
+                <th class="py-3 px-4">Cluster ID</th>
+                <th class="py-3 px-4">Disease</th>
+                <th class="py-3 px-4">District / Taluka</th>
+                <th class="py-3 px-4">Coordinates (WGS84)</th>
+                <th class="py-3 px-4">Risk Level</th>
+                <th class="py-3 px-4">Status</th>
+                <th class="py-3 px-4 text-right">Action</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-black/5" id="wcag-table-body">
+              <!-- Dynamically populated from JS -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ===================================================================== -->
+      <!-- TAB 3: VETERINARY BIOSECURITY PROTOCOL REFERENCE                      -->
+      <!-- Directly matching User Reference Image 2                              -->
+      <!-- ===================================================================== -->
+      <section id="tab-protocols" class="space-y-4 hidden tab-pane">
+        
+        <!-- Header & Sync Status from Reference Screenshot 2 -->
+        <div class="bg-white p-4 rounded-xl border border-black/10 shadow-sm flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <div class="flex items-center gap-2">
+              <div class="p-1 rounded bg-blue-50 text-[#2F6FDE]">
+                <i data-lucide="book-open" class="w-5 h-5"></i>
+              </div>
+              <h2 class="text-lg font-bold text-[#141414] font-figtree">
+                Veterinary Biosecurity Protocol Reference
+              </h2>
+            </div>
+            <p class="text-xs text-zinc-500 font-inter mt-1">
+              PASHUVANI Disease Registry catalog, pathogen surveillance parameters, and departmental protocol reference.
+            </p>
+          </div>
+          <div class="flex items-center gap-2 text-xs font-inter">
+            <span class="text-zinc-500">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block mr-1"></span>
+              Scope: <strong>Maharashtra (Statewide)</strong> â€¢ Synced: <strong>14:28:41 IST</strong>
+            </span>
+            <button onclick="refreshProtocolsRegistry()" class="px-3 py-1.5 rounded bg-parchment border border-black/10 font-semibold hover:bg-white flex items-center gap-1.5 text-zinc-700">
+              <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> Refresh Registry
+            </button>
+          </div>
+        </div>
+
+        <!-- 4 Top KPI Blocks from Reference Screenshot 2 -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+          
+          <!-- KPI 1: Registered Pathogens -->
+          <div class="vetra-card p-4">
+            <div class="flex items-center justify-between text-zinc-500 text-[11px] font-bold uppercase tracking-wider">
+              <span>REGISTERED PATHOGENS</span>
+              <i data-lucide="book" class="w-4 h-4 text-[#2F6FDE]"></i>
+            </div>
+            <div class="text-2xl font-black text-[#141414] mt-1 font-figtree">5 <span class="text-xs font-normal text-zinc-500">Pathogen Profiles</span></div>
+            <div class="text-[10px] font-mono text-zinc-500 mt-1">Status: REFERENCE_CONTENT</div>
+          </div>
+
+          <!-- KPI 2: Notifiable / Reportable -->
+          <div class="vetra-card p-4 border-l-4 border-l-[#C62828]">
+            <div class="flex items-center justify-between text-zinc-500 text-[11px] font-bold uppercase tracking-wider">
+              <span>NOTIFIABLE / REPORTABLE</span>
+              <i data-lucide="shield-alert" class="w-4 h-4 text-[#C62828]"></i>
+            </div>
+            <div class="text-2xl font-black text-[#C62828] mt-1 font-figtree">5 of 5 <span class="text-xs font-normal text-zinc-500">Pathogens</span></div>
+            <div class="text-[10px] font-mono text-zinc-500 mt-1">Recorded in Disease Registry</div>
+          </div>
+
+          <!-- KPI 3: Zoonotic Potential -->
+          <div class="vetra-card p-4 border-l-4 border-l-[#F2994A]">
+            <div class="flex items-center justify-between text-zinc-500 text-[11px] font-bold uppercase tracking-wider">
+              <span>ZOONOTIC POTENTIAL</span>
+              <i data-lucide="alert-triangle" class="w-4 h-4 text-[#F2994A]"></i>
+            </div>
+            <div class="text-2xl font-black text-[#141414] mt-1 font-figtree">2 <span class="text-xs font-normal text-zinc-500">Human Transmission Risk</span></div>
+            <div class="text-[10px] font-mono text-zinc-500 mt-1">Recorded in Disease Registry</div>
+          </div>
+
+          <!-- KPI 4: Active Outbreak Clusters -->
+          <div class="vetra-card p-4 border-l-4 border-l-[#94e130]">
+            <div class="flex items-center justify-between text-zinc-500 text-[11px] font-bold uppercase tracking-wider">
+              <span>ACTIVE OUTBREAK CLUSTERS</span>
+              <i data-lucide="flame" class="w-4 h-4 text-emerald-600"></i>
+            </div>
+            <div class="text-2xl font-black text-[#141414] mt-1 font-figtree">5 <span class="text-xs font-normal text-zinc-500">Pathogens Active</span></div>
+            <div class="text-[10px] font-mono text-zinc-500 mt-1">Correlated from Surveillance Feed</div>
+          </div>
+        </div>
+
+        <!-- Search & Filter Controls from Reference Screenshot 2 -->
+        <div class="bg-white p-3.5 rounded-xl border border-black/10 shadow-sm space-y-3 text-xs font-inter">
+          <div class="flex flex-wrap items-center justify-between gap-3">
+            <div class="relative flex-1 min-w-[280px]">
+              <i data-lucide="search" class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400"></i>
+              <input type="text" id="protocol-search" oninput="filterProtocols()" placeholder="Search by Disease Name, Category, or Susceptible Species..." class="w-full pl-9 pr-3 py-2 rounded-lg border border-black/15 bg-parchment/60 focus:outline-none focus:border-[#94e130]" />
+            </div>
+
+            <div class="flex items-center gap-2">
+              <button id="zoonotic-toggle-btn" onclick="toggleZoonoticFilter()" class="px-3.5 py-2 rounded-lg border border-black/15 font-semibold text-zinc-700 hover:bg-parchment flex items-center gap-1.5 transition-all">
+                <i data-lucide="alert-triangle" class="w-3.5 h-3.5 text-[#F2994A]"></i> Filter: Zoonotic
+              </button>
+              <button onclick="resetProtocolFilters()" class="text-zinc-500 hover:text-black flex items-center gap-1 px-2 py-1">
+                <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i> Reset
+              </button>
+            </div>
+          </div>
+
+          <!-- Dropdowns Row from Screenshot 2 -->
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 border-t border-black/5 text-[11px]">
+            <div>
+              <span class="text-zinc-500 font-bold block mb-1">SEVERITY CLASSIFICATION:</span>
+              <select id="protocol-severity" onchange="filterProtocols()" class="w-full p-2 bg-parchment rounded-lg border border-black/10 font-semibold focus:outline-none">
+                <option value="all">All Severity Levels</option>
+                <option value="critical">Critical</option>
+                <option value="high">High Severity</option>
+                <option value="medium">Medium</option>
+              </select>
+            </div>
+
+            <div>
+              <span class="text-zinc-500 font-bold block mb-1">ZOONOTIC STATUS:</span>
+              <select id="protocol-zoonotic" onchange="filterProtocols()" class="w-full p-2 bg-parchment rounded-lg border border-black/10 font-semibold focus:outline-none">
+                <option value="all">All Transmission Modes</option>
+                <option value="zoonotic">Zoonotic (Human Risk)</option>
+                <option value="animal-only">Non-Zoonotic (Animal Only)</option>
+              </select>
+            </div>
+
+            <div>
+              <span class="text-zinc-500 font-bold block mb-1">STATUTORY MANDATE:</span>
+              <select id="protocol-mandate" onchange="filterProtocols()" class="w-full p-2 bg-parchment rounded-lg border border-black/10 font-semibold focus:outline-none">
+                <option value="all">All Reporting Mandates</option>
+                <option value="mandatory">Reportable: Yes (Mandatory)</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Protocol Cards Grid (Directly matching Reference Screenshot 2) -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4" id="protocols-grid">
+
+          <!-- Card 1: Foot-and-Mouth Disease (FMD) -->
+          <div class="protocol-card vetra-card p-4 flex flex-col justify-between" data-disease="fmd" data-severity="high" data-zoonotic="no">
+            <div>
+              <div class="flex items-center justify-between text-[10px] font-mono text-zinc-500 mb-2">
+                <span>REFERENCE_CONTENT</span>
+                <span class="px-2 py-0.5 rounded bg-orange-100 text-orange-900 font-bold">HIGH SEVERITY</span>
+              </div>
+              <h3 class="font-bold text-base text-[#141414] font-figtree">Foot-and-Mouth Disease (FMD)</h3>
+              <p class="text-[11px] text-zinc-500 font-inter">Notifiable Pathogen (Disease Registry)</p>
+
+              <!-- Stats Matrix -->
+              <div class="grid grid-cols-3 gap-2 my-3 p-2 bg-parchment/60 rounded-lg border border-black/5 text-[11px] font-inter text-center">
+                <div><span class="text-zinc-400 block text-[9px]">Radius:</span><strong>Â±25 km</strong></div>
+                <div><span class="text-zinc-400 block text-[9px]">Cluster Min:</span><strong>â‰¥3 Cases</strong></div>
+                <div><span class="text-zinc-400 block text-[9px]">Window:</span><strong>N/A</strong></div>
+              </div>
+
+              <div class="text-xs font-inter space-y-1 text-zinc-700">
+                <div><span class="text-zinc-400">Species:</span> Cattle, Buffalo, Sheep, Goat, Pig</div>
+                <div><span class="text-zinc-400">Reportable:</span> <strong>Yes (Mandatory)</strong></div>
+              </div>
+            </div>
+
+            <div class="mt-4 space-y-2">
+              <div onclick="jumpToGISCluster('fmd')" class="p-2 rounded-lg bg-orange-50 border border-orange-200 flex items-center justify-between text-xs cursor-pointer hover:bg-orange-100 transition-colors">
+                <span class="text-[#C62828] font-bold text-[11px] flex items-center gap-1">
+                  <i data-lucide="alert-circle" class="w-3.5 h-3.5"></i> Active Cluster (CRITICAL)
+                </span>
+                <span class="text-[#141414] font-semibold text-[11px] hover:underline flex items-center gap-0.5">
+                  View Cluster <i data-lucide="arrow-right" class="w-3 h-3"></i>
+                </span>
+              </div>
+              <button onclick="openProtocolDetails('fmd')" class="w-full py-2 bg-white border border-black/15 hover:bg-parchment rounded-lg text-xs font-bold text-zinc-800 flex items-center justify-center gap-1 transition-colors">
+                <i data-lucide="book" class="w-3.5 h-3.5"></i> Open Protocol Reference &rarr;
+              </button>
+            </div>
+          </div>
+
+          <!-- Card 2: Lumpy Skin Disease (LSD) -->
+          <div class="protocol-card vetra-card p-4 flex flex-col justify-between" data-disease="lsd" data-severity="high" data-zoonotic="no">
+            <div>
+              <div class="flex items-center justify-between text-[10px] font-mono text-zinc-500 mb-2">
+                <span>REFERENCE_CONTENT</span>
+                <span class="px-2 py-0.5 rounded bg-orange-100 text-orange-900 font-bold">HIGH SEVERITY</span>
+              </div>
+              <h3 class="font-bold text-base text-[#141414] font-figtree">Lumpy Skin Disease (LSD)</h3>
+              <p class="text-[11px] text-zinc-500 font-inter">Notifiable Pathogen (Disease Registry)</p>
+
+              <div class="grid grid-cols-3 gap-2 my-3 p-2 bg-parchment/60 rounded-lg border border-black/5 text-[11px] font-inter text-center">
+                <div><span class="text-zinc-400 block text-[9px]">Radius:</span><strong>Â±25 km</strong></div>
+                <div><span class="text-zinc-400 block text-[9px]">Cluster Min:</span><strong>â‰¥3 Cases</strong></div>
+                <div><span class="text-zinc-400 block text-[9px]">Window:</span><strong>N/A</strong></div>
+              </div>
+
+              <div class="text-xs font-inter space-y-1 text-zinc-700">
+                <div><span class="text-zinc-400">Species:</span> Cattle, Buffalo</div>
+                <div><span class="text-zinc-400">Reportable:</span> <strong>Yes (Mandatory)</strong></div>
+              </div>
+            </div>
+
+            <div class="mt-4 space-y-2">
+              <div onclick="jumpToGISCluster('lsd')" class="p-2 rounded-lg bg-orange-50 border border-orange-200 flex items-center justify-between text-xs cursor-pointer hover:bg-orange-100 transition-colors">
+                <span class="text-[#F2994A] font-bold text-[11px] flex items-center gap-1">
+                  <i data-lucide="alert-triangle" class="w-3.5 h-3.5"></i> Active Cluster (HIGH)
+                </span>
+                <span class="text-[#141414] font-semibold text-[11px] hover:underline flex items-center gap-0.5">
+                  View Cluster <i data-lucide="arrow-right" class="w-3 h-3"></i>
+                </span>
+              </div>
+              <button onclick="openProtocolDetails('lsd')" class="w-full py-2 bg-white border border-black/15 hover:bg-parchment rounded-lg text-xs font-bold text-zinc-800 flex items-center justify-center gap-1 transition-colors">
+                <i data-lucide="book" class="w-3.5 h-3.5"></i> Open Protocol Reference &rarr;
+              </button>
+            </div>
+          </div>
+
+          <!-- Card 3: Anthrax Suspicion (Zoonotic) -->
+          <div class="protocol-card vetra-card p-4 flex flex-col justify-between border-2 border-red-200" data-disease="anthrax" data-severity="critical" data-zoonotic="yes">
+            <div>
+              <div class="flex items-center justify-between text-[10px] font-mono text-zinc-500 mb-2">
+                <span>REFERENCE_CONTENT</span>
+                <div class="flex items-center gap-1">
+                  <span class="px-1.5 py-0.5 rounded bg-red-100 text-[#C62828] font-bold">CRITICAL</span>
+                  <span class="px-1.5 py-0.5 rounded bg-yellow-100 text-amber-900 font-bold">ZOONOTIC</span>
+                </div>
+              </div>
+              <h3 class="font-bold text-base text-[#141414] font-figtree">Anthrax Suspicion</h3>
+              <p class="text-[11px] text-zinc-500 font-inter">Zoonotic Pathogen (Disease Registry)</p>
+
+              <div class="grid grid-cols-3 gap-2 my-3 p-2 bg-parchment/60 rounded-lg border border-black/5 text-[11px] font-inter text-center">
+                <div><span class="text-zinc-400 block text-[9px]">Radius:</span><strong>Â±25 km</strong></div>
+                <div><span class="text-zinc-400 block text-[9px]">Cluster Min:</span><strong>â‰¥1 Case</strong></div>
+                <div><span class="text-zinc-400 block text-[9px]">Window:</span><strong>N/A</strong></div>
+              </div>
+
+              <div class="text-xs font-inter space-y-1 text-zinc-700">
+                <div><span class="text-zinc-400">Species:</span> Cattle, Buffalo, Sheep, Goat, Human</div>
+                <div><span class="text-zinc-400">Reportable:</span> <strong>Yes (Immediate)</strong></div>
+              </div>
+            </div>
+
+            <div class="mt-4 space-y-2">
+              <div onclick="jumpToGISCluster('anthrax')" class="p-2 rounded-lg bg-red-50 border border-red-200 flex items-center justify-between text-xs cursor-pointer hover:bg-red-100 transition-colors">
+                <span class="text-[#C62828] font-bold text-[11px] flex items-center gap-1">
+                  <i data-lucide="alert-octagon" class="w-3.5 h-3.5"></i> Active Cluster (CRITICAL)
+                </span>
+                <span class="text-[#141414] font-semibold text-[11px] hover:underline flex items-center gap-0.5">
+                  View Cluster <i data-lucide="arrow-right" class="w-3 h-3"></i>
+                </span>
+              </div>
+              <button onclick="openProtocolDetails('anthrax')" class="w-full py-2 bg-white border border-black/15 hover:bg-parchment rounded-lg text-xs font-bold text-zinc-800 flex items-center justify-center gap-1 transition-colors">
+                <i data-lucide="book" class="w-3.5 h-3.5"></i> Open Protocol Reference &rarr;
+              </button>
+            </div>
+          </div>
+
+          <!-- Card 4: PPR (Peste des Petits Ruminants) -->
+          <div class="protocol-card vetra-card p-4 flex flex-col justify-between" data-disease="ppr" data-severity="medium" data-zoonotic="no">
+            <div>
+              <div class="flex items-center justify-between text-[10px] font-mono text-zinc-500 mb-2">
+                <span>REFERENCE_CONTENT</span>
+                <span class="px-2 py-0.5 rounded bg-blue-100 text-blue-900 font-bold">MEDIUM</span>
+              </div>
+              <h3 class="font-bold text-base text-[#141414] font-figtree">Peste des Petits Ruminants (PPR)</h3>
+              <p class="text-[11px] text-zinc-500 font-inter">Notifiable Pathogen (Disease Registry)</p>
+
+              <div class="grid grid-cols-3 gap-2 my-3 p-2 bg-parchment/60 rounded-lg border border-black/5 text-[11px] font-inter text-center">
+                <div><span class="text-zinc-400 block text-[9px]">Radius:</span><strong>Â±15 km</strong></div>
+                <div><span class="text-zinc-400 block text-[9px]">Cluster Min:</span><strong>â‰¥3 Cases</strong></div>
+                <div><span class="text-zinc-400 block text-[9px]">Window:</span><strong>N/A</strong></div>
+              </div>
+
+              <div class="text-xs font-inter space-y-1 text-zinc-700">
+                <div><span class="text-zinc-400">Species:</span> Sheep, Goat</div>
+                <div><span class="text-zinc-400">Reportable:</span> <strong>Yes (Mandatory)</strong></div>
+              </div>
+            </div>
+
+            <div class="mt-4 space-y-2">
+              <div onclick="jumpToGISCluster('ppr')" class="p-2 rounded-lg bg-yellow-50 border border-yellow-200 flex items-center justify-between text-xs cursor-pointer hover:bg-yellow-100 transition-colors">
+                <span class="text-[#F2994A] font-bold text-[11px] flex items-center gap-1">
+                  <i data-lucide="alert-triangle" class="w-3.5 h-3.5"></i> Active Cluster (MEDIUM)
+                </span>
+                <span class="text-[#141414] font-semibold text-[11px] hover:underline flex items-center gap-0.5">
+                  View Cluster <i data-lucide="arrow-right" class="w-3 h-3"></i>
+                </span>
+              </div>
+              <button onclick="openProtocolDetails('ppr')" class="w-full py-2 bg-white border border-black/15 hover:bg-parchment rounded-lg text-xs font-bold text-zinc-800 flex items-center justify-center gap-1 transition-colors">
+                <i data-lucide="book" class="w-3.5 h-3.5"></i> Open Protocol Reference &rarr;
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ===================================================================== -->
+      <!-- TAB 4: CASE MANAGEMENT                                                -->
+      <!-- ===================================================================== -->
+      <section id="tab-cases" class="space-y-4 hidden tab-pane">
+        <div>
+          <h1 class="text-2xl font-bold text-ink">Field Case Management</h1>
+          <p class="text-sm text-ink-secondary font-inter">Review clinical symptoms, on-device TFLite MobileNetV3 predictions, and field veterinarian notes</p>
+        </div>
+        <div class="vetra-card p-0 overflow-hidden">
+          <div class="p-4 border-b border-black/10 flex justify-between bg-white items-center">
+            <span class="font-bold text-sm text-ink">Active Livestock Case Queue</span>
+            <span class="text-xs text-ink-metadata font-inter">Showing 3 verified demo records</span>
+          </div>
+          <table class="w-full text-left font-inter text-sm">
+            <thead class="bg-parchment text-xs uppercase font-figtree font-bold text-ink-secondary">
+              <tr>
+                <th class="py-3 px-4">Case ID</th>
+                <th class="py-3 px-4">Animal Details</th>
+                <th class="py-3 px-4">Symptoms</th>
+                <th class="py-3 px-4">Location</th>
+                <th class="py-3 px-4">AI Prediction</th>
+                <th class="py-3 px-4">Status</th>
+                <th class="py-3 px-4 text-right">Action</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-black/5">
+              <tr class="hover:bg-parchment/40 cursor-pointer" onclick="openDrawer('rpt_001')">
+                <td class="py-3 px-4 font-mono text-xs">rpt_001</td>
+                <td class="py-3 px-4 font-bold text-ink">Lakshmi (Gir Cow)</td>
+                <td class="py-3 px-4 text-xs">Oral blisters, severe drooling, limping</td>
+                <td class="py-3 px-4 text-xs">Haveli, Pune</td>
+                <td class="py-3 px-4 text-xs font-semibold text-[#C62828]">Foot & Mouth (92%)</td>
+                <td class="py-3 px-4"><span class="chip-critical">Confirmed</span></td>
+                <td class="py-3 px-4 text-right">
+                  <button class="px-3 py-1 rounded bg-white border border-black/10 text-xs font-semibold">Inspect</button>
+                </td>
+              </tr>
+              <tr class="hover:bg-parchment/40 cursor-pointer" onclick="openDrawer('rpt_002')">
+                <td class="py-3 px-4 font-mono text-xs">rpt_002</td>
+                <td class="py-3 px-4 font-bold text-ink">Kalu (Murrah Buffalo)</td>
+                <td class="py-3 px-4 text-xs">Skin nodules (3cm), drop in milk</td>
+                <td class="py-3 px-4 text-xs">Shirur, Pune</td>
+                <td class="py-3 px-4 text-xs font-semibold text-[#C62828]">Lumpy Skin (87%)</td>
+                <td class="py-3 px-4"><span class="chip-critical">Confirmed</span></td>
+                <td class="py-3 px-4 text-right">
+                  <button class="px-3 py-1 rounded bg-white border border-black/10 text-xs font-semibold">Inspect</button>
+                </td>
+              </tr>
+              <tr class="hover:bg-parchment/40 cursor-pointer" onclick="openDrawer('rpt_003')">
+                <td class="py-3 px-4 font-mono text-xs">rpt_003</td>
+                <td class="py-3 px-4 font-bold text-ink">Gauri (Jersey Cross)</td>
+                <td class="py-3 px-4 text-xs">Sore hooves, mild drooling</td>
+                <td class="py-3 px-4 text-xs">Khed, Pune</td>
+                <td class="py-3 px-4 text-xs font-semibold text-[#F2994A]">Suspected FMD (78%)</td>
+                <td class="py-3 px-4"><span class="chip-caution">Pending Vet</span></td>
+                <td class="py-3 px-4 text-right">
+                  <button class="px-3 py-1 rounded bg-white border border-black/10 text-xs font-semibold">Inspect</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ===================================================================== -->
+      <!-- TAB 5: DISPATCHED ADVISORY ALERTS                                     -->
+      <!-- ===================================================================== -->
+      <section id="tab-alerts" class="space-y-4 hidden tab-pane">
+        <div class="flex items-center justify-between">
+          <div>
+            <h1 class="text-2xl font-bold text-ink">Active Quarantine Advisories</h1>
+            <p class="text-sm text-ink-secondary font-inter">Live SMS and push alerts dispatched across target districts in Maharashtra</p>
+          </div>
+          <button onclick="openModal()" class="btn-primary text-xs h-10 px-4">
+            <i data-lucide="send" class="w-3.5 h-3.5"></i> Broadcast Alert
+          </button>
+        </div>
+
+        <div class="space-y-3" id="alerts-list">
+          <div class="vetra-card border-l-4 border-l-[#C62828]">
+            <div class="flex items-center justify-between pb-2 border-b border-black/5">
+              <span class="chip-critical text-[10px]">CRITICAL SEVERITY</span>
+              <span class="text-xs text-ink-metadata font-inter">Dispatched: Nov 2, 2026 â€¢ Pune District</span>
+            </div>
+            <h3 class="font-bold text-base text-ink mt-2">Urgent Quarantine Order: Foot & Mouth Disease Cluster in Haveli</h3>
+            <p class="text-xs text-ink-secondary font-inter mt-1 leading-relaxed">
+              Immediate prohibition of animal transport. Mandatory ring vaccination protocol initiated in a 10km radius around infected gram panchayats.
+            </p>
+          </div>
+
+          <div class="vetra-card border-l-4 border-l-[#F2994A]">
+            <div class="flex items-center justify-between pb-2 border-b border-black/5">
+              <span class="chip-caution text-[10px]">HIGH SEVERITY</span>
+              <span class="text-xs text-ink-metadata font-inter">Dispatched: Nov 1, 2026 â€¢ Ahmednagar District</span>
+            </div>
+            <h3 class="font-bold text-base text-ink mt-2">Vector Control Warning: Lumpy Skin Disease Surge in Ahmednagar</h3>
+            <p class="text-xs text-ink-secondary font-inter mt-1 leading-relaxed">
+              Elevated biting fly activity. Farmers advised to spray neem vector repellents and report cutaneous nodules to nearest dispensary.
+            </p>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- 4. SLIDE-OVER CASE DETAIL DRAWER                                          -->
+  <!-- ========================================================================= -->
+  <div id="case-drawer" class="fixed inset-y-0 right-0 w-full max-w-lg bg-white border-l border-black/15 shadow-2xl z-50 transform translate-x-full transition-transform duration-300 ease-out flex flex-col justify-between font-figtree">
+    <div class="p-6 border-b border-black/10 flex items-center justify-between bg-white sticky top-0">
+      <div>
+        <div class="flex items-center gap-2">
+          <span id="d-id" class="text-xs font-mono bg-parchment px-2 py-0.5 rounded text-ink-metadata">rpt_001</span>
+          <span id="d-badge" class="chip-critical">Confirmed Outbreak</span>
+        </div>
+        <h2 id="d-title" class="text-xl font-bold text-ink mt-1">Lakshmi â€” Gir Cow</h2>
+      </div>
+      <button onclick="closeDrawer()" class="p-1.5 rounded-sm hover:bg-parchment text-ink-metadata hover:text-ink cursor-pointer">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+    </div>
+
+    <div class="p-6 overflow-y-auto space-y-6 flex-1 font-inter">
+      <div class="rounded-md overflow-hidden border border-black/10 relative h-48 bg-black/5">
+        <img id="d-img" src="https://images.unsplash.com/photo-1546445317-29f4545e9d53?auto=format&fit=crop&q=80&w=800" class="w-full h-full object-cover" alt="Clinical Presentation">
+        <div class="absolute bottom-2 left-2 bg-black/70 backdrop-blur-sm text-white text-[11px] px-2 py-0.5 rounded">
+          Clinical Field Photo
+        </div>
+      </div>
+
+      <div>
+        <h4 class="text-xs font-bold uppercase tracking-wider text-ink-secondary mb-2 font-figtree">Reported Symptoms</h4>
+        <div class="flex flex-wrap gap-1.5" id="d-symptoms"></div>
+        <div class="mt-3 p-3 bg-parchment/60 rounded border border-black/5 text-xs text-ink" id="d-desc"></div>
+      </div>
+
+      <div class="p-4 rounded-sm bg-gradient-to-br from-parchment/80 to-white border border-black/10 space-y-1">
+        <div class="flex items-center justify-between text-xs">
+          <span class="font-bold text-ink font-figtree flex items-center gap-1.5">
+            <i data-lucide="cpu" class="w-4 h-4 text-[#82c927]"></i> MobileNetV3 Screening
+          </span>
+          <span class="chip-healthy text-[11px]" id="d-aiconf">92% Match</span>
+        </div>
+        <div class="text-xs text-ink mt-1">
+          Target Pathology: <strong class="text-[#C62828] font-figtree text-sm" id="d-aipred">Foot & Mouth Disease</strong>
+        </div>
+      </div>
+
+      <div class="p-4 rounded-sm bg-blue-50/50 border border-blue-200 space-y-2">
+        <div class="flex items-center justify-between text-xs pb-1 border-b border-blue-100">
+          <span class="font-bold text-blue-950 font-figtree flex items-center gap-1">
+            <i data-lucide="shield-check" class="w-4 h-4 text-[#2F6FDE]"></i> Veterinary Diagnosis
+          </span>
+          <span class="text-ink-metadata" id="d-vet">Dr. Anita Deshmukh</span>
+        </div>
+        <p class="text-xs text-ink" id="d-notes"></p>
+      </div>
+    </div>
+
+    <div class="p-4 border-t border-black/10 bg-parchment/50 flex justify-between items-center">
+      <span class="text-xs text-ink-metadata font-inter">Farmer Contact: +91 98231 44556</span>
+      <button onclick="closeDrawer()" class="px-4 py-2 bg-ink text-white text-xs font-semibold rounded-sm hover:bg-black cursor-pointer">
+        Close Inspector
+      </button>
+    </div>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- 5. PROTOCOL REFERENCE MODAL (Opened from Protocol Cards)                 -->
+  <!-- ========================================================================= -->
+  <div id="protocol-modal" style="display: none;" class="fixed inset-0 bg-black/65 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-xl max-w-2xl w-full p-6 shadow-2xl border border-black/15 font-figtree animate-fadeIn max-h-[90vh] flex flex-col justify-between">
+      <div class="flex items-center justify-between pb-3 border-b border-black/10">
+        <div class="flex items-center gap-2.5">
+          <div class="p-2 bg-blue-50 rounded-lg text-[#2F6FDE]">
+            <i data-lucide="book-open" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <h3 class="font-bold text-lg text-ink" id="pm-title">Official SOP & Biosecurity Protocol</h3>
+            <p class="text-xs text-zinc-500 font-inter" id="pm-sub">DAHD National Animal Disease Control Guidelines</p>
+          </div>
+        </div>
+        <button onclick="closeProtocolModal()" class="p-1.5 text-zinc-400 hover:text-black cursor-pointer">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <div class="my-4 overflow-y-auto space-y-4 font-inter text-xs text-zinc-700 flex-1 pr-1" id="pm-body">
+        <!-- Dynamically injected protocol steps -->
+      </div>
+
+      <div class="pt-3 border-t border-black/10 flex justify-between items-center text-xs">
+        <span class="text-zinc-500">Statutory Authority: Section 6(1) Prevention & Control of Infectious Diseases Act</span>
+        <button onclick="closeProtocolModal()" class="px-4 py-2 bg-ink text-white rounded-lg font-semibold hover:bg-black cursor-pointer">
+          Acknowledge & Close
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- 6. BROADCAST OUTBREAK ALERT MODAL                                         -->
+  <!-- ========================================================================= -->
+  <div id="broadcast-modal" style="display: none;" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-xl max-w-lg w-full p-6 shadow-2xl border border-black/15 font-figtree animate-fadeIn">
+      <div class="flex items-center justify-between pb-3 border-b border-black/10">
+        <div class="flex items-center gap-2">
+          <div class="p-2 bg-red-100 rounded-lg"><i data-lucide="alert-triangle" class="w-5 h-5 text-[#C62828]"></i></div>
+          <div>
+            <h3 class="font-bold text-lg text-ink">Broadcast Outbreak Alert</h3>
+            <p class="text-xs text-ink-metadata font-inter">Dispatches SMS & Push to farmers across target district</p>
+          </div>
+        </div>
+        <button onclick="closeModal()" class="p-1 text-ink-metadata hover:text-ink cursor-pointer"><i data-lucide="x" class="w-5 h-5"></i></button>
+      </div>
+
+      <form onsubmit="handleBroadcast(event)" class="mt-4 space-y-3 text-xs font-inter">
+        <div>
+          <label class="block font-semibold text-ink mb-1">Headline</label>
+          <input type="text" id="alert-title-input" required placeholder="e.g. Mandatory Ring Vaccination Order in Haveli Block" class="w-full px-3 py-2 rounded-lg border border-border-hairline bg-parchment focus:outline-none focus:border-[#94e130]" />
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-semibold text-ink mb-1">Target District</label>
+            <select id="alert-district-input" class="w-full px-3 py-2 rounded-lg border border-border-hairline bg-parchment focus:outline-none">
+              <option>Pune District</option>
+              <option>Ahmednagar</option>
+              <option>Satara</option>
+              <option>Solapur</option>
+            </select>
+          </div>
+          <div>
+            <label class="block font-semibold text-ink mb-1">Severity</label>
+            <select id="alert-severity-input" class="w-full px-3 py-2 rounded-lg border border-border-hairline bg-parchment font-bold text-[#C62828] focus:outline-none">
+              <option value="critical">Critical (Quarantine Order)</option>
+              <option value="high">High (Vector Warning)</option>
+              <option value="medium">Medium (Advisory)</option>
+            </select>
+          </div>
+        </div>
+        <div>
+          <label class="block font-semibold text-ink mb-1">Advisory Instructions</label>
+          <textarea id="alert-msg-input" rows="3" required placeholder="Specify isolation distance, sanitation measures, and local veterinary contact..." class="w-full px-3 py-2 rounded-lg border border-border-hairline bg-parchment focus:outline-none focus:border-[#94e130]"></textarea>
+        </div>
+        <div class="pt-3 border-t border-black/10 flex justify-end gap-2">
+          <button type="button" onclick="closeModal()" class="px-4 py-2 font-semibold text-ink-secondary hover:text-ink cursor-pointer">Cancel</button>
+          <button type="submit" class="btn-primary text-xs h-10 px-5 cursor-pointer">Send Broadcast</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- 7. APPLICATION LOGIC & LEAFLET MAP SCRIPTS                                -->
+  <!-- ========================================================================= -->
+  <script>
+    lucide.createIcons();
+
+    // ---------------------------------------------------------------------------
+    // CINEMATIC NETFLIX-STYLE AUDIO SYNTHESIZER (Pure Web Audio API - Zero External Deps)
+    // ---------------------------------------------------------------------------
+    function playTaDumSound() {
+      try {
+        var AudioContext = window.AudioContext || window.webkitAudioContext;
+        if (!AudioContext) return;
+        var ctx = new AudioContext();
+
+        var now = ctx.currentTime;
+
+        // Sub-bass impact oscillator 1 (55Hz dropping to 30Hz)
+        var osc1 = ctx.createOscillator();
+        var gain1 = ctx.createGain();
+        osc1.type = 'sine';
+        osc1.frequency.setValueAtTime(65, now);
+        osc1.frequency.exponentialRampToValueAtTime(28, now + 1.2);
+
+        gain1.gain.setValueAtTime(0.01, now);
+        gain1.gain.exponentialRampToValueAtTime(0.8, now + 0.08);
+        gain1.gain.exponentialRampToValueAtTime(0.001, now + 1.8);
+
+        osc1.connect(gain1);
+        gain1.connect(ctx.destination);
+        osc1.start(now);
+        osc1.stop(now + 1.9);
+
+        // High shimmer harmonic (Netflix-style metallic chime overtone)
+        var osc2 = ctx.createOscillator();
+        var gain2 = ctx.createGain();
+        osc2.type = 'triangle';
+        osc2.frequency.setValueAtTime(220, now + 0.05);
+        osc2.frequency.exponentialRampToValueAtTime(110, now + 0.8);
+
+        gain2.gain.setValueAtTime(0.001, now);
+        gain2.gain.exponentialRampToValueAtTime(0.25, now + 0.1);
+        gain2.gain.exponentialRampToValueAtTime(0.001, now + 1.2);
+
+        osc2.connect(gain2);
+        gain2.connect(ctx.destination);
+        osc2.start(now + 0.05);
+        osc2.stop(now + 1.3);
+
+      } catch (e) {
+        console.warn('Web Audio API not allowed without user gesture:', e);
+      }
+    }
+
+    // Dismiss Splash Screen
+    function dismissNetflixSplash() {
+      var splash = document.getElementById('netflix-splash');
+      if (!splash) return;
+      splash.classList.add('splash-dissolve');
+      setTimeout(function() {
+        splash.style.display = 'none';
+        if (overviewMap) overviewMap.invalidateSize(true);
+      }, 750);
+    }
+
+    // Replay Netflix Splash Screen
+    function replayNetflixSplash() {
+      var splash = document.getElementById('netflix-splash');
+      if (!splash) return;
+      splash.style.display = 'flex';
+      splash.classList.remove('splash-dissolve');
+      playTaDumSound();
+      setTimeout(dismissNetflixSplash, 3200);
+    }
+
+    // Auto-launch splash after 2.8s
+    setTimeout(dismissNetflixSplash, 2800);
+
+    // Live IST Clock
+    function updateLiveClock() {
+      var d = new Date();
+      var timeStr = d.toLocaleTimeString('en-US', { hour12: false }) + ' IST';
+      var el = document.getElementById('live-ist-clock');
+      if (el) el.innerText = timeStr;
+    }
+    setInterval(updateLiveClock, 1000);
+
+    // Maps & Layer Variables
+    var overviewMap = null;
+    var fullMap = null;
+    var overviewTileLayer = null;
+    var fullTileLayer = null;
+    var clusterLayers = [];
+    var allMarkers = [];
+
+    // Map Tile Layer Sources (OpenStreetMap + MapTiler + Satellite)
+    var MAPTILER_KEY = 'cKTaQaghkXlhl6xd2pWw';
+    var tileSources = {
+      osm: {
+        url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+        attr: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+      },
+      maptiler: {
+        url: 'https://api.maptiler.com/maps/streets-v2/{z}/{x}/{y}.png?key=' + MAPTILER_KEY,
+        attr: '&copy; MapTiler &copy; OpenStreetMap contributors'
+      },
+      satellite: {
+        url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+        attr: 'Tiles &copy; Esri &mdash; National Geographic, Esri'
+      }
+    };
+
+    function setTileLayer(type) {
+      var source = tileSources[type] || tileSources.osm;
+      if (overviewTileLayer) overviewTileLayer.setUrl(source.url);
+      if (fullTileLayer) fullTileLayer.setUrl(source.url);
+
+      ['osm', 'maptiler', 'satellite'].forEach(function(t) {
+        var btn = document.getElementById('full-tile-' + t);
+        if (btn) btn.className = (t === type) ? 'seg-btn seg-btn-active' : 'seg-btn seg-btn-inactive';
+      });
+    }
+
+    // Case Database
+    var caseDatabase = {
+      'rpt_001': {
+        id: 'rpt_001',
+        title: 'Lakshmi â€” Gir Cow',
+        tag: 'MH-PUN-8841',
+        status: 'Confirmed Outbreak',
+        badgeClass: 'chip-critical',
+        symptoms: ['Excessive Salivation', 'Buccal Blisters', 'Severe Lameness'],
+        desc: 'Animal unable to walk or consume fodder since yesterday morning. Drooling profusely with ruptured vesicle lesions on lower dental pad.',
+        aipred: 'Foot and Mouth Disease (FMD)',
+        aiconf: '92% Match',
+        vet: 'Dr. Anita Deshmukh (Haveli)',
+        notes: 'Acute vesicles confirmed inside buccal cavity. 10km ring quarantine and mandatory surveillance perimeter issued.',
+        img: 'https://images.unsplash.com/photo-1546445317-29f4545e9d53?auto=format&fit=crop&q=80&w=800'
+      },
+      'rpt_002': {
+        id: 'rpt_002',
+        title: 'Kalu â€” Murrah Buffalo',
+        tag: 'MH-PUN-9102',
+        status: 'Confirmed Outbreak',
+        badgeClass: 'chip-critical',
+        symptoms: ['3cm Cutaneous Nodules', 'Milk Yield Drop', 'High Fever'],
+        desc: 'Hard round circumscribed nodules across neck, flank, and perineum. Milk production plummeted from 12L to 3L.',
+        aipred: 'Lumpy Skin Disease (LSD)',
+        aiconf: '87% Match',
+        vet: 'Dr. Sanjay Thorat (Shirur)',
+        notes: 'Classic poxvirus cutaneous eruptions. Vector control and immediate isolation from herd ordered.',
+        img: 'https://images.unsplash.com/photo-1527153857715-3908f2bae5e8?auto=format&fit=crop&q=80&w=800'
+      },
+      'rpt_003': {
+        id: 'rpt_003',
+        title: 'Gauri â€” Jersey Cross',
+        tag: 'MH-PUN-1104',
+        status: 'Pending Vet Inspection',
+        badgeClass: 'chip-caution',
+        symptoms: ['Limping', 'Mild Mouth Blister', 'Loss of Appetite'],
+        desc: 'Animal limping since this morning. Minor lesions noticed on lower gum. Farmer noticed reluctance to chew cud.',
+        aipred: 'Suspected Foot & Mouth',
+        aiconf: '78% Match',
+        vet: 'Assigned to Dr. Thorat',
+        notes: 'Field visit scheduled for 2:00 PM today for confirmatory buccal swab collection.',
+        img: 'https://images.unsplash.com/photo-1500595046743-cd271d694d30?auto=format&fit=crop&q=80&w=800'
+      }
+    };
+
+    function openDrawer(caseId) {
+      var data = caseDatabase[caseId] || caseDatabase['rpt_001'];
+      document.getElementById('d-id').innerText = data.id;
+      document.getElementById('d-title').innerText = data.title;
+      document.getElementById('d-badge').innerText = data.status;
+      document.getElementById('d-badge').className = data.badgeClass;
+      document.getElementById('d-desc').innerText = '"' + data.desc + '"';
+      document.getElementById('d-aipred').innerText = data.aipred;
+      document.getElementById('d-aiconf').innerText = data.aiconf;
+      document.getElementById('d-vet').innerText = data.vet;
+      document.getElementById('d-notes').innerText = '"' + data.notes + '"';
+      document.getElementById('d-img').src = data.img;
+
+      var symContainer = document.getElementById('d-symptoms');
+      symContainer.innerHTML = '';
+      data.symptoms.forEach(function(s) {
+        var sp = document.createElement('span');
+        sp.className = 'px-2.5 py-1 rounded-md bg-orange-100 text-orange-900 border border-orange-200 text-xs font-medium';
+        sp.innerText = s;
+        symContainer.appendChild(sp);
+      });
+
+      document.getElementById('case-drawer').classList.add('drawer-open');
+    }
+
+    function closeDrawer() {
+      document.getElementById('case-drawer').classList.remove('drawer-open');
+    }
+
+    function openModal() { document.getElementById('broadcast-modal').style.display = 'flex'; }
+    function closeModal() { document.getElementById('broadcast-modal').style.display = 'none'; }
+
+    function handleBroadcast(e) {
+      e.preventDefault();
+      var title = document.getElementById('alert-title-input').value;
+      var dist = document.getElementById('alert-district-input').value;
+      var sev = document.getElementById('alert-severity-input').value;
+      var msg = document.getElementById('alert-msg-input').value;
+
+      var list = document.getElementById('alerts-list');
+      var card = document.createElement('div');
+      card.className = 'vetra-card border-l-4 border-l-[#C62828] animate-fadeIn';
+      card.innerHTML = `
+        <div class="flex items-center justify-between pb-2 border-b border-black/5">
+          <span class="chip-critical text-[10px]">${sev.toUpperCase()} SEVERITY</span>
+          <span class="text-xs text-ink-metadata font-inter">Dispatched: Just Now â€¢ ${dist}</span>
+        </div>
+        <h3 class="font-bold text-base text-ink mt-2">${title}</h3>
+        <p class="text-xs text-ink-secondary font-inter mt-1 leading-relaxed">${msg}</p>
+      `;
+      list.prepend(card);
+      closeModal();
+      alert('Alert successfully broadcast to ' + dist + ' livestock owners via SMS & Push.');
+    }
+
+    // Switch Surveillance Tabs
+    function switchTab(tabId) {
+      ['overview', 'map', 'protocols', 'cases', 'alerts'].forEach(function(t) {
+        var el = document.getElementById('tab-' + t);
+        if (el) el.classList.add('hidden');
+        var nav = document.getElementById('nav-' + t);
+        if (nav) nav.className = "w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-xs font-bold text-zinc-600 hover:bg-parchment/60 hover:text-ink transition-all";
+      });
+
+      var activeTabEl = document.getElementById('tab-' + tabId);
+      if (activeTabEl) activeTabEl.classList.remove('hidden');
+      var activeNav = document.getElementById('nav-' + tabId);
+      if (activeNav) activeNav.className = "w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-xs font-bold transition-all bg-parchment text-ink shadow-sm border-l-4 border-l-[#94e130]";
+
+      setTimeout(function() {
+        if (tabId === 'overview' && overviewMap) overviewMap.invalidateSize(true);
+        if (tabId === 'map' && fullMap) fullMap.invalidateSize(true);
+      }, 100);
+    }
+
+    // Toggle Spatial Map View vs WCAG Table View (From Reference Screenshot 1)
+    function toggleGISViewMode(mode) {
+      var mapContainer = document.getElementById('gis-map-canvas-container');
+      var tableContainer = document.getElementById('gis-table-view-container');
+      var mapBtn = document.getElementById('view-mode-map');
+      var tableBtn = document.getElementById('view-mode-table');
+
+      if (mode === 'map') {
+        mapContainer.style.display = 'block';
+        tableContainer.style.display = 'none';
+        mapBtn.className = "px-3 py-1.5 rounded-lg bg-white border border-black/20 font-bold shadow-sm flex items-center gap-1.5 text-[#141414]";
+        tableBtn.className = "px-3 py-1.5 rounded-lg bg-parchment/60 border border-black/10 text-zinc-600 hover:text-black flex items-center gap-1.5";
+        if (fullMap) fullMap.invalidateSize(true);
+      } else {
+        mapContainer.style.display = 'none';
+        tableContainer.style.display = 'block';
+        tableBtn.className = "px-3 py-1.5 rounded-lg bg-white border border-black/20 font-bold shadow-sm flex items-center gap-1.5 text-[#141414]";
+        mapBtn.className = "px-3 py-1.5 rounded-lg bg-parchment/60 border border-black/10 text-zinc-600 hover:text-black flex items-center gap-1.5";
+        populateWCAGTable();
+      }
+    }
+
+    function populateWCAGTable() {
+      var tbody = document.getElementById('wcag-table-body');
+      tbody.innerHTML = '';
+      allMarkers.forEach(function(item) {
+        var tr = document.createElement('tr');
+        tr.className = "hover:bg-parchment/40";
+        tr.innerHTML = `
+          <td class="py-3 px-4 font-mono font-bold">${item.data.id}</td>
+          <td class="py-3 px-4 font-semibold text-ink">${item.data.diseaseCode}</td>
+          <td class="py-3 px-4 text-zinc-600">${item.data.district}</td>
+          <td class="py-3 px-4 font-mono text-zinc-500">${item.data.pos[0].toFixed(4)}, ${item.data.pos[1].toFixed(4)}</td>
+          <td class="py-3 px-4"><span class="${item.data.status === 'verified' ? 'chip-critical' : 'chip-caution'}">${item.data.status.toUpperCase()}</span></td>
+          <td class="py-3 px-4 font-semibold">${item.data.status}</td>
+          <td class="py-3 px-4 text-right">
+            <button onclick="openDrawer('${item.data.id}')" class="px-2.5 py-1 bg-white border border-black/15 rounded text-xs font-bold hover:bg-parchment">Inspect</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function exportGISData() {
+      var csv = "Case_ID,Disease,District,Latitude,Longitude,Status\n";
+      allMarkers.forEach(function(m) {
+        csv += `${m.data.id},${m.data.diseaseCode},"${m.data.district}",${m.data.pos[0]},${m.data.pos[1]},${m.data.status}\n`;
+      });
+      var blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      var link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.setAttribute("download", "pashuvani_gis_vectors.csv");
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    // Apply GIS Filters
+    function applyGISFilters() {
+      var disease = document.getElementById('map-disease-filter').value;
+      var status = document.getElementById('map-status-filter').value;
+      var district = document.getElementById('map-district-filter').value;
+      var search = document.getElementById('map-quick-search').value.toLowerCase();
+
+      var showConfirmed = document.getElementById('layer-confirmed').checked;
+      var showSuspected = document.getElementById('layer-suspected').checked;
+      var showAI = document.getElementById('layer-ai').checked;
+
+      var visibleCount = 0;
+
+      allMarkers.forEach(function(item) {
+        var matchDisease = (disease === 'all' || item.data.diseaseCode === disease);
+        var matchStatus = (status === 'all' || item.data.status === status);
+        var matchDistrict = (district === 'all' || item.data.district.indexOf(district) > -1);
+        var matchSearch = (search === '' || item.data.title.toLowerCase().indexOf(search) > -1 || item.data.district.toLowerCase().indexOf(search) > -1);
+
+        var layerOk = true;
+        if (item.data.status === 'verified' && !showConfirmed) layerOk = false;
+        if (item.data.status === 'submitted' && !showSuspected) layerOk = false;
+
+        if (matchDisease && matchStatus && matchDistrict && matchSearch && layerOk) {
+          if (!fullMap.hasLayer(item.marker)) fullMap.addLayer(item.marker);
+          visibleCount++;
+        } else {
+          if (fullMap.hasLayer(item.marker)) fullMap.removeLayer(item.marker);
+        }
+      });
+
+      document.getElementById('visible-pins-badge').innerText = visibleCount + ' Visible';
+    }
+
+    function resetGISFilters() {
+      document.getElementById('map-disease-filter').value = 'all';
+      document.getElementById('map-risk-filter').value = 'all';
+      document.getElementById('map-status-filter').value = 'all';
+      document.getElementById('map-district-filter').value = 'all';
+      document.getElementById('map-quick-search').value = '';
+      document.getElementById('layer-confirmed').checked = true;
+      document.getElementById('layer-suspected').checked = true;
+      document.getElementById('layer-ai').checked = true;
+      applyGISFilters();
+    }
+
+    function toggleLayerBuffers(checked) {
+      clusterLayers.forEach(function(l) {
+        if (checked) { fullMap.addLayer(l); } else { fullMap.removeLayer(l); }
+      });
+    }
+
+    function toggleKDE(checked) {
+      if (checked) {
+        alert('Kernel Density Estimation (KDE) surface overlay active. Spatial intensity bandwidth calculated at 15km standard deviation.');
+      }
+    }
+
+    function refreshGIS() {
+      var loader = document.getElementById('gis-loading-overlay');
+      loader.style.display = 'flex';
+      setTimeout(function() {
+        loader.style.display = 'none';
+        applyGISFilters();
+        alert('PostGIS spatial vector stream synchronized. 0 new transmissions detected in past 15 minutes.');
+      }, 700);
+    }
+
+    // Protocol Filters from Reference Screenshot 2
+    var isZoonoticOnly = false;
+    function toggleZoonoticFilter() {
+      isZoonoticOnly = !isZoonoticOnly;
+      var btn = document.getElementById('zoonotic-toggle-btn');
+      if (isZoonoticOnly) {
+        btn.classList.add('bg-orange-100', 'border-orange-400', 'text-orange-950', 'font-bold');
+      } else {
+        btn.classList.remove('bg-orange-100', 'border-orange-400', 'text-orange-950', 'font-bold');
+      }
+      filterProtocols();
+    }
+
+    function filterProtocols() {
+      var query = document.getElementById('protocol-search').value.toLowerCase();
+      var sev = document.getElementById('protocol-severity').value;
+      var zoo = document.getElementById('protocol-zoonotic').value;
+      var cards = document.querySelectorAll('.protocol-card');
+
+      cards.forEach(function(c) {
+        var title = c.innerText.toLowerCase();
+        var cardSev = c.getAttribute('data-severity');
+        var isZoonotic = c.getAttribute('data-zoonotic') === 'yes';
+
+        var okQuery = (title.indexOf(query) > -1);
+        var okSev = (sev === 'all' || cardSev === sev);
+        var okZooMode = (zoo === 'all' || (zoo === 'zoonotic' && isZoonotic) || (zoo === 'animal-only' && !isZoonotic));
+        var okZooToggle = (!isZoonoticOnly || isZoonotic);
+
+        c.style.display = (okQuery && okSev && okZooMode && okZooToggle) ? '' : 'none';
+      });
+    }
+
+    function resetProtocolFilters() {
+      document.getElementById('protocol-search').value = '';
+      document.getElementById('protocol-severity').value = 'all';
+      document.getElementById('protocol-zoonotic').value = 'all';
+      isZoonoticOnly = false;
+      document.getElementById('zoonotic-toggle-btn').classList.remove('bg-orange-100', 'border-orange-400', 'text-orange-950', 'font-bold');
+      filterProtocols();
+    }
+
+    function refreshProtocolsRegistry() {
+      alert('PASHUVANI Disease Registry synchronized with Department of Animal Husbandry and Dairying (DAHD) central database.');
+    }
+
+    // Protocol Details Modal Logic
+    var protocolDetailsData = {
+      'fmd': {
+        title: 'Foot-and-Mouth Disease (FMD) â€” Standard Protocol',
+        sub: 'Pathogen: Aphthovirus (Picornaviridae) â€¢ High Transmission Risk',
+        steps: [
+          '<strong>1. Immediate Ring Quarantine:</strong> Establish 10km radius containment zone around infected village; prohibit cattle transport.',
+          '<strong>2. Ring Vaccination SOP:</strong> Deploy bivalent/trivalent FMD vaccine to all cattle, buffalo, sheep and goats in a 25km buffer.',
+          '<strong>3. Disinfection:</strong> Disinfect stalls with 4% sodium carbonate or 2% sodium hydroxide solution.',
+          '<strong>4. Departmental Reporting:</strong> Submit Form 1A to District Animal Disease Diagnostic Laboratory within 4 hours.'
+        ]
+      },
+      'lsd': {
+        title: 'Lumpy Skin Disease (LSD) â€” Biosecurity Directive',
+        sub: 'Pathogen: Capripoxvirus â€¢ Vector: Stomoxys calcitrans, Aedes spp.',
+        steps: [
+          '<strong>1. Vector Control:</strong> Apply synthetic pyrethroids or 5% neem extract spray across cattle sheds to eliminate biting flies.',
+          '<strong>2. Goat Pox Vaccine Deployment:</strong> Administer homologous Goat Pox vaccine (Uttarkashi strain) at 10^3.5 TCID50 per animal.',
+          '<strong>3. Cutaneous Lesion Care:</strong> Dress burst nodules with antiseptic zinc oxide and iodoform spray.',
+          '<strong>4. Movement Ban:</strong> Suspend animal cattle bazaars in affected talukas for 21 days.'
+        ]
+      },
+      'anthrax': {
+        title: 'Anthrax Suspicion â€” URGENT ZOONOTIC PROTOCOL',
+        sub: 'Pathogen: Bacillus anthracis (Spore-forming) â€¢ Human Lethality Risk',
+        steps: [
+          '<strong>1. STRICT BAN ON POST-MORTEM:</strong> Do NOT open carcass under any circumstances. Exposure to oxygen triggers spore formation.',
+          '<strong>2. Deep Burial SOP:</strong> Carcass must be buried minimum 6 feet deep, surrounded by quicklime (calcium oxide).',
+          '<strong>3. Human Health Notification:</strong> Immediate emergency alert to District Health Officer (DHO) for human prophylactic ciprofloxacin.',
+          '<strong>4. Veterinary PPE:</strong> Mandatory Level B Tyvek suit, heavy rubber gloves, and N95 masks for attending vet staff.'
+        ]
+      },
+      'ppr': {
+        title: 'Peste des Petits Ruminants (PPR) â€” Ruminant Protocol',
+        sub: 'Pathogen: Small Ruminant Morbillivirus â€¢ High Sheep & Goat Mortality',
+        steps: [
+          '<strong>1. Herd Isolation:</strong> Segregate all coughing or scouring sheep and goats into dedicated quarantine pens.',
+          '<strong>2. Targeted Ring Vaccination:</strong> Administer live attenuated PPR vaccine (Sungri 96 strain) to all small ruminants.',
+          '<strong>3. Supportive Care:</strong> Rehydration therapy, broad-spectrum antibiotics for secondary bacterial pneumonia.',
+          '<strong>4. Carcass Disposal:</strong> Incineration or deep burial with disinfectant application.'
+        ]
+      }
+    };
+
+    function openProtocolDetails(diseaseKey) {
+      var data = protocolDetailsData[diseaseKey] || protocolDetailsData['fmd'];
+      document.getElementById('pm-title').innerText = data.title;
+      document.getElementById('pm-sub').innerText = data.sub;
+
+      var body = document.getElementById('pm-body');
+      body.innerHTML = '';
+      data.steps.forEach(function(step) {
+        var p = document.createElement('div');
+        p.className = 'p-3 rounded-lg bg-parchment/60 border border-black/5 leading-relaxed';
+        p.innerHTML = step;
+        body.appendChild(p);
+      });
+
+      document.getElementById('protocol-modal').style.display = 'flex';
+    }
+
+    function closeProtocolModal() {
+      document.getElementById('protocol-modal').style.display = 'none';
+    }
+
+    // Direct Jump from Protocol Card to GIS Map Cluster (From User Reference 2)
+    function jumpToGISCluster(diseaseKey) {
+      switchTab('map');
+      setTimeout(function() {
+        if (!fullMap) return;
+        if (diseaseKey === 'fmd') {
+          fullMap.setView([18.5800, 73.9200], 10);
+          clusterLayers[0].openPopup();
+        } else if (diseaseKey === 'lsd') {
+          fullMap.setView([19.1400, 74.6800], 10);
+          clusterLayers[1].openPopup();
+        } else if (diseaseKey === 'anthrax') {
+          fullMap.setView([17.6805, 74.0183], 10);
+        } else {
+          fullMap.setView([18.5204, 74.2500], 8);
+        }
+      }, 150);
+    }
+
+    // ---------------------------------------------------------------------------
+    // INITIALIZE MAPS & GEOSPATIAL VECTOR LAYERS
+    // ---------------------------------------------------------------------------
+    window.addEventListener('DOMContentLoaded', function() {
+      var centerCoords = [18.5204, 74.2500]; // Maharashtra Center Coordinates
+      var defaultSource = tileSources.osm;
+
+      // 1. Overview Tab Mini-Map
+      overviewMap = L.map('overview-map', { zoomControl: false }).setView(centerCoords, 8);
+      overviewTileLayer = L.tileLayer(defaultSource.url, { attribution: defaultSource.attr, maxZoom: 18 }).addTo(overviewMap);
+
+      // 2. Full GIS Surveillance Map
+      fullMap = L.map('full-map').setView(centerCoords, 8);
+      fullTileLayer = L.tileLayer(defaultSource.url, { attribution: defaultSource.attr, maxZoom: 18 }).addTo(fullMap);
+
+      var cases = [
+        { id: 'rpt_001', pos: [18.5204, 73.8567], color: '#C62828', title: 'Cow (Gir) â€” FMD Confirmed', district: 'Pune (Haveli)', status: 'verified', diseaseCode: 'FMD' },
+        { id: 'rpt_002', pos: [18.7500, 74.1500], color: '#C62828', title: 'Buffalo (Murrah) â€” LSD Confirmed', district: 'Pune (Shirur)', status: 'verified', diseaseCode: 'LSD' },
+        { id: 'rpt_003', pos: [18.6200, 73.9800], color: '#F2994A', title: 'Jersey Cross â€” Pending Vet', district: 'Pune (Khed)', status: 'submitted', diseaseCode: 'FMD' },
+        { id: 'rpt_004', pos: [19.0952, 74.7496], color: '#C62828', title: 'Cow â€” Lumpy Skin Confirmed', district: 'Ahmednagar', status: 'verified', diseaseCode: 'LSD' },
+        { id: 'rpt_005', pos: [17.6805, 74.0183], color: '#C62828', title: 'Cow â€” Anthrax Suspicion (Zoonotic)', district: 'Satara', status: 'verified', diseaseCode: 'Anthrax' },
+        { id: 'rpt_006', pos: [16.7050, 74.2433], color: '#94e130', title: 'Buffalo â€” Healthy Post-Treatment', district: 'Kolhapur', status: 'resolved', diseaseCode: 'FMD' }
+      ];
+
+      // Cluster Buffers (From Screenshot 1)
+      var c1 = L.circle([18.5800, 73.9200], {
+        color: '#C62828', fillColor: '#C62828', fillOpacity: 0.16, radius: 18000, weight: 2, dashArray: '6, 6'
+      }).addTo(overviewMap).bindPopup("<strong>Critical FMD Hotspot Cluster</strong><br>28 active cases in Pune (Haveli).");
+
+      var c1_full = L.circle([18.5800, 73.9200], {
+        color: '#C62828', fillColor: '#C62828', fillOpacity: 0.16, radius: 18000, weight: 2, dashArray: '6, 6'
+      }).addTo(fullMap).bindPopup("<strong>Critical FMD Hotspot Cluster</strong><br>28 active cases in Pune (Haveli).");
+
+      var c2 = L.circle([19.1400, 74.6800], {
+        color: '#F2994A', fillColor: '#F2994A', fillOpacity: 0.14, radius: 22000, weight: 2, dashArray: '6, 6'
+      }).addTo(overviewMap).bindPopup("<strong>High LSD Hotspot</strong><br>19 cases in Ahmednagar.");
+
+      var c2_full = L.circle([19.1400, 74.6800], {
+        color: '#F2994A', fillColor: '#F2994A', fillOpacity: 0.14, radius: 22000, weight: 2, dashArray: '6, 6'
+      }).addTo(fullMap).bindPopup("<strong>High LSD Hotspot</strong><br>19 cases in Ahmednagar.");
+
+      clusterLayers.push(c1_full);
+      clusterLayers.push(c2_full);
+
+      // District Boundaries Layer (RFC 7946 GeoJSON)
+      var districtLayer = null;
+      fetch('/geo/districts.json')
+        .then(function(res) { return res.json(); })
+        .then(function(geoData) {
+          districtLayer = L.geoJSON(geoData, {
+            style: { color: '#16a34a', weight: 1, fillOpacity: 0.1 },
+            onEachFeature: function(feature, layer) {
+              if (feature.properties && feature.properties.name) {
+                layer.bindTooltip(
+                  "<div style='font-family:Figtree,sans-serif;font-size:12px;padding:2px;'>" +
+                  "<strong style='color:#16a34a;'>" + feature.properties.name + " District</strong><br>" +
+                  "<span style='color:#555;font-size:11px;'>Active Cases: <strong>" + (feature.properties.active_cases || 0) + "</strong></span><br>" +
+                  "<span style='color:#777;font-size:11px;'>Surveillance: " + (feature.properties.surveillance_status || 'Monitored') + "</span>" +
+                  "</div>",
+                  { sticky: true }
+                );
+              }
+            }
+          }).addTo(fullMap);
+
+          L.geoJSON(geoData, {
+            style: { color: '#16a34a', weight: 1, fillOpacity: 0.08 }
+          }).addTo(overviewMap);
+        })
+        .catch(function(err) {
+          console.warn('Could not load /geo/districts.json', err);
+        });
+
+      // Add Vector Case Markers
+      cases.forEach(function(c) {
+        var mOverview = L.circleMarker(c.pos, {
+          radius: 8, fillColor: c.color, color: '#141414', weight: 2, opacity: 1, fillOpacity: 0.95
+        }).addTo(overviewMap);
+
+        var mFull = L.circleMarker(c.pos, {
+          radius: 8, fillColor: c.color, color: '#141414', weight: 2, opacity: 1, fillOpacity: 0.95
+        }).addTo(fullMap);
+
+        allMarkers.push({ marker: mFull, data: c });
+
+        var popupContent = `
+          <div style="font-family: 'Figtree', sans-serif; min-width: 190px; padding: 4px;">
+            <div style="font-size: 11px; color: #737373;">${c.district}</div>
+            <div style="font-weight: 700; font-size: 13px; color: #141414; margin-top: 2px;">${c.title}</div>
+            <div style="margin-top: 8px;">
+              <button onclick="openDrawer('${c.id}')" style="width: 100%; background: #94e130; color: #141414; font-weight: 700; font-size: 11px; padding: 6px 10px; border-radius: 6px; border: none; cursor: pointer;">
+                Inspect Clinical Record
+              </button>
+            </div>
+          </div>
+        `;
+        mOverview.bindPopup(popupContent);
+        mFull.bindPopup(popupContent);
+      });
+    });
+  </script>
+</body>
+</html>
