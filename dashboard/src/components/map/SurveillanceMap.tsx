@@ -87,17 +87,25 @@ export const SurveillanceMap: React.FC<SurveillanceMapProps> = ({ pins = [], clu
         minZoom: 6,
         maxZoom: 18,
         maxBounds: mhBounds,
-        maxBoundsViscosity: 0.95,
-        scrollWheelZoom: true,
+        maxBoundsViscosity: 1.0,
+        scrollWheelZoom: false,
       });
 
       mapInstanceRef.current = map;
+
+      map.on('zoomend', () => {
+        if (map.getZoom() < 6) {
+          map.setView([18.4500, 74.3500], 7, { animate: false });
+        }
+      });
 
       // Base Tile Layer
       const initialSource = TILE_SOURCES[activeTile];
       tileLayerRef.current = L.tileLayer(initialSource.url, {
         attribution: initialSource.attribution,
+        minZoom: 6,
         maxZoom: initialSource.maxZoom,
+        noWrap: true,
       }).addTo(map);
 
       // Automatic fallback if tile provider fails
@@ -332,7 +340,7 @@ export const SurveillanceMap: React.FC<SurveillanceMapProps> = ({ pins = [], clu
   }, [filteredPins]);
 
   return (
-    <div className="vetra-card p-0 overflow-hidden relative shadow-sm">
+    <div className="vetra-card p-0 overflow-hidden relative shadow-sm flex flex-col justify-between h-full">
       {/* Map Control Header */}
       <div className="p-4 bg-surface-card border-b border-black/10 flex flex-wrap items-center justify-between gap-3 font-figtree">
         <div>
@@ -464,8 +472,8 @@ export const SurveillanceMap: React.FC<SurveillanceMapProps> = ({ pins = [], clu
       </div>
 
       {/* Direct Leaflet Map Canvas Container */}
-      <div className="h-[520px] w-full relative z-0">
-        <div ref={mapContainerRef} className="h-full w-full" />
+      <div className="flex-1 min-h-[540px] w-full relative z-0">
+        <div ref={mapContainerRef} className="absolute inset-0 h-full w-full" />
         <div className="absolute top-3 right-3 z-[450] flex items-center gap-1.5">
           <button
             onClick={() => recenterMap('clusters')}
