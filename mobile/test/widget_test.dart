@@ -1,31 +1,104 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:pashu_wani/main.dart';
+import 'package:pashu_wani/core/auth/session_manager.dart';
+import 'package:pashu_wani/core/auth/token_store.dart';
+import 'package:pashu_wani/core/auth/role_guard.dart';
 import 'package:pashu_wani/core/localization/app_strings.dart';
 import 'package:pashu_wani/data/local/offline_store.dart';
 import 'package:pashu_wani/data/models/animal_model.dart';
 import 'package:pashu_wani/data/models/disease_report_model.dart';
 import 'package:pashu_wani/data/models/user_model.dart';
+import 'package:pashu_wani/data/vet_repository.dart';
+import 'package:pashu_wani/screens/auth/welcome_screen.dart';
+import 'package:pashu_wani/screens/auth/access_restricted_screen.dart';
 import 'package:pashu_wani/screens/home/main_navigation_screen.dart';
+import 'package:pashu_wani/screens/vet/vet_shell.dart';
 
 void main() {
   setUp(() {
     SharedPreferences.setMockInitialValues({});
+    SessionManager.resetForTest(tokens: MemoryTokenStore());
     AppStrings.setLanguage('mr');
   });
 
-  testWidgets('PashuWaniApp startup, splash transition, and navigation', (WidgetTester tester) async {
+  testWidgets('PashuWaniApp startup, splash transition to WelcomeScreen, and demo entry', (WidgetTester tester) async {
     await tester.pumpWidget(const PashuWaniApp());
     expect(find.byType(PashuWaniApp), findsOneWidget);
 
-    // Allow async OfflineStore().initialize() to complete and schedule the 1600ms splash timer
+    // Allow splash timer to complete
     for (int i = 0; i < 6; i++) {
       await tester.pump(const Duration(milliseconds: 500));
     }
 
-    // Verify transition to MainNavigationScreen and FarmerHomeScreen content
+    // Unauthenticated startup correctly displays WelcomeScreen (AuthGate)
+    expect(find.byType(WelcomeScreen), findsOneWidget);
+
+    // Enter Farmer Demo Mode
+    await SessionManager.instance.enterDemo();
+    await tester.pumpAndSettle();
+
     expect(find.byType(MainNavigationScreen), findsOneWidget);
     expect(find.text('Ramesh Jadhav'), findsOneWidget);
+  });
+
+  testWidgets('Veterinarian demo session routes to VetShell with verified badge', (WidgetTester tester) async {
+    await tester.pumpWidget(const PashuWaniApp());
+    for (int i = 0; i < 6; i++) {
+      await tester.pump(const Duration(milliseconds: 500));
+    }
+
+    // Enter Vet Demo Mode
+    await SessionManager.instance.enterDemoVet();
+    await tester.pumpAndSettle();
+
+    expect(find.byType(VetShell), findsOneWidget);
+    expect(SessionManager.instance.isVerifiedVet, true);
+  });
+
+  testWidgets('RoleGuard prevents farmer session from mounting VetShell', (WidgetTester tester) async {
+    await SessionManager.instance.enterDemo(); // Farmer session
+
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: RoleGuard(
+          role: 'vet',
+          child: VetShell(),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.byType(AccessRestrictedScreen), findsOneWidget);
+    expect(find.byType(VetShell), findsNothing);
+  });
+
+  test('VetRepository verification records decision and updates status', () async {
+    await SessionManager.instance.enterDemoVet();
+    final repo = VetRepository.shared;
+
+    final pending = await repo.pendingReports();
+    expect(pending.items.isNotEmpty, true);
+    final targetReport = pending.items.first;
+
+    // Submit clinical verification
+    final verified = await repo.verify(
+      targetReport.id,
+      decision: 'confirmed',
+      diseaseCode: 'lumpy_skin_disease',
+      notes: 'Firm nodules verified across neck. Isolated from herd.',
+      visitRequired: true,
+    );
+
+    expect(verified.status, 'confirmed');
+    expect(verified.verification?.decision, 'confirmed');
+    expect(verified.verification?.diseaseCode, 'lumpy_skin_disease');
+    expect(verified.verification?.visitRequired, true);
+
+    // Summary totals reflect updated counts
+    final summary = await repo.summary();
+    expect(summary.confirmed, greaterThanOrEqualTo(1));
   });
 
   test('OfflineStore persists animals, reports, screening, alert consent, and language across restarts', () async {

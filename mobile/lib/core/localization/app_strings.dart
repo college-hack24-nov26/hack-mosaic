@@ -1,3 +1,5 @@
+import 'vet_strings.dart';
+
 class AppStrings {
   AppStrings._();
 
@@ -10,7 +12,15 @@ class AppStrings {
   }
 
   static String t(String key) {
-    return _translations[key]?[currentLang] ?? _translations[key]?['en'] ?? key;
+    final m = _translations[key] ?? vetStrings[key];
+    return m?[currentLang] ?? m?['en'] ?? key;
+  }
+
+  /// `t` with `{placeholder}` substitution.
+  static String tf(String key, Map<String, String> args) {
+    var out = t(key);
+    args.forEach((k, v) => out = out.replaceAll('{$k}', v));
+    return out;
   }
 
   static String formatSymptom(String code) {

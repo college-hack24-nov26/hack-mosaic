@@ -11,7 +11,10 @@ class ApiClient {
   ApiClient._internal();
 
   // Android emulator: 10.0.2.2, iOS simulator/desktop: localhost
+  static const String _envBaseUrl = String.fromEnvironment('API_BASE_URL');
+
   static String get baseUrl {
+    if (_envBaseUrl.isNotEmpty) return _envBaseUrl;
     if (Platform.isAndroid) {
       return 'http://10.0.2.2:8080/api/v1';
     }

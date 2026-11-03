@@ -30,3 +30,4 @@ class VoiceService {
 
   Future<void> stop() => _tts.stop();
 }
+

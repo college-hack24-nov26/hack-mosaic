@@ -144,3 +144,4 @@ spoken_summary (2-4 short sentences read aloud to the farmer: what is seen, what
     }
   }
 }
+
