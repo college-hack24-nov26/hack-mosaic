@@ -5,6 +5,7 @@ import '../../core/theme/app_typography.dart';
 import '../../core/theme/app_spacing.dart';
 import '../../core/localization/app_strings.dart';
 import '../../core/services/gemini_service.dart';
+import '../../core/services/offline_tflite_service.dart';
 import '../../core/services/voice_service.dart';
 import '../../core/widgets/app_card.dart';
 import '../../core/widgets/app_button.dart';
@@ -16,12 +17,16 @@ class ScanResultsScreen extends StatefulWidget {
   final String imagePath;
   final String? animalId;
   final GeminiGuidance guidance;
+  final OfflineTfliteResult? tfliteResult;
+  final bool usedOnlineAi;
 
   const ScanResultsScreen({
     super.key,
     required this.imagePath,
     this.animalId,
     required this.guidance,
+    this.tfliteResult,
+    this.usedOnlineAi = false,
   });
 
   @override
@@ -85,6 +90,91 @@ class _ScanResultsScreenState extends State<ScanResultsScreen> {
     }
   }
 
+  Widget _buildTfliteCard(OfflineTfliteResult tflite) {
+    final s = tflite.screening;
+    final pct = (s.topConfidence * 100).toStringAsFixed(1);
+    final badgeColor = s.inconclusive
+        ? AppColors.cautionAmber
+        : (tflite.isHealthy ? AppColors.successGreen : AppColors.alertCritical);
+
+    return AppCard(
+      padding: const EdgeInsets.all(AppSpacing.lg),
+      color: Colors.white,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(Icons.memory, size: 20, color: AppColors.primary),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  AppStrings.t('tflite_card_title'),
+                  style: AppTypography.cardTitle.copyWith(fontSize: 14),
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                decoration: BoxDecoration(
+                  color: AppColors.surfaceContainer,
+                  borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
+                ),
+                child: Text(
+                  '${tflite.inferenceMs} ms',
+                  style: AppTypography.caption.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.primary,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+            decoration: BoxDecoration(
+              color: badgeColor.withValues(alpha: 0.12),
+              borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
+            ),
+            child: Text(
+              tflite.localizedClassificationLabel,
+              style: AppTypography.badge.copyWith(
+                color: badgeColor,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+          const SizedBox(height: 12),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(AppStrings.t('statistical_prob'), style: AppTypography.caption),
+              Text(
+                '$pct%',
+                style: AppTypography.cardTitle.copyWith(fontSize: 14, color: badgeColor),
+              ),
+            ],
+          ),
+          const SizedBox(height: 6),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(6),
+            child: LinearProgressIndicator(
+              value: s.topConfidence.clamp(0.0, 1.0),
+              minHeight: 8,
+              backgroundColor: AppColors.surfaceContainer,
+              valueColor: AlwaysStoppedAnimation<Color>(badgeColor),
+            ),
+          ),
+          const SizedBox(height: 10),
+          Text(
+            '${AppStrings.t('model_version_notice')} (${s.modelVersion})',
+            style: AppTypography.caption.copyWith(fontSize: 11),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _bulletCard(List<String> items, {Color dot = AppColors.primary}) {
     return AppCard(
       padding: const EdgeInsets.all(AppSpacing.md),
@@ -112,6 +202,7 @@ class _ScanResultsScreenState extends State<ScanResultsScreen> {
   @override
   Widget build(BuildContext context) {
     final g = widget.guidance;
+    final tflite = widget.tfliteResult;
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -124,6 +215,11 @@ class _ScanResultsScreenState extends State<ScanResultsScreen> {
             child: Image.file(File(widget.imagePath), height: 220, width: double.infinity, fit: BoxFit.cover),
           ),
           const SizedBox(height: AppSpacing.lg),
+
+          if (tflite != null) ...[
+            _buildTfliteCard(tflite),
+            const SizedBox(height: AppSpacing.lg),
+          ],
 
           AppCard(
             padding: const EdgeInsets.all(AppSpacing.lg),
@@ -154,7 +250,12 @@ class _ScanResultsScreenState extends State<ScanResultsScreen> {
                   ),
                 ),
                 const SizedBox(height: 8),
-                Text(AppStrings.t('generated_by_ai'), style: AppTypography.caption),
+                Text(
+                  widget.usedOnlineAi
+                      ? AppStrings.t('generated_by_ai')
+                      : AppStrings.t('model_version_notice'),
+                  style: AppTypography.caption,
+                ),
               ],
             ),
           ),
@@ -200,21 +301,23 @@ class _ScanResultsScreenState extends State<ScanResultsScreen> {
               final conf = g.urgency == 'high'
                   ? 0.88
                   : (g.urgency == 'medium' ? 0.74 : 0.55);
+              final screening = tflite?.screening ??
+                  ScreeningResult(
+                    modelVersion: 'gemini-2.5-flash-preliminary',
+                    topLabel: topCond,
+                    topConfidence: conf,
+                    inconclusive: g.urgency == 'low',
+                    scores: [
+                      {'label': topCond, 'score': conf},
+                    ],
+                    ranAt: DateTime.now().toUtc(),
+                  );
               Navigator.of(context).pushReplacement(
                 MaterialPageRoute(
                   builder: (_) => CreateReportScreen(
                     preselectedAnimalId: widget.animalId,
                     initialPhotoPath: widget.imagePath,
-                    initialScreening: ScreeningResult(
-                      modelVersion: 'gemini-2.5-flash-preliminary',
-                      topLabel: topCond,
-                      topConfidence: conf,
-                      inconclusive: g.urgency == 'low',
-                      scores: [
-                        {'label': topCond, 'score': conf},
-                      ],
-                      ranAt: DateTime.now().toUtc(),
-                    ),
+                    initialScreening: screening,
                   ),
                 ),
               );

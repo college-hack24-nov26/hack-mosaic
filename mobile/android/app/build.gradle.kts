@@ -25,6 +25,10 @@ android {
         versionName = flutter.versionName
     }
 
+    androidResources {
+        noCompress += listOf("tflite", "lite")
+    }
+
     buildTypes {
         release {
             // TODO: Add your own signing config for the release build.
@@ -32,6 +36,10 @@ android {
             signingConfig = signingConfigs.getByName("debug")
         }
     }
+}
+
+dependencies {
+    implementation("com.google.ai.edge.litert:litert:1.0.1")
 }
 
 kotlin {

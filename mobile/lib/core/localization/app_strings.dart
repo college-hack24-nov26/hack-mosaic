@@ -324,9 +324,39 @@ class AppStrings {
     'scan_tap_hint': {'en': 'Keep nodules, wounds or mouth sores clearly visible', 'mr': 'गाठी, जखम किंवा तोंडातील फोड स्पष्ट दिसू द्या', 'hi': 'गांठें, घाव या मुंह के छाले साफ दिखें'},
     'scan_tips_title': {'en': 'Screening Tips', 'mr': 'तपासणी मार्गदर्शन', 'hi': 'जांच सुझाव'},
     'scan_tips_body': {
-      'en': '• Take the photo in good light\n• Hold the camera steady on the affected area\n• AI guidance needs an internet connection',
-      'mr': '• चांगल्या प्रकाशात फोटो काढा\n• कॅमेरा बाधित भागावर स्थिर ठेवा\n• एआय मार्गदर्शनासाठी इंटरनेट आवश्यक आहे',
-      'hi': '• अच्छी रोशनी में फोटो लें\n• कैमरा प्रभावित हिस्से पर स्थिर रखें\n• एआई मार्गदर्शन के लिए इंटरनेट चाहिए',
+      'en': '• Take the photo in good light\n• Hold the camera steady on the affected area\n• Works offline with On-Device TFLite + online Gemini AI',
+      'mr': '• चांगल्या प्रकाशात फोटो काढा\n• कॅमेरा बाधित भागावर स्थिर ठेवा\n• इंटरनेट नसतानाही ऑन-डिव्हाइस टीएफलाईट मॉडेलने तपासणी होते',
+      'hi': '• अच्छी रोशनी में फोटो लें\n• कैमरा प्रभावित हिस्से पर स्थिर रखें\n• बिना इंटरनेट के भी ऑन-डिवाइस टीएफलाइट मॉडल से जांच होती है',
+    },
+    'tflite_card_title': {
+      'en': 'On-Device TFLite Screening (Offline Model)',
+      'mr': 'ऑन-डिव्हाइस टीएफलाईट प्राथमिक तपासणी (ऑफलाइन मॉडेल)',
+      'hi': 'ऑन-डिवाइस टीएफलाइट प्रारंभिक जांच (ऑफलाइन मॉडल)',
+    },
+    'tflite_healthy': {
+      'en': 'No Obvious External Lesion Detected (Healthy Pattern)',
+      'mr': 'बाह्य जखम किंवा गाठी आढळल्या नाहीत (निरोगी नमुना)',
+      'hi': 'बाहरी घाव या गांठ के स्पष्ट संकेत नहीं मिले (स्वस्थ पैटर्न)',
+    },
+    'tflite_suspected_disease': {
+      'en': 'Possible Bovine Lesion / FMD-LSD Signs Detected',
+      'mr': 'संभाव्य जनावरांतील जखम / लाळ्या-लंपी सदृश लक्षणे आढळली',
+      'hi': 'संभावित पशु घाव / खुरपका-लम्पी जैसे संकेत मिले',
+    },
+    'tflite_inconclusive': {
+      'en': 'Inconclusive (<65% confidence) — Retake in clearer light or consult vet',
+      'mr': 'अनिर्णित (<६५% विश्वासार्हता) — स्पष्ट प्रकाशात फोटो घ्या किंवा पशुवैद्यकास दाखवा',
+      'hi': 'अनिर्णायक (<६५% विश्वसनीयता) — साफ रोशनी में फोटो लें या पशु चिकित्सक को दिखाएं',
+    },
+    'tflite_offline_badge': {
+      'en': 'Offline TFLite Mode (No Internet Needed)',
+      'mr': 'ऑफलाइन टीएफलाईट मोड (इंटरनेट विना कार्यरत)',
+      'hi': 'ऑफलाइन टीएफलाइट मोड (बिना इंटरनेट के सक्रिय)',
+    },
+    'tflite_hybrid_badge': {
+      'en': 'Hybrid: On-Device TFLite + Online Gemini AI',
+      'mr': 'हायब्रिड: ऑन-डिव्हाइस टीएफलाईट + ऑनलाइन जेमिनी एआय',
+      'hi': 'हाइब्रिड: ऑन-डिवाइस टीएफलाइट + ऑनलाइन जेमिनी एआई',
     },
     'camera': {'en': 'Camera', 'mr': 'कॅमेरा', 'hi': 'कैमरा'},
     'gallery': {'en': 'Gallery', 'mr': 'गॅलरी', 'hi': 'गैलरी'},
