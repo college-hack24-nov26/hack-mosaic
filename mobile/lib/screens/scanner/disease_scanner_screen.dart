@@ -6,6 +6,7 @@ import '../../core/theme/app_typography.dart';
 import '../../core/theme/app_spacing.dart';
 import '../../core/localization/app_strings.dart';
 import '../../core/services/gemini_service.dart';
+import '../../core/services/offline_tflite_service.dart';
 import '../../core/widgets/app_button.dart';
 import '../../core/widgets/app_card.dart';
 import '../../data/local/offline_store.dart';
@@ -49,8 +50,10 @@ class _DiseaseScannerScreenState extends State<DiseaseScannerScreen> {
     }
   }
 
-  /// Online: Gemini gives preliminary first-aid guidance.
-  /// Offline: no fabricated result; the farmer is told and can still file a report.
+  /// Hybrid Offline-First Screening:
+  /// 1. Runs on-device TensorFlow Lite (`bovine_disease_classifier.tflite`) with zero internet required.
+  /// 2. When online and Gemini is configured, augments with Gemini 2.5 Flash visual observations.
+  /// 3. When offline, uses localized TFLite interim care guidance + offline voice readout.
   Future<void> _runScreening() async {
     if (_imagePath == null) {
       _snack(AppStrings.t('scan_need_photo'));
@@ -58,38 +61,60 @@ class _DiseaseScannerScreenState extends State<DiseaseScannerScreen> {
     }
 
     setState(() => _isAnalyzing = true);
+    final animal = _selectedAnimalId == null
+        ? null
+        : _store.animals.where((a) => a.id == _selectedAnimalId).firstOrNull;
+
+    OfflineTfliteResult? tfliteResult;
     try {
-      final animal = _selectedAnimalId == null
-          ? null
-          : _store.animals.where((a) => a.id == _selectedAnimalId).firstOrNull;
-      final guidance = await GeminiService.analyze(
-        image: File(_imagePath!),
-        animalLabel: animal == null ? null : '${animal.displayName} (${animal.speciesCode})',
+      tfliteResult = await OfflineTfliteService.classify(
+        imagePath: _imagePath!,
+        species: animal?.speciesCode ?? 'bovine',
       );
-      if (!mounted) return;
-      setState(() => _isAnalyzing = false);
-      Navigator.of(context).push(
-        MaterialPageRoute(
-          builder: (_) => ScanResultsScreen(
-            imagePath: _imagePath!,
-            animalId: _selectedAnimalId,
-            guidance: guidance,
-          ),
-        ),
-      );
-    } on GeminiException catch (e) {
-      if (!mounted) return;
-      setState(() => _isAnalyzing = false);
-      switch (e.failure) {
-        case GeminiFailure.noKey:
-          _showOfflineSheet(AppStrings.t('scan_no_key'));
-        case GeminiFailure.offline:
-        case GeminiFailure.timeout:
-          _showOfflineSheet(AppStrings.t('scan_offline'));
-        case GeminiFailure.badResponse:
-          _showOfflineSheet(AppStrings.t('scan_failed'));
-      }
+    } catch (_) {
+      // Non-Android desktop/web test environment fallback
+      tfliteResult = null;
     }
+
+    GeminiGuidance? guidance;
+    bool usedOnlineAi = false;
+    if (_store.isOnline && GeminiService.isConfigured) {
+      try {
+        guidance = await GeminiService.analyze(
+          image: File(_imagePath!),
+          animalLabel: animal == null ? null : '${animal.displayName} (${animal.speciesCode})',
+        );
+        usedOnlineAi = true;
+      } on GeminiException {
+        guidance = tfliteResult?.toOfflineGuidance();
+      }
+    } else {
+      guidance = tfliteResult?.toOfflineGuidance();
+    }
+
+    if (!mounted) return;
+    setState(() => _isAnalyzing = false);
+
+    if (guidance == null && tfliteResult != null) {
+      guidance = tfliteResult.toOfflineGuidance();
+    }
+
+    if (guidance == null) {
+      _showOfflineSheet(AppStrings.t('scan_offline'));
+      return;
+    }
+
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => ScanResultsScreen(
+          imagePath: _imagePath!,
+          animalId: _selectedAnimalId,
+          guidance: guidance!,
+          tfliteResult: tfliteResult,
+          usedOnlineAi: usedOnlineAi,
+        ),
+      ),
+    );
   }
 
   void _showOfflineSheet(String message) {
@@ -145,6 +170,32 @@ class _DiseaseScannerScreenState extends State<DiseaseScannerScreen> {
       body: ListView(
         padding: const EdgeInsets.all(AppSpacing.lg),
         children: [
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            decoration: BoxDecoration(
+              color: AppColors.primary.withValues(alpha: 0.10),
+              borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+              border: Border.all(color: AppColors.primary.withValues(alpha: 0.25)),
+            ),
+            child: Row(
+              children: [
+                const Icon(Icons.memory, size: 18, color: AppColors.primary),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    _store.isOnline && GeminiService.isConfigured
+                        ? AppStrings.t('tflite_hybrid_badge')
+                        : AppStrings.t('tflite_offline_badge'),
+                    style: AppTypography.caption.copyWith(
+                      color: AppColors.primary,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: AppSpacing.md),
           Text(AppStrings.t('select_animal_title'), style: AppTypography.cardTitle),
           const SizedBox(height: AppSpacing.sm),
           DropdownButtonFormField<String>(
