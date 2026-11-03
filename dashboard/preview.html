@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Pashuvani Ã¢â‚¬â€ Government Animal Health & Disease Surveillance</title>
+  <title>Pashuvani — Government Animal Health & Disease Surveillance</title>
   
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -909,20 +909,56 @@
 
         <!-- Overview Map Preview & XGBoost Intelligence Card -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div class="lg:col-span-2 vetra-card p-0 overflow-hidden relative">
+          <div class="lg:col-span-2 vetra-card p-0 overflow-hidden flex flex-col justify-between relative shadow-sm">
             <div class="p-4 border-b border-black/10 flex items-center justify-between bg-white">
               <div>
-                <h3 class="font-bold text-base text-ink flex items-center gap-2">
-                  <span class="w-2.5 h-2.5 rounded-full bg-[#C62828] animate-pulse"></span>
-                  Active Geographic Disease Clusters
-                </h3>
-                <p class="text-xs text-ink-metadata font-inter">PostGIS spatial cluster tracking & WGS84 GeoJSON stream</p>
+                <div class="flex items-center gap-2">
+                  <span class="w-2.5 h-2.5 rounded-full bg-[#8C5A48] animate-pulse"></span>
+                  <h3 class="font-bold text-base text-ink">Active Geographic Disease Clusters</h3>
+                  <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-50 text-emerald-800 border border-emerald-200 font-semibold">Live Telemetry</span>
+                </div>
+                <p class="text-xs text-ink-metadata font-inter mt-0.5">PostGIS spatial cluster tracking &bull; Maharashtra Statewide GIS</p>
               </div>
-              <button onclick="switchTab('map')" class="text-xs font-bold text-ink hover:underline flex items-center gap-1">
-                Open Full GIS Canvas <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
-              </button>
+              <div class="flex items-center gap-2">
+                <button onclick="resetOverviewMapView()" title="Recenter on Maharashtra" class="px-2.5 py-1 text-xs font-semibold rounded bg-parchment hover:bg-white border border-black/15 flex items-center gap-1 transition-all cursor-pointer shadow-2xs">
+                  <i data-lucide="crosshair" class="w-3.5 h-3.5 text-zinc-600"></i> Recenter
+                </button>
+                <button onclick="switchTab('map')" class="aero-btn aero-btn-lime px-3 py-1.5 text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow-sm">
+                  <span>Open Full GIS Canvas</span>
+                  <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+                </button>
+              </div>
             </div>
-            <div id="overview-map" class="h-96 w-full"></div>
+
+            <!-- Leaflet Map Container: fills available card height -->
+            <div class="flex-1 w-full relative z-0" style="min-height: 480px;">
+              <div id="overview-map" class="w-full h-full" style="min-height: 480px;"></div>
+            </div>
+
+            <!-- Active Cluster Buffer Strip: bottom of overview map card -->
+            <div class="p-3 bg-parchment/70 border-t border-black/10 grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs font-inter">
+              <div class="p-2 rounded-lg bg-white border border-black/10 flex items-center justify-between shadow-2xs">
+                <div>
+                  <span class="text-[10px] text-zinc-500 font-bold block uppercase tracking-wider">Pune Hotspot</span>
+                  <span class="font-bold text-[#8C5A48] font-figtree">28 Cases &bull; 10km Ring</span>
+                </div>
+                <span class="w-2.5 h-2.5 rounded-full bg-[#8C5A48]"></span>
+              </div>
+              <div class="p-2 rounded-lg bg-white border border-black/10 flex items-center justify-between shadow-2xs">
+                <div>
+                  <span class="text-[10px] text-zinc-500 font-bold block uppercase tracking-wider">Ahmednagar Cluster</span>
+                  <span class="font-bold text-[#A48560] font-figtree">19 Cases &bull; 15km Ring</span>
+                </div>
+                <span class="w-2.5 h-2.5 rounded-full bg-[#A48560]"></span>
+              </div>
+              <div class="p-2 rounded-lg bg-white border border-black/10 flex items-center justify-between shadow-2xs">
+                <div>
+                  <span class="text-[10px] text-zinc-500 font-bold block uppercase tracking-wider">Satara Corridor</span>
+                  <span class="font-bold text-[#3E5266] font-figtree">12 Cases &bull; 10km Buffer</span>
+                </div>
+                <span class="w-2.5 h-2.5 rounded-full bg-[#3E5266]"></span>
+              </div>
+            </div>
           </div>
 
           <!-- Real Integrated XGBoost Disease Outbreak Risk Card -->
@@ -1694,7 +1730,7 @@
                 </span>
               </div>
               <p class="text-xs text-zinc-500 font-inter mt-1">
-                Area-wise animal immunization logs &bull; 2Â°C&ndash;8Â°C Cold chain telemetry &bull; High-risk ring perimeter quota management
+                Area-wise animal immunization logs &bull; 2°C–8°C Cold chain telemetry &bull; High-risk ring perimeter quota management
               </p>
             </div>
 
@@ -1775,10 +1811,10 @@
               <i data-lucide="thermometer-snowflake" class="w-4 h-4 text-blue-600"></i>
             </div>
             <div class="mt-2 flex items-baseline justify-between">
-              <span class="text-2xl font-extrabold font-figtree text-blue-700">4.1Â°C Avg</span>
+              <span class="text-2xl font-extrabold font-figtree text-blue-700">4.1°C Avg</span>
               <span class="text-[11px] font-semibold text-blue-700 bg-blue-100 px-1.5 py-0.5 rounded">99.2% Compliant</span>
             </div>
-            <p class="text-[11px] text-zinc-500 font-inter mt-1">WHO spec: 2.0Â°C to 8.0Â°C active</p>
+            <p class="text-[11px] text-zinc-500 font-inter mt-1">WHO spec: 2.0°C to 8.0°C active</p>
           </div>
 
           <div class="vetra-card p-4">
@@ -1809,8 +1845,7 @@
           </div>
 
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            <!-- 1. Pune District 3D Pie Chart -->
-            
+
     <div class="aero-card p-4 flex flex-col justify-between">
       <div>
         <div class="flex items-center justify-between pb-2 border-b border-black/5 mb-2">
@@ -1818,55 +1853,60 @@
             <h4 class="font-bold text-sm text-ink font-figtree">Pune District</h4>
             <span class="text-[10px] text-zinc-500 font-mono">Pune Veterinary Unit</span>
           </div>
-          <span class="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-orange-100 text-orange-900 border border-orange-200">
+          <span class="text-[10px] font-semibold px-2 py-0.5 rounded-full border bg-stone-200 text-stone-800 border-stone-300">
             Hotspot Ring Priority
           </span>
         </div>
 
-        <!-- 3D Cylindrical Donut Pie Visual Canvas -->
-        <div class="pie-3d-wrapper relative my-1">
-          <svg class="pie-3d-svg" width="135" height="135" viewBox="0 0 120 120">
-            <!-- 3D Shadow Depth Underlay -->
-            <circle cx="60" cy="65" r="44" fill="none" stroke="rgba(0,0,0,0.16)" stroke-width="17" />
-            <!-- Base Ring -->
-            <circle cx="60" cy="60" r="44" fill="none" stroke="#f1f5f9" stroke-width="17" />
-            <!-- Donut Slices -->
-            <g transform="rotate(-90 60 60)">
+        
+        <!-- Proper Filled Circle 3D Pie Chart -->
+        <div class="pie-3d-wrapper relative my-2">
+          <svg class="pie-3d-svg" width="140" height="130" viewBox="0 0 120 115">
+            <defs>
+              <linearGradient id="pieGloss" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stop-color="#ffffff" stop-opacity="0.45" />
+                <stop offset="60%" stop-color="#ffffff" stop-opacity="0.08" />
+                <stop offset="100%" stop-color="#ffffff" stop-opacity="0" />
+              </linearGradient>
+              <filter id="pieShadow" x="-20%" y="-20%" width="140%" height="150%">
+                <feDropShadow dx="0" dy="5" stdDeviation="4" flood-color="rgba(20,20,20,0.18)" />
+              </filter>
+            </defs>
+
+            <!-- 3D Shadow Base Disk -->
+            <circle cx="60" cy="58" r="44" fill="rgba(0,0,0,0.14)" />
+            
+            <!-- 3D Cylinder Rim Depth (Lower Edge) -->
+            <path d="M 16 54 A 44 44 0 0 0 104 54 L 104 58 A 44 44 0 0 1 16 58 Z" fill="rgba(0,0,0,0.22)" />
+
+            <!-- Main Pie Wedges Group (Filter Shadow Applied) -->
+            <g filter="url(#pieShadow)">
               
-      <circle cx="60" cy="60" r="44" fill="none" stroke="#C2410C" stroke-width="17"
-        stroke-dasharray="132.70 143.76"
-        stroke-dashoffset="0.00"
-        class="pie-segment"
-      >
+      <path d="M 60.0 54.0 L 60.0 10.0 A 44 44 0 0 1 65.5 97.7 Z" fill="#8C5A48" stroke="#ffffff" stroke-width="1.5" stroke-linejoin="round" class="pie-wedge transition-all cursor-pointer">
         <title>LSD Goat Pox: 48% (8,832 doses)</title>
-      </circle>
-    
-      <circle cx="60" cy="60" r="44" fill="none" stroke="#15803D" stroke-width="17"
-        stroke-dasharray="94.00 182.46"
-        stroke-dashoffset="-132.70"
-        class="pie-segment"
-      >
+      </path>
+      <path d="M 60.0 54.0 L 65.5 97.7 A 44 44 0 0 1 20.2 35.3 Z" fill="#4E6E5D" stroke="#ffffff" stroke-width="1.5" stroke-linejoin="round" class="pie-wedge transition-all cursor-pointer">
         <title>FMD Trivalent: 34% (6,256 doses)</title>
-      </circle>
-    
-      <circle cx="60" cy="60" r="44" fill="none" stroke="#1D4ED8" stroke-width="17"
-        stroke-dasharray="49.76 226.70"
-        stroke-dashoffset="-226.70"
-        class="pie-segment"
-      >
+      </path>
+      <path d="M 60.0 54.0 L 20.2 35.3 A 44 44 0 0 1 60.0 10.0 Z" fill="#3E5266" stroke="#ffffff" stroke-width="1.5" stroke-linejoin="round" class="pie-wedge transition-all cursor-pointer">
         <title>Anthrax Spore: 18% (3,312 doses)</title>
-      </circle>
-    
+      </path>
             </g>
-            <!-- Specular Light Reflection Ring (Windows 7 Gloss Arc) -->
-            <circle cx="60" cy="58" r="44" fill="none" stroke="rgba(255,255,255,0.35)" stroke-width="2" />
-            <!-- Center Cutout with Glass Highlights -->
-            <circle cx="60" cy="60" r="33" fill="#ffffff" stroke="rgba(0,0,0,0.08)" stroke-width="1.5" />
-            <circle cx="60" cy="60" r="30" fill="#f8fafc" stroke="rgba(0,0,0,0.03)" stroke-width="1" />
-            <!-- Central Typography Badge -->
-            <text x="60" y="56" text-anchor="middle" font-family="'Figtree', sans-serif" font-size="14" font-weight="800" fill="#141414">87.6%</text>
-            <text x="60" y="69" text-anchor="middle" font-family="'Inter', sans-serif" font-size="8" font-weight="700" fill="#64748b" letter-spacing="0.5">COVERAGE</text>
+
+            <!-- Specular Gloss Arc (Top 3D Glass Sheen) -->
+            <path d="M 20 48 A 44 44 0 0 1 100 48 A 42 22 0 0 0 20 48 Z" fill="url(#pieGloss)" pointer-events="none" />
+            
+            <!-- Center Pivot Accent Bead -->
+            <circle cx="60" cy="54" r="3.5" fill="#ffffff" stroke="rgba(0,0,0,0.25)" stroke-width="1" />
           </svg>
+        </div>
+
+        <!-- Coverage Ribbon Badge -->
+        <div class="flex items-center justify-center -mt-1 mb-2">
+          <span class="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full text-xs font-bold bg-parchment text-ink border border-black/10 shadow-xs">
+            <span class="w-2 h-2 rounded-full" style="background: #4E6E5D;"></span>
+            87.6% Ring Coverage
+          </span>
         </div>
 
         <!-- Stats Bar -->
@@ -1877,7 +1917,7 @@
           </div>
           <div class="text-right">
             <span class="text-[10px] text-zinc-500 block">Cold Chain</span>
-            <span class="font-mono font-bold text-[#15803D]">4.1°C Optimal</span>
+            <span class="font-mono font-bold" style="color: #4E6E5D;">4.1°C Optimal</span>
           </div>
         </div>
 
@@ -1886,108 +1926,109 @@
           
     <div class="flex items-center justify-between text-[11px] py-1 border-b border-black/5 last:border-0">
       <span class="flex items-center gap-1.5 font-medium text-zinc-700">
-        <span class="w-2.5 h-2.5 rounded-full flex-shrink-0 shadow-xs" style="background: #C2410C;"></span>
+        <span class="w-2.5 h-2.5 rounded-full flex-shrink-0 shadow-xs" style="background: #8C5A48;"></span>
         <span class="truncate">LSD Goat Pox</span>
       </span>
       <span class="font-mono font-bold text-zinc-800 whitespace-nowrap">48% <span class="text-zinc-500 font-normal">(8,832)</span></span>
     </div>
-  
     <div class="flex items-center justify-between text-[11px] py-1 border-b border-black/5 last:border-0">
       <span class="flex items-center gap-1.5 font-medium text-zinc-700">
-        <span class="w-2.5 h-2.5 rounded-full flex-shrink-0 shadow-xs" style="background: #15803D;"></span>
+        <span class="w-2.5 h-2.5 rounded-full flex-shrink-0 shadow-xs" style="background: #4E6E5D;"></span>
         <span class="truncate">FMD Trivalent</span>
       </span>
       <span class="font-mono font-bold text-zinc-800 whitespace-nowrap">34% <span class="text-zinc-500 font-normal">(6,256)</span></span>
     </div>
-  
     <div class="flex items-center justify-between text-[11px] py-1 border-b border-black/5 last:border-0">
       <span class="flex items-center gap-1.5 font-medium text-zinc-700">
-        <span class="w-2.5 h-2.5 rounded-full flex-shrink-0 shadow-xs" style="background: #1D4ED8;"></span>
+        <span class="w-2.5 h-2.5 rounded-full flex-shrink-0 shadow-xs" style="background: #3E5266;"></span>
         <span class="truncate">Anthrax Spore</span>
       </span>
       <span class="font-mono font-bold text-zinc-800 whitespace-nowrap">18% <span class="text-zinc-500 font-normal">(3,312)</span></span>
     </div>
-  
         </div>
       </div>
 
-      
-    <button onclick="filterVaccinationByDistrict('Pune')" class="aero-btn aero-btn-white w-full mt-3 py-1.5 px-3 text-ink text-xs font-bold border border-black/10 hover:border-[#94e130] flex items-center justify-center gap-1.5 shadow-xs">
-      <i data-lucide="filter" class="w-3.5 h-3.5 text-[#15803D]"></i> Filter Pune Records
-    </button>
-  
+      <div class="mt-3 pt-2 border-t border-black/5 flex items-center justify-between text-xs font-inter">
+        <button onclick="filterByDistrictCard('Pune')" class="text-[11px] font-bold text-ink hover:text-[#4E6E5D] flex items-center gap-1 cursor-pointer transition-colors">
+          <span>Filter Area Records</span>
+          <i data-lucide="chevron-right" class="w-3 h-3"></i>
+        </button>
+        <span class="text-[10px] text-zinc-400 font-mono">Cold Chain Logged</span>
+      </div>
     </div>
-  
 
-            <!-- 2. Ahmednagar District 3D Pie Chart -->
-            
     <div class="aero-card p-4 flex flex-col justify-between">
       <div>
         <div class="flex items-center justify-between pb-2 border-b border-black/5 mb-2">
           <div>
             <h4 class="font-bold text-sm text-ink font-figtree">Ahmednagar District</h4>
-            <span class="text-[10px] text-zinc-500 font-mono">Ahmednagar Veterinary Unit</span>
+            <span class="text-[10px] text-zinc-500 font-mono">Ahmednagar North Zone</span>
           </div>
-          <span class="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-amber-100 text-amber-900 border border-amber-200">
-            Dairy Belt Ring Active
+          <span class="text-[10px] font-semibold px-2 py-0.5 rounded-full border bg-stone-200 text-stone-800 border-stone-300">
+            Active Ring Buffer
           </span>
         </div>
 
-        <!-- 3D Cylindrical Donut Pie Visual Canvas -->
-        <div class="pie-3d-wrapper relative my-1">
-          <svg class="pie-3d-svg" width="135" height="135" viewBox="0 0 120 120">
-            <!-- 3D Shadow Depth Underlay -->
-            <circle cx="60" cy="65" r="44" fill="none" stroke="rgba(0,0,0,0.16)" stroke-width="17" />
-            <!-- Base Ring -->
-            <circle cx="60" cy="60" r="44" fill="none" stroke="#f1f5f9" stroke-width="17" />
-            <!-- Donut Slices -->
-            <g transform="rotate(-90 60 60)">
+        
+        <!-- Proper Filled Circle 3D Pie Chart -->
+        <div class="pie-3d-wrapper relative my-2">
+          <svg class="pie-3d-svg" width="140" height="130" viewBox="0 0 120 115">
+            <defs>
+              <linearGradient id="pieGloss" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stop-color="#ffffff" stop-opacity="0.45" />
+                <stop offset="60%" stop-color="#ffffff" stop-opacity="0.08" />
+                <stop offset="100%" stop-color="#ffffff" stop-opacity="0" />
+              </linearGradient>
+              <filter id="pieShadow" x="-20%" y="-20%" width="140%" height="150%">
+                <feDropShadow dx="0" dy="5" stdDeviation="4" flood-color="rgba(20,20,20,0.18)" />
+              </filter>
+            </defs>
+
+            <!-- 3D Shadow Base Disk -->
+            <circle cx="60" cy="58" r="44" fill="rgba(0,0,0,0.14)" />
+            
+            <!-- 3D Cylinder Rim Depth (Lower Edge) -->
+            <path d="M 16 54 A 44 44 0 0 0 104 54 L 104 58 A 44 44 0 0 1 16 58 Z" fill="rgba(0,0,0,0.22)" />
+
+            <!-- Main Pie Wedges Group (Filter Shadow Applied) -->
+            <g filter="url(#pieShadow)">
               
-      <circle cx="60" cy="60" r="44" fill="none" stroke="#C2410C" stroke-width="17"
-        stroke-dasharray="152.05 124.41"
-        stroke-dashoffset="0.00"
-        class="pie-segment"
-      >
+      <path d="M 60.0 54.0 L 60.0 10.0 A 44 44 0 1 1 46.4 95.8 Z" fill="#8C5A48" stroke="#ffffff" stroke-width="1.5" stroke-linejoin="round" class="pie-wedge transition-all cursor-pointer">
         <title>LSD Goat Pox: 55% (7,040 doses)</title>
-      </circle>
-    
-      <circle cx="60" cy="60" r="44" fill="none" stroke="#15803D" stroke-width="17"
-        stroke-dasharray="96.76 179.70"
-        stroke-dashoffset="-152.05"
-        class="pie-segment"
-      >
+      </path>
+      <path d="M 60.0 54.0 L 46.4 95.8 A 44 44 0 0 1 34.1 18.4 Z" fill="#4E6E5D" stroke="#ffffff" stroke-width="1.5" stroke-linejoin="round" class="pie-wedge transition-all cursor-pointer">
         <title>FMD Trivalent: 35% (4,480 doses)</title>
-      </circle>
-    
-      <circle cx="60" cy="60" r="44" fill="none" stroke="#1D4ED8" stroke-width="17"
-        stroke-dasharray="27.65 248.81"
-        stroke-dashoffset="-248.81"
-        class="pie-segment"
-      >
+      </path>
+      <path d="M 60.0 54.0 L 34.1 18.4 A 44 44 0 0 1 60.0 10.0 Z" fill="#3E5266" stroke="#ffffff" stroke-width="1.5" stroke-linejoin="round" class="pie-wedge transition-all cursor-pointer">
         <title>Anthrax Spore: 10% (1,280 doses)</title>
-      </circle>
-    
+      </path>
             </g>
-            <!-- Specular Light Reflection Ring (Windows 7 Gloss Arc) -->
-            <circle cx="60" cy="58" r="44" fill="none" stroke="rgba(255,255,255,0.35)" stroke-width="2" />
-            <!-- Center Cutout with Glass Highlights -->
-            <circle cx="60" cy="60" r="33" fill="#ffffff" stroke="rgba(0,0,0,0.08)" stroke-width="1.5" />
-            <circle cx="60" cy="60" r="30" fill="#f8fafc" stroke="rgba(0,0,0,0.03)" stroke-width="1" />
-            <!-- Central Typography Badge -->
-            <text x="60" y="56" text-anchor="middle" font-family="'Figtree', sans-serif" font-size="14" font-weight="800" fill="#141414">82.5%</text>
-            <text x="60" y="69" text-anchor="middle" font-family="'Inter', sans-serif" font-size="8" font-weight="700" fill="#64748b" letter-spacing="0.5">COVERAGE</text>
+
+            <!-- Specular Gloss Arc (Top 3D Glass Sheen) -->
+            <path d="M 20 48 A 44 44 0 0 1 100 48 A 42 22 0 0 0 20 48 Z" fill="url(#pieGloss)" pointer-events="none" />
+            
+            <!-- Center Pivot Accent Bead -->
+            <circle cx="60" cy="54" r="3.5" fill="#ffffff" stroke="rgba(0,0,0,0.25)" stroke-width="1" />
           </svg>
+        </div>
+
+        <!-- Coverage Ribbon Badge -->
+        <div class="flex items-center justify-center -mt-1 mb-2">
+          <span class="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full text-xs font-bold bg-parchment text-ink border border-black/10 shadow-xs">
+            <span class="w-2 h-2 rounded-full" style="background: #4E6E5D;"></span>
+            85.3% Ring Coverage
+          </span>
         </div>
 
         <!-- Stats Bar -->
         <div class="flex items-center justify-between my-2 p-2 bg-parchment/60 rounded-lg border border-black/5 text-xs font-inter shadow-inner">
           <div>
             <span class="text-[10px] text-zinc-500 block">Doses Inoculated</span>
-            <span class="font-mono font-bold text-ink">12,800 <span class="text-zinc-500 font-normal">/ 15,500</span></span>
+            <span class="font-mono font-bold text-ink">12,800 <span class="text-zinc-500 font-normal">/ 15,000</span></span>
           </div>
           <div class="text-right">
             <span class="text-[10px] text-zinc-500 block">Cold Chain</span>
-            <span class="font-mono font-bold text-[#15803D]">3.8°C Optimal</span>
+            <span class="font-mono font-bold" style="color: #4E6E5D;">3.8°C Steady</span>
           </div>
         </div>
 
@@ -1996,108 +2037,109 @@
           
     <div class="flex items-center justify-between text-[11px] py-1 border-b border-black/5 last:border-0">
       <span class="flex items-center gap-1.5 font-medium text-zinc-700">
-        <span class="w-2.5 h-2.5 rounded-full flex-shrink-0 shadow-xs" style="background: #C2410C;"></span>
+        <span class="w-2.5 h-2.5 rounded-full flex-shrink-0 shadow-xs" style="background: #8C5A48;"></span>
         <span class="truncate">LSD Goat Pox</span>
       </span>
       <span class="font-mono font-bold text-zinc-800 whitespace-nowrap">55% <span class="text-zinc-500 font-normal">(7,040)</span></span>
     </div>
-  
     <div class="flex items-center justify-between text-[11px] py-1 border-b border-black/5 last:border-0">
       <span class="flex items-center gap-1.5 font-medium text-zinc-700">
-        <span class="w-2.5 h-2.5 rounded-full flex-shrink-0 shadow-xs" style="background: #15803D;"></span>
+        <span class="w-2.5 h-2.5 rounded-full flex-shrink-0 shadow-xs" style="background: #4E6E5D;"></span>
         <span class="truncate">FMD Trivalent</span>
       </span>
       <span class="font-mono font-bold text-zinc-800 whitespace-nowrap">35% <span class="text-zinc-500 font-normal">(4,480)</span></span>
     </div>
-  
     <div class="flex items-center justify-between text-[11px] py-1 border-b border-black/5 last:border-0">
       <span class="flex items-center gap-1.5 font-medium text-zinc-700">
-        <span class="w-2.5 h-2.5 rounded-full flex-shrink-0 shadow-xs" style="background: #1D4ED8;"></span>
+        <span class="w-2.5 h-2.5 rounded-full flex-shrink-0 shadow-xs" style="background: #3E5266;"></span>
         <span class="truncate">Anthrax Spore</span>
       </span>
       <span class="font-mono font-bold text-zinc-800 whitespace-nowrap">10% <span class="text-zinc-500 font-normal">(1,280)</span></span>
     </div>
-  
         </div>
       </div>
 
-      
-    <button onclick="filterVaccinationByDistrict('Ahmednagar')" class="aero-btn aero-btn-white w-full mt-3 py-1.5 px-3 text-ink text-xs font-bold border border-black/10 hover:border-[#94e130] flex items-center justify-center gap-1.5 shadow-xs">
-      <i data-lucide="filter" class="w-3.5 h-3.5 text-[#15803D]"></i> Filter Ahmednagar Records
-    </button>
-  
+      <div class="mt-3 pt-2 border-t border-black/5 flex items-center justify-between text-xs font-inter">
+        <button onclick="filterByDistrictCard('Ahmednagar')" class="text-[11px] font-bold text-ink hover:text-[#4E6E5D] flex items-center gap-1 cursor-pointer transition-colors">
+          <span>Filter Area Records</span>
+          <i data-lucide="chevron-right" class="w-3 h-3"></i>
+        </button>
+        <span class="text-[10px] text-zinc-400 font-mono">Cold Chain Logged</span>
+      </div>
     </div>
-  
 
-            <!-- 3. Satara District 3D Pie Chart -->
-            
     <div class="aero-card p-4 flex flex-col justify-between">
       <div>
         <div class="flex items-center justify-between pb-2 border-b border-black/5 mb-2">
           <div>
             <h4 class="font-bold text-sm text-ink font-figtree">Satara District</h4>
-            <span class="text-[10px] text-zinc-500 font-mono">Satara Veterinary Unit</span>
+            <span class="text-[10px] text-zinc-500 font-mono">Satara South Command</span>
           </div>
-          <span class="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-blue-100 text-blue-900 border border-blue-200">
-            Zoonotic Buffer Active
+          <span class="text-[10px] font-semibold px-2 py-0.5 rounded-full border bg-stone-200 text-stone-800 border-stone-300">
+            Zoonotic Caution
           </span>
         </div>
 
-        <!-- 3D Cylindrical Donut Pie Visual Canvas -->
-        <div class="pie-3d-wrapper relative my-1">
-          <svg class="pie-3d-svg" width="135" height="135" viewBox="0 0 120 120">
-            <!-- 3D Shadow Depth Underlay -->
-            <circle cx="60" cy="65" r="44" fill="none" stroke="rgba(0,0,0,0.16)" stroke-width="17" />
-            <!-- Base Ring -->
-            <circle cx="60" cy="60" r="44" fill="none" stroke="#f1f5f9" stroke-width="17" />
-            <!-- Donut Slices -->
-            <g transform="rotate(-90 60 60)">
+        
+        <!-- Proper Filled Circle 3D Pie Chart -->
+        <div class="pie-3d-wrapper relative my-2">
+          <svg class="pie-3d-svg" width="140" height="130" viewBox="0 0 120 115">
+            <defs>
+              <linearGradient id="pieGloss" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stop-color="#ffffff" stop-opacity="0.45" />
+                <stop offset="60%" stop-color="#ffffff" stop-opacity="0.08" />
+                <stop offset="100%" stop-color="#ffffff" stop-opacity="0" />
+              </linearGradient>
+              <filter id="pieShadow" x="-20%" y="-20%" width="140%" height="150%">
+                <feDropShadow dx="0" dy="5" stdDeviation="4" flood-color="rgba(20,20,20,0.18)" />
+              </filter>
+            </defs>
+
+            <!-- 3D Shadow Base Disk -->
+            <circle cx="60" cy="58" r="44" fill="rgba(0,0,0,0.14)" />
+            
+            <!-- 3D Cylinder Rim Depth (Lower Edge) -->
+            <path d="M 16 54 A 44 44 0 0 0 104 54 L 104 58 A 44 44 0 0 1 16 58 Z" fill="rgba(0,0,0,0.22)" />
+
+            <!-- Main Pie Wedges Group (Filter Shadow Applied) -->
+            <g filter="url(#pieShadow)">
               
-      <circle cx="60" cy="60" r="44" fill="none" stroke="#1D4ED8" stroke-width="17"
-        stroke-dasharray="116.11 160.35"
-        stroke-dashoffset="0.00"
-        class="pie-segment"
-      >
+      <path d="M 60.0 54.0 L 60.0 10.0 A 44 44 0 0 1 81.2 92.6 Z" fill="#3E5266" stroke="#ffffff" stroke-width="1.5" stroke-linejoin="round" class="pie-wedge transition-all cursor-pointer">
         <title>Anthrax Spore: 42% (3,948 doses)</title>
-      </circle>
-    
-      <circle cx="60" cy="60" r="44" fill="none" stroke="#C2410C" stroke-width="17"
-        stroke-dasharray="105.05 171.41"
-        stroke-dashoffset="-116.11"
-        class="pie-segment"
-      >
+      </path>
+      <path d="M 60.0 54.0 L 81.2 92.6 A 44 44 0 0 1 18.2 40.4 Z" fill="#8C5A48" stroke="#ffffff" stroke-width="1.5" stroke-linejoin="round" class="pie-wedge transition-all cursor-pointer">
         <title>LSD Goat Pox: 38% (3,572 doses)</title>
-      </circle>
-    
-      <circle cx="60" cy="60" r="44" fill="none" stroke="#15803D" stroke-width="17"
-        stroke-dasharray="55.29 221.17"
-        stroke-dashoffset="-221.17"
-        class="pie-segment"
-      >
+      </path>
+      <path d="M 60.0 54.0 L 18.2 40.4 A 44 44 0 0 1 60.0 10.0 Z" fill="#4E6E5D" stroke="#ffffff" stroke-width="1.5" stroke-linejoin="round" class="pie-wedge transition-all cursor-pointer">
         <title>FMD Trivalent: 20% (1,880 doses)</title>
-      </circle>
-    
+      </path>
             </g>
-            <!-- Specular Light Reflection Ring (Windows 7 Gloss Arc) -->
-            <circle cx="60" cy="58" r="44" fill="none" stroke="rgba(255,255,255,0.35)" stroke-width="2" />
-            <!-- Center Cutout with Glass Highlights -->
-            <circle cx="60" cy="60" r="33" fill="#ffffff" stroke="rgba(0,0,0,0.08)" stroke-width="1.5" />
-            <circle cx="60" cy="60" r="30" fill="#f8fafc" stroke="rgba(0,0,0,0.03)" stroke-width="1" />
-            <!-- Central Typography Badge -->
-            <text x="60" y="56" text-anchor="middle" font-family="'Figtree', sans-serif" font-size="14" font-weight="800" fill="#141414">83.9%</text>
-            <text x="60" y="69" text-anchor="middle" font-family="'Inter', sans-serif" font-size="8" font-weight="700" fill="#64748b" letter-spacing="0.5">COVERAGE</text>
+
+            <!-- Specular Gloss Arc (Top 3D Glass Sheen) -->
+            <path d="M 20 48 A 44 44 0 0 1 100 48 A 42 22 0 0 0 20 48 Z" fill="url(#pieGloss)" pointer-events="none" />
+            
+            <!-- Center Pivot Accent Bead -->
+            <circle cx="60" cy="54" r="3.5" fill="#ffffff" stroke="rgba(0,0,0,0.25)" stroke-width="1" />
           </svg>
+        </div>
+
+        <!-- Coverage Ribbon Badge -->
+        <div class="flex items-center justify-center -mt-1 mb-2">
+          <span class="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full text-xs font-bold bg-parchment text-ink border border-black/10 shadow-xs">
+            <span class="w-2 h-2 rounded-full" style="background: #4E6E5D;"></span>
+            81.7% Ring Coverage
+          </span>
         </div>
 
         <!-- Stats Bar -->
         <div class="flex items-center justify-between my-2 p-2 bg-parchment/60 rounded-lg border border-black/5 text-xs font-inter shadow-inner">
           <div>
             <span class="text-[10px] text-zinc-500 block">Doses Inoculated</span>
-            <span class="font-mono font-bold text-ink">9,400 <span class="text-zinc-500 font-normal">/ 11,200</span></span>
+            <span class="font-mono font-bold text-ink">9,400 <span class="text-zinc-500 font-normal">/ 11,500</span></span>
           </div>
           <div class="text-right">
             <span class="text-[10px] text-zinc-500 block">Cold Chain</span>
-            <span class="font-mono font-bold text-[#15803D]">4.3°C Optimal</span>
+            <span class="font-mono font-bold" style="color: #4E6E5D;">4.4°C Safe</span>
           </div>
         </div>
 
@@ -2106,97 +2148,98 @@
           
     <div class="flex items-center justify-between text-[11px] py-1 border-b border-black/5 last:border-0">
       <span class="flex items-center gap-1.5 font-medium text-zinc-700">
-        <span class="w-2.5 h-2.5 rounded-full flex-shrink-0 shadow-xs" style="background: #1D4ED8;"></span>
+        <span class="w-2.5 h-2.5 rounded-full flex-shrink-0 shadow-xs" style="background: #3E5266;"></span>
         <span class="truncate">Anthrax Spore</span>
       </span>
       <span class="font-mono font-bold text-zinc-800 whitespace-nowrap">42% <span class="text-zinc-500 font-normal">(3,948)</span></span>
     </div>
-  
     <div class="flex items-center justify-between text-[11px] py-1 border-b border-black/5 last:border-0">
       <span class="flex items-center gap-1.5 font-medium text-zinc-700">
-        <span class="w-2.5 h-2.5 rounded-full flex-shrink-0 shadow-xs" style="background: #C2410C;"></span>
+        <span class="w-2.5 h-2.5 rounded-full flex-shrink-0 shadow-xs" style="background: #8C5A48;"></span>
         <span class="truncate">LSD Goat Pox</span>
       </span>
       <span class="font-mono font-bold text-zinc-800 whitespace-nowrap">38% <span class="text-zinc-500 font-normal">(3,572)</span></span>
     </div>
-  
     <div class="flex items-center justify-between text-[11px] py-1 border-b border-black/5 last:border-0">
       <span class="flex items-center gap-1.5 font-medium text-zinc-700">
-        <span class="w-2.5 h-2.5 rounded-full flex-shrink-0 shadow-xs" style="background: #15803D;"></span>
+        <span class="w-2.5 h-2.5 rounded-full flex-shrink-0 shadow-xs" style="background: #4E6E5D;"></span>
         <span class="truncate">FMD Trivalent</span>
       </span>
       <span class="font-mono font-bold text-zinc-800 whitespace-nowrap">20% <span class="text-zinc-500 font-normal">(1,880)</span></span>
     </div>
-  
         </div>
       </div>
 
-      
-    <button onclick="filterVaccinationByDistrict('Satara')" class="aero-btn aero-btn-white w-full mt-3 py-1.5 px-3 text-ink text-xs font-bold border border-black/10 hover:border-[#94e130] flex items-center justify-center gap-1.5 shadow-xs">
-      <i data-lucide="filter" class="w-3.5 h-3.5 text-[#15803D]"></i> Filter Satara Records
-    </button>
-  
+      <div class="mt-3 pt-2 border-t border-black/5 flex items-center justify-between text-xs font-inter">
+        <button onclick="filterByDistrictCard('Satara')" class="text-[11px] font-bold text-ink hover:text-[#4E6E5D] flex items-center gap-1 cursor-pointer transition-colors">
+          <span>Filter Area Records</span>
+          <i data-lucide="chevron-right" class="w-3 h-3"></i>
+        </button>
+        <span class="text-[10px] text-zinc-400 font-mono">Cold Chain Logged</span>
+      </div>
     </div>
-  
 
-            <!-- 4. Kolhapur District 3D Pie Chart -->
-            
     <div class="aero-card p-4 flex flex-col justify-between">
       <div>
         <div class="flex items-center justify-between pb-2 border-b border-black/5 mb-2">
           <div>
             <h4 class="font-bold text-sm text-ink font-figtree">Kolhapur District</h4>
-            <span class="text-[10px] text-zinc-500 font-mono">Kolhapur Veterinary Unit</span>
+            <span class="text-[10px] text-zinc-500 font-mono">Western Dairy Belt</span>
           </div>
-          <span class="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-900 border border-emerald-200">
-            Tier 1 Target Achieved
+          <span class="text-[10px] font-semibold px-2 py-0.5 rounded-full border bg-emerald-100 text-emerald-900 border-emerald-200">
+            High Target Met
           </span>
         </div>
 
-        <!-- 3D Cylindrical Donut Pie Visual Canvas -->
-        <div class="pie-3d-wrapper relative my-1">
-          <svg class="pie-3d-svg" width="135" height="135" viewBox="0 0 120 120">
-            <!-- 3D Shadow Depth Underlay -->
-            <circle cx="60" cy="65" r="44" fill="none" stroke="rgba(0,0,0,0.16)" stroke-width="17" />
-            <!-- Base Ring -->
-            <circle cx="60" cy="60" r="44" fill="none" stroke="#f1f5f9" stroke-width="17" />
-            <!-- Donut Slices -->
-            <g transform="rotate(-90 60 60)">
+        
+        <!-- Proper Filled Circle 3D Pie Chart -->
+        <div class="pie-3d-wrapper relative my-2">
+          <svg class="pie-3d-svg" width="140" height="130" viewBox="0 0 120 115">
+            <defs>
+              <linearGradient id="pieGloss" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stop-color="#ffffff" stop-opacity="0.45" />
+                <stop offset="60%" stop-color="#ffffff" stop-opacity="0.08" />
+                <stop offset="100%" stop-color="#ffffff" stop-opacity="0" />
+              </linearGradient>
+              <filter id="pieShadow" x="-20%" y="-20%" width="140%" height="150%">
+                <feDropShadow dx="0" dy="5" stdDeviation="4" flood-color="rgba(20,20,20,0.18)" />
+              </filter>
+            </defs>
+
+            <!-- 3D Shadow Base Disk -->
+            <circle cx="60" cy="58" r="44" fill="rgba(0,0,0,0.14)" />
+            
+            <!-- 3D Cylinder Rim Depth (Lower Edge) -->
+            <path d="M 16 54 A 44 44 0 0 0 104 54 L 104 58 A 44 44 0 0 1 16 58 Z" fill="rgba(0,0,0,0.22)" />
+
+            <!-- Main Pie Wedges Group (Filter Shadow Applied) -->
+            <g filter="url(#pieShadow)">
               
-      <circle cx="60" cy="60" r="44" fill="none" stroke="#15803D" stroke-width="17"
-        stroke-dasharray="143.76 132.70"
-        stroke-dashoffset="0.00"
-        class="pie-segment"
-      >
+      <path d="M 60.0 54.0 L 60.0 10.0 A 44 44 0 1 1 54.5 97.7 Z" fill="#4E6E5D" stroke="#ffffff" stroke-width="1.5" stroke-linejoin="round" class="pie-wedge transition-all cursor-pointer">
         <title>FMD Trivalent: 52% (5,824 doses)</title>
-      </circle>
-    
-      <circle cx="60" cy="60" r="44" fill="none" stroke="#C2410C" stroke-width="17"
-        stroke-dasharray="105.05 171.41"
-        stroke-dashoffset="-143.76"
-        class="pie-segment"
-      >
+      </path>
+      <path d="M 60.0 54.0 L 54.5 97.7 A 44 44 0 0 1 34.1 18.4 Z" fill="#8C5A48" stroke="#ffffff" stroke-width="1.5" stroke-linejoin="round" class="pie-wedge transition-all cursor-pointer">
         <title>LSD Goat Pox: 38% (4,256 doses)</title>
-      </circle>
-    
-      <circle cx="60" cy="60" r="44" fill="none" stroke="#D97706" stroke-width="17"
-        stroke-dasharray="27.65 248.81"
-        stroke-dashoffset="-248.81"
-        class="pie-segment"
-      >
+      </path>
+      <path d="M 60.0 54.0 L 34.1 18.4 A 44 44 0 0 1 60.0 10.0 Z" fill="#A48560" stroke="#ffffff" stroke-width="1.5" stroke-linejoin="round" class="pie-wedge transition-all cursor-pointer">
         <title>PPR Ruminants: 10% (1,120 doses)</title>
-      </circle>
-    
+      </path>
             </g>
-            <!-- Specular Light Reflection Ring (Windows 7 Gloss Arc) -->
-            <circle cx="60" cy="58" r="44" fill="none" stroke="rgba(255,255,255,0.35)" stroke-width="2" />
-            <!-- Center Cutout with Glass Highlights -->
-            <circle cx="60" cy="60" r="33" fill="#ffffff" stroke="rgba(0,0,0,0.08)" stroke-width="1.5" />
-            <circle cx="60" cy="60" r="30" fill="#f8fafc" stroke="rgba(0,0,0,0.03)" stroke-width="1" />
-            <!-- Central Typography Badge -->
-            <text x="60" y="56" text-anchor="middle" font-family="'Figtree', sans-serif" font-size="14" font-weight="800" fill="#141414">93.3%</text>
-            <text x="60" y="69" text-anchor="middle" font-family="'Inter', sans-serif" font-size="8" font-weight="700" fill="#64748b" letter-spacing="0.5">COVERAGE</text>
+
+            <!-- Specular Gloss Arc (Top 3D Glass Sheen) -->
+            <path d="M 20 48 A 44 44 0 0 1 100 48 A 42 22 0 0 0 20 48 Z" fill="url(#pieGloss)" pointer-events="none" />
+            
+            <!-- Center Pivot Accent Bead -->
+            <circle cx="60" cy="54" r="3.5" fill="#ffffff" stroke="rgba(0,0,0,0.25)" stroke-width="1" />
           </svg>
+        </div>
+
+        <!-- Coverage Ribbon Badge -->
+        <div class="flex items-center justify-center -mt-1 mb-2">
+          <span class="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full text-xs font-bold bg-parchment text-ink border border-black/10 shadow-xs">
+            <span class="w-2 h-2 rounded-full" style="background: #4E6E5D;"></span>
+            93.3% Ring Coverage
+          </span>
         </div>
 
         <!-- Stats Bar -->
@@ -2207,7 +2250,7 @@
           </div>
           <div class="text-right">
             <span class="text-[10px] text-zinc-500 block">Cold Chain</span>
-            <span class="font-mono font-bold text-[#15803D]">3.9°C Optimal</span>
+            <span class="font-mono font-bold" style="color: #4E6E5D;">4.0°C Optimal</span>
           </div>
         </div>
 
@@ -2216,97 +2259,98 @@
           
     <div class="flex items-center justify-between text-[11px] py-1 border-b border-black/5 last:border-0">
       <span class="flex items-center gap-1.5 font-medium text-zinc-700">
-        <span class="w-2.5 h-2.5 rounded-full flex-shrink-0 shadow-xs" style="background: #15803D;"></span>
+        <span class="w-2.5 h-2.5 rounded-full flex-shrink-0 shadow-xs" style="background: #4E6E5D;"></span>
         <span class="truncate">FMD Trivalent</span>
       </span>
       <span class="font-mono font-bold text-zinc-800 whitespace-nowrap">52% <span class="text-zinc-500 font-normal">(5,824)</span></span>
     </div>
-  
     <div class="flex items-center justify-between text-[11px] py-1 border-b border-black/5 last:border-0">
       <span class="flex items-center gap-1.5 font-medium text-zinc-700">
-        <span class="w-2.5 h-2.5 rounded-full flex-shrink-0 shadow-xs" style="background: #C2410C;"></span>
+        <span class="w-2.5 h-2.5 rounded-full flex-shrink-0 shadow-xs" style="background: #8C5A48;"></span>
         <span class="truncate">LSD Goat Pox</span>
       </span>
       <span class="font-mono font-bold text-zinc-800 whitespace-nowrap">38% <span class="text-zinc-500 font-normal">(4,256)</span></span>
     </div>
-  
     <div class="flex items-center justify-between text-[11px] py-1 border-b border-black/5 last:border-0">
       <span class="flex items-center gap-1.5 font-medium text-zinc-700">
-        <span class="w-2.5 h-2.5 rounded-full flex-shrink-0 shadow-xs" style="background: #D97706;"></span>
+        <span class="w-2.5 h-2.5 rounded-full flex-shrink-0 shadow-xs" style="background: #A48560;"></span>
         <span class="truncate">PPR Ruminants</span>
       </span>
       <span class="font-mono font-bold text-zinc-800 whitespace-nowrap">10% <span class="text-zinc-500 font-normal">(1,120)</span></span>
     </div>
-  
         </div>
       </div>
 
-      
-    <button onclick="filterVaccinationByDistrict('Kolhapur')" class="aero-btn aero-btn-white w-full mt-3 py-1.5 px-3 text-ink text-xs font-bold border border-black/10 hover:border-[#94e130] flex items-center justify-center gap-1.5 shadow-xs">
-      <i data-lucide="filter" class="w-3.5 h-3.5 text-[#15803D]"></i> Filter Kolhapur Records
-    </button>
-  
+      <div class="mt-3 pt-2 border-t border-black/5 flex items-center justify-between text-xs font-inter">
+        <button onclick="filterByDistrictCard('Kolhapur')" class="text-[11px] font-bold text-ink hover:text-[#4E6E5D] flex items-center gap-1 cursor-pointer transition-colors">
+          <span>Filter Area Records</span>
+          <i data-lucide="chevron-right" class="w-3 h-3"></i>
+        </button>
+        <span class="text-[10px] text-zinc-400 font-mono">Cold Chain Logged</span>
+      </div>
     </div>
-  
 
-            <!-- 5. Solapur District 3D Pie Chart -->
-            
     <div class="aero-card p-4 flex flex-col justify-between">
       <div>
         <div class="flex items-center justify-between pb-2 border-b border-black/5 mb-2">
           <div>
             <h4 class="font-bold text-sm text-ink font-figtree">Solapur District</h4>
-            <span class="text-[10px] text-zinc-500 font-mono">Solapur Veterinary Unit</span>
+            <span class="text-[10px] text-zinc-500 font-mono">Eastern Drought Transit</span>
           </div>
-          <span class="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-amber-100 text-amber-900 border border-amber-200">
-            Border Checkpost Buffer
+          <span class="text-[10px] font-semibold px-2 py-0.5 rounded-full border bg-stone-200 text-stone-800 border-stone-300">
+            PPR Containment
           </span>
         </div>
 
-        <!-- 3D Cylindrical Donut Pie Visual Canvas -->
-        <div class="pie-3d-wrapper relative my-1">
-          <svg class="pie-3d-svg" width="135" height="135" viewBox="0 0 120 120">
-            <!-- 3D Shadow Depth Underlay -->
-            <circle cx="60" cy="65" r="44" fill="none" stroke="rgba(0,0,0,0.16)" stroke-width="17" />
-            <!-- Base Ring -->
-            <circle cx="60" cy="60" r="44" fill="none" stroke="#f1f5f9" stroke-width="17" />
-            <!-- Donut Slices -->
-            <g transform="rotate(-90 60 60)">
+        
+        <!-- Proper Filled Circle 3D Pie Chart -->
+        <div class="pie-3d-wrapper relative my-2">
+          <svg class="pie-3d-svg" width="140" height="130" viewBox="0 0 120 115">
+            <defs>
+              <linearGradient id="pieGloss" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stop-color="#ffffff" stop-opacity="0.45" />
+                <stop offset="60%" stop-color="#ffffff" stop-opacity="0.08" />
+                <stop offset="100%" stop-color="#ffffff" stop-opacity="0" />
+              </linearGradient>
+              <filter id="pieShadow" x="-20%" y="-20%" width="140%" height="150%">
+                <feDropShadow dx="0" dy="5" stdDeviation="4" flood-color="rgba(20,20,20,0.18)" />
+              </filter>
+            </defs>
+
+            <!-- 3D Shadow Base Disk -->
+            <circle cx="60" cy="58" r="44" fill="rgba(0,0,0,0.14)" />
+            
+            <!-- 3D Cylinder Rim Depth (Lower Edge) -->
+            <path d="M 16 54 A 44 44 0 0 0 104 54 L 104 58 A 44 44 0 0 1 16 58 Z" fill="rgba(0,0,0,0.22)" />
+
+            <!-- Main Pie Wedges Group (Filter Shadow Applied) -->
+            <g filter="url(#pieShadow)">
               
-      <circle cx="60" cy="60" r="44" fill="none" stroke="#D97706" stroke-width="17"
-        stroke-dasharray="124.41 152.05"
-        stroke-dashoffset="0.00"
-        class="pie-segment"
-      >
+      <path d="M 60.0 54.0 L 60.0 10.0 A 44 44 0 0 1 73.6 95.8 Z" fill="#A48560" stroke="#ffffff" stroke-width="1.5" stroke-linejoin="round" class="pie-wedge transition-all cursor-pointer">
         <title>PPR Ruminants: 45% (3,442 doses)</title>
-      </circle>
-    
-      <circle cx="60" cy="60" r="44" fill="none" stroke="#15803D" stroke-width="17"
-        stroke-dasharray="96.76 179.70"
-        stroke-dashoffset="-124.41"
-        class="pie-segment"
-      >
+      </path>
+      <path d="M 60.0 54.0 L 73.6 95.8 A 44 44 0 0 1 18.2 40.4 Z" fill="#4E6E5D" stroke="#ffffff" stroke-width="1.5" stroke-linejoin="round" class="pie-wedge transition-all cursor-pointer">
         <title>FMD Trivalent: 35% (2,678 doses)</title>
-      </circle>
-    
-      <circle cx="60" cy="60" r="44" fill="none" stroke="#C2410C" stroke-width="17"
-        stroke-dasharray="55.29 221.17"
-        stroke-dashoffset="-221.17"
-        class="pie-segment"
-      >
+      </path>
+      <path d="M 60.0 54.0 L 18.2 40.4 A 44 44 0 0 1 60.0 10.0 Z" fill="#8C5A48" stroke="#ffffff" stroke-width="1.5" stroke-linejoin="round" class="pie-wedge transition-all cursor-pointer">
         <title>LSD Goat Pox: 20% (1,530 doses)</title>
-      </circle>
-    
+      </path>
             </g>
-            <!-- Specular Light Reflection Ring (Windows 7 Gloss Arc) -->
-            <circle cx="60" cy="58" r="44" fill="none" stroke="rgba(255,255,255,0.35)" stroke-width="2" />
-            <!-- Center Cutout with Glass Highlights -->
-            <circle cx="60" cy="60" r="33" fill="#ffffff" stroke="rgba(0,0,0,0.08)" stroke-width="1.5" />
-            <circle cx="60" cy="60" r="30" fill="#f8fafc" stroke="rgba(0,0,0,0.03)" stroke-width="1" />
-            <!-- Central Typography Badge -->
-            <text x="60" y="56" text-anchor="middle" font-family="'Figtree', sans-serif" font-size="14" font-weight="800" fill="#141414">76.5%</text>
-            <text x="60" y="69" text-anchor="middle" font-family="'Inter', sans-serif" font-size="8" font-weight="700" fill="#64748b" letter-spacing="0.5">COVERAGE</text>
+
+            <!-- Specular Gloss Arc (Top 3D Glass Sheen) -->
+            <path d="M 20 48 A 44 44 0 0 1 100 48 A 42 22 0 0 0 20 48 Z" fill="url(#pieGloss)" pointer-events="none" />
+            
+            <!-- Center Pivot Accent Bead -->
+            <circle cx="60" cy="54" r="3.5" fill="#ffffff" stroke="rgba(0,0,0,0.25)" stroke-width="1" />
           </svg>
+        </div>
+
+        <!-- Coverage Ribbon Badge -->
+        <div class="flex items-center justify-center -mt-1 mb-2">
+          <span class="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full text-xs font-bold bg-parchment text-ink border border-black/10 shadow-xs">
+            <span class="w-2 h-2 rounded-full" style="background: #A48560;"></span>
+            76.5% Ring Coverage
+          </span>
         </div>
 
         <!-- Stats Bar -->
@@ -2317,7 +2361,7 @@
           </div>
           <div class="text-right">
             <span class="text-[10px] text-zinc-500 block">Cold Chain</span>
-            <span class="font-mono font-bold text-amber-800">4.5°C Monitor</span>
+            <span class="font-mono font-bold" style="color: #A48560;">4.6°C Monitored</span>
           </div>
         </div>
 
@@ -2326,105 +2370,101 @@
           
     <div class="flex items-center justify-between text-[11px] py-1 border-b border-black/5 last:border-0">
       <span class="flex items-center gap-1.5 font-medium text-zinc-700">
-        <span class="w-2.5 h-2.5 rounded-full flex-shrink-0 shadow-xs" style="background: #D97706;"></span>
+        <span class="w-2.5 h-2.5 rounded-full flex-shrink-0 shadow-xs" style="background: #A48560;"></span>
         <span class="truncate">PPR Ruminants</span>
       </span>
       <span class="font-mono font-bold text-zinc-800 whitespace-nowrap">45% <span class="text-zinc-500 font-normal">(3,442)</span></span>
     </div>
-  
     <div class="flex items-center justify-between text-[11px] py-1 border-b border-black/5 last:border-0">
       <span class="flex items-center gap-1.5 font-medium text-zinc-700">
-        <span class="w-2.5 h-2.5 rounded-full flex-shrink-0 shadow-xs" style="background: #15803D;"></span>
+        <span class="w-2.5 h-2.5 rounded-full flex-shrink-0 shadow-xs" style="background: #4E6E5D;"></span>
         <span class="truncate">FMD Trivalent</span>
       </span>
       <span class="font-mono font-bold text-zinc-800 whitespace-nowrap">35% <span class="text-zinc-500 font-normal">(2,678)</span></span>
     </div>
-  
     <div class="flex items-center justify-between text-[11px] py-1 border-b border-black/5 last:border-0">
       <span class="flex items-center gap-1.5 font-medium text-zinc-700">
-        <span class="w-2.5 h-2.5 rounded-full flex-shrink-0 shadow-xs" style="background: #C2410C;"></span>
+        <span class="w-2.5 h-2.5 rounded-full flex-shrink-0 shadow-xs" style="background: #8C5A48;"></span>
         <span class="truncate">LSD Goat Pox</span>
       </span>
       <span class="font-mono font-bold text-zinc-800 whitespace-nowrap">20% <span class="text-zinc-500 font-normal">(1,530)</span></span>
     </div>
-  
         </div>
       </div>
 
-      
-    <button onclick="filterVaccinationByDistrict('Solapur')" class="aero-btn aero-btn-white w-full mt-3 py-1.5 px-3 text-ink text-xs font-bold border border-black/10 hover:border-[#94e130] flex items-center justify-center gap-1.5 shadow-xs">
-      <i data-lucide="filter" class="w-3.5 h-3.5 text-[#15803D]"></i> Filter Solapur Records
-    </button>
-  
+      <div class="mt-3 pt-2 border-t border-black/5 flex items-center justify-between text-xs font-inter">
+        <button onclick="filterByDistrictCard('Solapur')" class="text-[11px] font-bold text-ink hover:text-[#4E6E5D] flex items-center gap-1 cursor-pointer transition-colors">
+          <span>Filter Area Records</span>
+          <i data-lucide="chevron-right" class="w-3 h-3"></i>
+        </button>
+        <span class="text-[10px] text-zinc-400 font-mono">Cold Chain Logged</span>
+      </div>
     </div>
-  
 
-            <!-- 6. Statewide Macro Composition 3D Pie Chart -->
-            
     <div class="aero-card p-4 flex flex-col justify-between">
       <div>
         <div class="flex items-center justify-between pb-2 border-b border-black/5 mb-2">
           <div>
             <h4 class="font-bold text-sm text-ink font-figtree">Statewide Cumulative Mix</h4>
-            <span class="text-[10px] text-zinc-500 font-mono">Statewide Aggregate</span>
+            <span class="text-[10px] text-zinc-500 font-mono">Maharashtra DAH Directorate</span>
           </div>
-          <span class="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-green-100 text-green-900 border border-green-200">
-            State Quota 84.8%
+          <span class="text-[10px] font-semibold px-2 py-0.5 rounded-full border bg-slate-200 text-slate-800 border-slate-300">
+            Statewide Total
           </span>
         </div>
 
-        <!-- 3D Cylindrical Donut Pie Visual Canvas -->
-        <div class="pie-3d-wrapper relative my-1">
-          <svg class="pie-3d-svg" width="135" height="135" viewBox="0 0 120 120">
-            <!-- 3D Shadow Depth Underlay -->
-            <circle cx="60" cy="65" r="44" fill="none" stroke="rgba(0,0,0,0.16)" stroke-width="17" />
-            <!-- Base Ring -->
-            <circle cx="60" cy="60" r="44" fill="none" stroke="#f1f5f9" stroke-width="17" />
-            <!-- Donut Slices -->
-            <g transform="rotate(-90 60 60)">
+        
+        <!-- Proper Filled Circle 3D Pie Chart -->
+        <div class="pie-3d-wrapper relative my-2">
+          <svg class="pie-3d-svg" width="140" height="130" viewBox="0 0 120 115">
+            <defs>
+              <linearGradient id="pieGloss" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stop-color="#ffffff" stop-opacity="0.45" />
+                <stop offset="60%" stop-color="#ffffff" stop-opacity="0.08" />
+                <stop offset="100%" stop-color="#ffffff" stop-opacity="0" />
+              </linearGradient>
+              <filter id="pieShadow" x="-20%" y="-20%" width="140%" height="150%">
+                <feDropShadow dx="0" dy="5" stdDeviation="4" flood-color="rgba(20,20,20,0.18)" />
+              </filter>
+            </defs>
+
+            <!-- 3D Shadow Base Disk -->
+            <circle cx="60" cy="58" r="44" fill="rgba(0,0,0,0.14)" />
+            
+            <!-- 3D Cylinder Rim Depth (Lower Edge) -->
+            <path d="M 16 54 A 44 44 0 0 0 104 54 L 104 58 A 44 44 0 0 1 16 58 Z" fill="rgba(0,0,0,0.22)" />
+
+            <!-- Main Pie Wedges Group (Filter Shadow Applied) -->
+            <g filter="url(#pieShadow)">
               
-      <circle cx="60" cy="60" r="44" fill="none" stroke="#C2410C" stroke-width="17"
-        stroke-dasharray="123.85 152.61"
-        stroke-dashoffset="0.00"
-        class="pie-segment"
-      >
+      <path d="M 60.0 54.0 L 60.0 10.0 A 44 44 0 0 1 74.1 95.7 Z" fill="#8C5A48" stroke="#ffffff" stroke-width="1.5" stroke-linejoin="round" class="pie-wedge transition-all cursor-pointer">
         <title>LSD Goat Pox: 44.8% (27,350 doses)</title>
-      </circle>
-    
-      <circle cx="60" cy="60" r="44" fill="none" stroke="#15803D" stroke-width="17"
-        stroke-dasharray="89.57 186.89"
-        stroke-dashoffset="-123.85"
-        class="pie-segment"
-      >
+      </path>
+      <path d="M 60.0 54.0 L 74.1 95.7 A 44 44 0 0 1 16.4 47.9 Z" fill="#4E6E5D" stroke="#ffffff" stroke-width="1.5" stroke-linejoin="round" class="pie-wedge transition-all cursor-pointer">
         <title>FMD Trivalent: 32.4% (19,770 doses)</title>
-      </circle>
-    
-      <circle cx="60" cy="60" r="44" fill="none" stroke="#1D4ED8" stroke-width="17"
-        stroke-dasharray="37.60 238.86"
-        stroke-dashoffset="-213.43"
-        class="pie-segment"
-      >
+      </path>
+      <path d="M 60.0 54.0 L 16.4 47.9 A 44 44 0 0 1 36.0 17.1 Z" fill="#3E5266" stroke="#ffffff" stroke-width="1.5" stroke-linejoin="round" class="pie-wedge transition-all cursor-pointer">
         <title>Anthrax Spore: 13.6% (8,300 doses)</title>
-      </circle>
-    
-      <circle cx="60" cy="60" r="44" fill="none" stroke="#D97706" stroke-width="17"
-        stroke-dasharray="25.43 251.03"
-        stroke-dashoffset="-251.03"
-        class="pie-segment"
-      >
+      </path>
+      <path d="M 60.0 54.0 L 36.0 17.1 A 44 44 0 0 1 60.0 10.0 Z" fill="#A48560" stroke="#ffffff" stroke-width="1.5" stroke-linejoin="round" class="pie-wedge transition-all cursor-pointer">
         <title>PPR Ruminants: 9.2% (5,630 doses)</title>
-      </circle>
-    
+      </path>
             </g>
-            <!-- Specular Light Reflection Ring (Windows 7 Gloss Arc) -->
-            <circle cx="60" cy="58" r="44" fill="none" stroke="rgba(255,255,255,0.35)" stroke-width="2" />
-            <!-- Center Cutout with Glass Highlights -->
-            <circle cx="60" cy="60" r="33" fill="#ffffff" stroke="rgba(0,0,0,0.08)" stroke-width="1.5" />
-            <circle cx="60" cy="60" r="30" fill="#f8fafc" stroke="rgba(0,0,0,0.03)" stroke-width="1" />
-            <!-- Central Typography Badge -->
-            <text x="60" y="56" text-anchor="middle" font-family="'Figtree', sans-serif" font-size="14" font-weight="800" fill="#141414">84.8%</text>
-            <text x="60" y="69" text-anchor="middle" font-family="'Inter', sans-serif" font-size="8" font-weight="700" fill="#64748b" letter-spacing="0.5">COVERAGE</text>
+
+            <!-- Specular Gloss Arc (Top 3D Glass Sheen) -->
+            <path d="M 20 48 A 44 44 0 0 1 100 48 A 42 22 0 0 0 20 48 Z" fill="url(#pieGloss)" pointer-events="none" />
+            
+            <!-- Center Pivot Accent Bead -->
+            <circle cx="60" cy="54" r="3.5" fill="#ffffff" stroke="rgba(0,0,0,0.25)" stroke-width="1" />
           </svg>
+        </div>
+
+        <!-- Coverage Ribbon Badge -->
+        <div class="flex items-center justify-center -mt-1 mb-2">
+          <span class="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full text-xs font-bold bg-parchment text-ink border border-black/10 shadow-xs">
+            <span class="w-2 h-2 rounded-full" style="background: #4E6E5D;"></span>
+            84.8% Ring Coverage
+          </span>
         </div>
 
         <!-- Stats Bar -->
@@ -2435,7 +2475,7 @@
           </div>
           <div class="text-right">
             <span class="text-[10px] text-zinc-500 block">Cold Chain</span>
-            <span class="font-mono font-bold text-[#15803D]">4.1°C Avg</span>
+            <span class="font-mono font-bold" style="color: #4E6E5D;">4.2°C Fleet Mean</span>
           </div>
         </div>
 
@@ -2444,46 +2484,43 @@
           
     <div class="flex items-center justify-between text-[11px] py-1 border-b border-black/5 last:border-0">
       <span class="flex items-center gap-1.5 font-medium text-zinc-700">
-        <span class="w-2.5 h-2.5 rounded-full flex-shrink-0 shadow-xs" style="background: #C2410C;"></span>
+        <span class="w-2.5 h-2.5 rounded-full flex-shrink-0 shadow-xs" style="background: #8C5A48;"></span>
         <span class="truncate">LSD Goat Pox</span>
       </span>
       <span class="font-mono font-bold text-zinc-800 whitespace-nowrap">44.8% <span class="text-zinc-500 font-normal">(27,350)</span></span>
     </div>
-  
     <div class="flex items-center justify-between text-[11px] py-1 border-b border-black/5 last:border-0">
       <span class="flex items-center gap-1.5 font-medium text-zinc-700">
-        <span class="w-2.5 h-2.5 rounded-full flex-shrink-0 shadow-xs" style="background: #15803D;"></span>
+        <span class="w-2.5 h-2.5 rounded-full flex-shrink-0 shadow-xs" style="background: #4E6E5D;"></span>
         <span class="truncate">FMD Trivalent</span>
       </span>
       <span class="font-mono font-bold text-zinc-800 whitespace-nowrap">32.4% <span class="text-zinc-500 font-normal">(19,770)</span></span>
     </div>
-  
     <div class="flex items-center justify-between text-[11px] py-1 border-b border-black/5 last:border-0">
       <span class="flex items-center gap-1.5 font-medium text-zinc-700">
-        <span class="w-2.5 h-2.5 rounded-full flex-shrink-0 shadow-xs" style="background: #1D4ED8;"></span>
+        <span class="w-2.5 h-2.5 rounded-full flex-shrink-0 shadow-xs" style="background: #3E5266;"></span>
         <span class="truncate">Anthrax Spore</span>
       </span>
       <span class="font-mono font-bold text-zinc-800 whitespace-nowrap">13.6% <span class="text-zinc-500 font-normal">(8,300)</span></span>
     </div>
-  
     <div class="flex items-center justify-between text-[11px] py-1 border-b border-black/5 last:border-0">
       <span class="flex items-center gap-1.5 font-medium text-zinc-700">
-        <span class="w-2.5 h-2.5 rounded-full flex-shrink-0 shadow-xs" style="background: #D97706;"></span>
+        <span class="w-2.5 h-2.5 rounded-full flex-shrink-0 shadow-xs" style="background: #A48560;"></span>
         <span class="truncate">PPR Ruminants</span>
       </span>
       <span class="font-mono font-bold text-zinc-800 whitespace-nowrap">9.2% <span class="text-zinc-500 font-normal">(5,630)</span></span>
     </div>
-  
         </div>
       </div>
 
-      
-    <button onclick="filterVaccinationByDistrict('all')" class="aero-btn aero-btn-white w-full mt-3 py-1.5 px-3 text-ink text-xs font-bold border border-black/10 flex items-center justify-center gap-1.5 shadow-xs">
-      <i data-lucide="layers" class="w-3.5 h-3.5 text-zinc-600"></i> View All Maharashtra Records
-    </button>
-  
+      <div class="mt-3 pt-2 border-t border-black/5 flex items-center justify-between text-xs font-inter">
+        <button onclick="filterByDistrictCard('all')" class="text-[11px] font-bold text-ink hover:text-[#4E6E5D] flex items-center gap-1 cursor-pointer transition-colors">
+          <span>Filter Area Records</span>
+          <i data-lucide="chevron-right" class="w-3 h-3"></i>
+        </button>
+        <span class="text-[10px] text-zinc-400 font-mono">Cold Chain Logged</span>
+      </div>
     </div>
-  
           </div>
         </div>
         <!-- TABLE SECTION: Area-Wise Animal Vaccination Records -->
@@ -2813,7 +2850,7 @@
           <span id="d-id" class="text-xs font-mono bg-parchment px-2 py-0.5 rounded text-ink-metadata">rpt_001</span>
           <span id="d-badge" class="chip-critical">Confirmed Outbreak</span>
         </div>
-        <h2 id="d-title" class="text-xl font-bold text-ink mt-1">Lakshmi Ã¢â‚¬â€ Gir Cow</h2>
+        <h2 id="d-title" class="text-xl font-bold text-ink mt-1">Lakshmi — Gir Cow</h2>
       </div>
       <button onclick="closeDrawer()" class="p-1.5 rounded-sm hover:bg-parchment text-ink-metadata hover:text-ink cursor-pointer">
         <i data-lucide="x" class="w-5 h-5"></i>
@@ -3010,7 +3047,7 @@
             <input type="number" id="sim-vap" step="0.1" value="19.4" class="w-full px-2 py-1.5 rounded border border-black/15 bg-white font-mono" />
           </div>
           <div>
-            <label class="block font-semibold text-ink mb-1">Mean Temp (Â°C)</label>
+            <label class="block font-semibold text-ink mb-1">Mean Temp (°C)</label>
             <input type="number" id="sim-tmp" step="0.1" value="26.1" class="w-full px-2 py-1.5 rounded border border-black/15 bg-white font-mono" />
           </div>
         </div>
@@ -3135,7 +3172,7 @@
             <input type="text" id="vax-form-batch" required placeholder="e.g. LSD-2026-99B" class="w-full px-3 py-2 rounded-lg border border-black/15 bg-white font-mono focus:outline-none" />
           </div>
           <div>
-            <label class="block font-semibold text-ink mb-1">Cold Storage Temp (Â°C)</label>
+            <label class="block font-semibold text-ink mb-1">Cold Storage Temp (°C)</label>
             <input type="number" step="0.1" id="vax-form-temp" required value="4.2" class="w-full px-3 py-2 rounded-lg border border-black/15 bg-white font-mono focus:outline-none" />
           </div>
         </div>
@@ -3297,7 +3334,10 @@
       splash.classList.add('splash-dissolve');
       setTimeout(function() {
         splash.style.display = 'none';
-        if (overviewMap) overviewMap.invalidateSize(true);
+        if (overviewMap) {
+          overviewMap.invalidateSize(true);
+          overviewMap.setView([18.5204, 74.2500], 8);
+        }
       }, 750);
     }
 
@@ -3401,7 +3441,7 @@
     var caseDatabase = {
       'rpt_001': {
         id: 'rpt_001',
-        title: 'Lakshmi Ã¢â‚¬â€ Gir Cow',
+        title: 'Lakshmi — Gir Cow',
         tag: 'MH-PUN-8841',
         status: 'Confirmed Outbreak',
         badgeClass: 'chip-critical',
@@ -3415,7 +3455,7 @@
       },
       'rpt_002': {
         id: 'rpt_002',
-        title: 'Kalu Ã¢â‚¬â€ Murrah Buffalo',
+        title: 'Kalu — Murrah Buffalo',
         tag: 'MH-PUN-9102',
         status: 'Confirmed Outbreak',
         badgeClass: 'chip-critical',
@@ -3429,7 +3469,7 @@
       },
       'rpt_003': {
         id: 'rpt_003',
-        title: 'Gauri Ã¢â‚¬â€ Jersey Cross',
+        title: 'Gauri — Jersey Cross',
         tag: 'MH-PUN-1104',
         status: 'Pending Vet Inspection',
         badgeClass: 'chip-caution',
@@ -3695,7 +3735,7 @@
     // Protocol Details Modal Logic
     var protocolDetailsData = {
       'fmd': {
-        title: 'Foot-and-Mouth Disease (FMD) Ã¢â‚¬â€ Standard Protocol',
+        title: 'Foot-and-Mouth Disease (FMD) — Standard Protocol',
         sub: 'Pathogen: Aphthovirus (Picornaviridae) Ã¢â‚¬Â¢ High Transmission Risk',
         steps: [
           '<strong>1. Immediate Ring Quarantine:</strong> Establish 10km radius containment zone around infected village; prohibit cattle transport.',
@@ -3705,7 +3745,7 @@
         ]
       },
       'lsd': {
-        title: 'Lumpy Skin Disease (LSD) Ã¢â‚¬â€ Biosecurity Directive',
+        title: 'Lumpy Skin Disease (LSD) — Biosecurity Directive',
         sub: 'Pathogen: Capripoxvirus Ã¢â‚¬Â¢ Vector: Stomoxys calcitrans, Aedes spp.',
         steps: [
           '<strong>1. Vector Control:</strong> Apply synthetic pyrethroids or 5% neem extract spray across cattle sheds to eliminate biting flies.',
@@ -3715,7 +3755,7 @@
         ]
       },
       'anthrax': {
-        title: 'Anthrax Suspicion Ã¢â‚¬â€ URGENT ZOONOTIC PROTOCOL',
+        title: 'Anthrax Suspicion — URGENT ZOONOTIC PROTOCOL',
         sub: 'Pathogen: Bacillus anthracis (Spore-forming) Ã¢â‚¬Â¢ Human Lethality Risk',
         steps: [
           '<strong>1. STRICT BAN ON POST-MORTEM:</strong> Do NOT open carcass under any circumstances. Exposure to oxygen triggers spore formation.',
@@ -3725,7 +3765,7 @@
         ]
       },
       'ppr': {
-        title: 'Peste des Petits Ruminants (PPR) Ã¢â‚¬â€ Ruminant Protocol',
+        title: 'Peste des Petits Ruminants (PPR) — Ruminant Protocol',
         sub: 'Pathogen: Small Ruminant Morbillivirus Ã¢â‚¬Â¢ High Sheep & Goat Mortality',
         steps: [
           '<strong>1. Herd Isolation:</strong> Segregate all coughing or scouring sheep and goats into dedicated quarantine pens.',
@@ -3779,12 +3819,42 @@
     // ---------------------------------------------------------------------------
     // INITIALIZE MAPS & GEOSPATIAL VECTOR LAYERS
     // ---------------------------------------------------------------------------
+    
+    // Recenter Overview Mini-Map back to Maharashtra
+    function resetOverviewMapView() {
+      if (overviewMap) {
+        overviewMap.invalidateSize(true);
+        overviewMap.setView([18.5204, 74.2500], 8);
+      }
+    }
+    window.resetOverviewMapView = resetOverviewMapView;
+
+    // Filter Vaccination Records by District Card
+    function filterVaccinationByDistrict(district) {
+      var select = document.getElementById('vax-filter-district');
+      if (select) {
+        select.value = district;
+        if (typeof filterVaccinationTable === 'function') filterVaccinationTable();
+      }
+      var targetTable = document.getElementById('tab-vaccination');
+      if (targetTable) {
+        var tableSection = targetTable.querySelector('.vetra-card:last-child');
+        if (tableSection) tableSection.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+    window.filterVaccinationByDistrict = filterVaccinationByDistrict;
+
     window.addEventListener('DOMContentLoaded', function() {
       var centerCoords = [18.5204, 74.2500]; // Maharashtra Center Coordinates
       var defaultSource = tileSources.maptiler;
 
       // 1. Overview Tab Mini-Map
-      overviewMap = L.map('overview-map', { zoomControl: false }).setView(centerCoords, 8);
+      overviewMap = L.map('overview-map', {
+        zoomControl: false,
+        minZoom: 7,            // Prevents zooming out to the entire world
+        maxZoom: 16,           // Keep within Maharashtra bounds
+        scrollWheelZoom: false // Disables mouse-wheel zooming while scrolling page
+      }).setView(centerCoords, 8);
       overviewTileLayer = L.tileLayer(defaultSource.url, { attribution: defaultSource.attr, maxZoom: 18 }).addTo(overviewMap);
 
       // 2. Full GIS Surveillance Map
@@ -3802,12 +3872,12 @@
       });
 
       var cases = [
-        { id: 'rpt_001', pos: [18.5204, 73.8567], color: '#C62828', title: 'Cow (Gir) Ã¢â‚¬â€ FMD Confirmed', district: 'Pune (Haveli)', status: 'verified', diseaseCode: 'FMD' },
-        { id: 'rpt_002', pos: [18.7500, 74.1500], color: '#C62828', title: 'Buffalo (Murrah) Ã¢â‚¬â€ LSD Confirmed', district: 'Pune (Shirur)', status: 'verified', diseaseCode: 'LSD' },
-        { id: 'rpt_003', pos: [18.6200, 73.9800], color: '#F2994A', title: 'Jersey Cross Ã¢â‚¬â€ Pending Vet', district: 'Pune (Khed)', status: 'submitted', diseaseCode: 'FMD' },
-        { id: 'rpt_004', pos: [19.0952, 74.7496], color: '#C62828', title: 'Cow Ã¢â‚¬â€ Lumpy Skin Confirmed', district: 'Ahmednagar', status: 'verified', diseaseCode: 'LSD' },
-        { id: 'rpt_005', pos: [17.6805, 74.0183], color: '#C62828', title: 'Cow Ã¢â‚¬â€ Anthrax Suspicion (Zoonotic)', district: 'Satara', status: 'verified', diseaseCode: 'Anthrax' },
-        { id: 'rpt_006', pos: [16.7050, 74.2433], color: '#94e130', title: 'Buffalo Ã¢â‚¬â€ Healthy Post-Treatment', district: 'Kolhapur', status: 'resolved', diseaseCode: 'FMD' }
+        { id: 'rpt_001', pos: [18.5204, 73.8567], color: '#C62828', title: 'Cow (Gir) — FMD Confirmed', district: 'Pune (Haveli)', status: 'verified', diseaseCode: 'FMD' },
+        { id: 'rpt_002', pos: [18.7500, 74.1500], color: '#C62828', title: 'Buffalo (Murrah) — LSD Confirmed', district: 'Pune (Shirur)', status: 'verified', diseaseCode: 'LSD' },
+        { id: 'rpt_003', pos: [18.6200, 73.9800], color: '#F2994A', title: 'Jersey Cross — Pending Vet', district: 'Pune (Khed)', status: 'submitted', diseaseCode: 'FMD' },
+        { id: 'rpt_004', pos: [19.0952, 74.7496], color: '#C62828', title: 'Cow — Lumpy Skin Confirmed', district: 'Ahmednagar', status: 'verified', diseaseCode: 'LSD' },
+        { id: 'rpt_005', pos: [17.6805, 74.0183], color: '#C62828', title: 'Cow — Anthrax Suspicion (Zoonotic)', district: 'Satara', status: 'verified', diseaseCode: 'Anthrax' },
+        { id: 'rpt_006', pos: [16.7050, 74.2433], color: '#94e130', title: 'Buffalo — Healthy Post-Treatment', district: 'Kolhapur', status: 'resolved', diseaseCode: 'FMD' }
       ];
 
       // Cluster Buffers (From Screenshot 1)
@@ -4182,13 +4252,13 @@
     // AREA-WISE VACCINATION REGISTRY DATA & LOGIC (PERSISTENT VIA LOCALSTORAGE)
     // =========================================================================
     var defaultVaccinationRecords = [
-      { id: "MH-PUN-08412", species: "Gir Cow", farmer: "Ramesh Jadhav", district: "Pune", taluka: "Haveli (Wagholi)", vaccine: "Goat Pox (LSD)", batch: "LSD-2026-99A", temp: "4.1Â°C", date: "Nov 3, 2026", status: "Completed", officer: "Dr. Anita Deshmukh" },
-      { id: "MH-PUN-09124", species: "Murrah Buffalo", farmer: "Balasaheb Shinde", district: "Pune", taluka: "Shirur", vaccine: "FMD Trivalent", batch: "FMD-881B", temp: "3.8Â°C", date: "Nov 3, 2026", status: "Completed", officer: "Dr. Sanjay Thorat" },
-      { id: "MH-AHM-04721", species: "Crossbred Holstein", farmer: "Eknath Vikhe", district: "Ahmednagar", taluka: "Rahata", vaccine: "Goat Pox (LSD)", batch: "LSD-2026-99A", temp: "4.4Â°C", date: "Nov 2, 2026", status: "Completed", officer: "Dr. Prashant Vikhe" },
-      { id: "MH-SAT-02198", species: "Khillari Bull", farmer: "Anandrao Patil", district: "Satara", taluka: "Karad", vaccine: "Anthrax Spore", batch: "ANT-012X", temp: "4.0Â°C", date: "Nov 2, 2026", status: "Completed", officer: "Dr. Rajesh Gaikwad" },
-      { id: "MH-SOL-06833", species: "Osmanabadi Goat", farmer: "Suresh Mali", district: "Solapur", taluka: "Pandharpur", vaccine: "PPR Sungri-96", batch: "PPR-554M", temp: "4.6Â°C", date: "Nov 1, 2026", status: "Completed", officer: "Dr. Sunil Mane" },
-      { id: "MH-KOL-05112", species: "Pandharpuri Buffalo", farmer: "Santosh Kadam", district: "Kolhapur", taluka: "Karveer", vaccine: "FMD Trivalent", batch: "FMD-881B", temp: "3.9Â°C", date: "Nov 1, 2026", status: "Completed", officer: "Dr. Suresh Patil" },
-      { id: "MH-NAS-07341", species: "Dangi Cow", farmer: "Vitthal Gite", district: "Nashik", taluka: "Sinnar", vaccine: "Goat Pox (LSD)", batch: "LSD-2026-99A", temp: "4.2Â°C", date: "Oct 31, 2026", status: "Completed", officer: "Dr. Nitin Aher" }
+      { id: "MH-PUN-08412", species: "Gir Cow", farmer: "Ramesh Jadhav", district: "Pune", taluka: "Haveli (Wagholi)", vaccine: "Goat Pox (LSD)", batch: "LSD-2026-99A", temp: "4.1°C", date: "Nov 3, 2026", status: "Completed", officer: "Dr. Anita Deshmukh" },
+      { id: "MH-PUN-09124", species: "Murrah Buffalo", farmer: "Balasaheb Shinde", district: "Pune", taluka: "Shirur", vaccine: "FMD Trivalent", batch: "FMD-881B", temp: "3.8°C", date: "Nov 3, 2026", status: "Completed", officer: "Dr. Sanjay Thorat" },
+      { id: "MH-AHM-04721", species: "Crossbred Holstein", farmer: "Eknath Vikhe", district: "Ahmednagar", taluka: "Rahata", vaccine: "Goat Pox (LSD)", batch: "LSD-2026-99A", temp: "4.4°C", date: "Nov 2, 2026", status: "Completed", officer: "Dr. Prashant Vikhe" },
+      { id: "MH-SAT-02198", species: "Khillari Bull", farmer: "Anandrao Patil", district: "Satara", taluka: "Karad", vaccine: "Anthrax Spore", batch: "ANT-012X", temp: "4.0°C", date: "Nov 2, 2026", status: "Completed", officer: "Dr. Rajesh Gaikwad" },
+      { id: "MH-SOL-06833", species: "Osmanabadi Goat", farmer: "Suresh Mali", district: "Solapur", taluka: "Pandharpur", vaccine: "PPR Sungri-96", batch: "PPR-554M", temp: "4.6°C", date: "Nov 1, 2026", status: "Completed", officer: "Dr. Sunil Mane" },
+      { id: "MH-KOL-05112", species: "Pandharpuri Buffalo", farmer: "Santosh Kadam", district: "Kolhapur", taluka: "Karveer", vaccine: "FMD Trivalent", batch: "FMD-881B", temp: "3.9°C", date: "Nov 1, 2026", status: "Completed", officer: "Dr. Suresh Patil" },
+      { id: "MH-NAS-07341", species: "Dangi Cow", farmer: "Vitthal Gite", district: "Nashik", taluka: "Sinnar", vaccine: "Goat Pox (LSD)", batch: "LSD-2026-99A", temp: "4.2°C", date: "Oct 31, 2026", status: "Completed", officer: "Dr. Nitin Aher" }
     ];
 
     function getStoredVaccinations() {
@@ -4269,7 +4339,7 @@
       var district = document.getElementById('vax-form-district').value;
       var taluka = document.getElementById('vax-form-taluka').value.trim();
       var batch = document.getElementById('vax-form-batch').value.trim();
-      var temp = parseFloat(document.getElementById('vax-form-temp').value) + 'Â°C';
+      var temp = parseFloat(document.getElementById('vax-form-temp').value) + '°C';
       var officer = document.getElementById('vax-form-officer').value.trim();
 
       var newRecord = {
