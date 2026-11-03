@@ -29,9 +29,9 @@ class SyncStatusBar extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.12),
+        color: color.withValues(alpha: 0.12),
         border: Border(
-          bottom: BorderSide(color: color.withOpacity(0.3), width: 1),
+          bottom: BorderSide(color: color.withValues(alpha: 0.3), width: 1),
         ),
       ),
       child: Row(
@@ -75,3 +75,4 @@ class SyncStatusBar extends StatelessWidget {
     );
   }
 }
+

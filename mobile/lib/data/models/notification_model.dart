@@ -37,3 +37,4 @@ class NotificationModel {
     isRead: json['is_read'] as bool? ?? false,
   );
 }
+

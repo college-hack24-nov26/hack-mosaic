@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../core/localization/app_strings.dart';
+import '../../core/network/api_client.dart';
 import '../models/user_model.dart';
 import '../models/animal_model.dart';
 import '../models/disease_report_model.dart';
@@ -36,8 +38,21 @@ class OfflineStore extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> setLanguage(String lang) async {
+    AppStrings.setLanguage(lang);
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('preferred_language', AppStrings.currentLang);
+    notifyListeners();
+  }
+
   Future<void> initialize() async {
     final prefs = await SharedPreferences.getInstance();
+
+    // 0. Load Preferred Language
+    final savedLang = prefs.getString('preferred_language');
+    if (savedLang != null) {
+      AppStrings.setLanguage(savedLang);
+    }
 
     // 1. Load User
     final userJson = prefs.getString('current_user');
@@ -182,6 +197,76 @@ class OfflineStore extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> markAnimalSynced(String animalId) async {
+    _animals = _animals
+        .map((a) => a.id == animalId ? a.copyWith(isSynced: true) : a)
+        .toList();
+    await _persistAnimals();
+    notifyListeners();
+  }
+
+  Future<void> markReportSynced(String reportId) async {
+    _reports = _reports
+        .map((r) => r.id == reportId ? r.copyWith(isSynced: true) : r)
+        .toList();
+    await _persistReports();
+    notifyListeners();
+  }
+
+  /// Attempts to synchronize all pending animals and reports with the Go backend
+  /// in dependency order (animals -> reports -> report images).
+  /// Only records that receive a 200/201 response from the backend are marked synced.
+  Future<int> syncPendingWithBackend() async {
+    if (_isSyncing || !_isOnline) return 0;
+
+    _isSyncing = true;
+    notifyListeners();
+
+    int syncedCount = 0;
+    try {
+      final api = ApiClient();
+
+      // 1. Sync pending animals first (dependency order per ARCHITECTURE.md §5)
+      for (int i = 0; i < _animals.length; i++) {
+        final animal = _animals[i];
+        if (!animal.isSynced) {
+          final ok = await api.syncAnimal(animal);
+          if (ok) {
+            _animals[i] = animal.copyWith(isSynced: true);
+            syncedCount++;
+          }
+        }
+      }
+      if (syncedCount > 0) {
+        await _persistAnimals();
+      }
+
+      // 2. Sync pending reports and any attached images
+      int reportsSynced = 0;
+      for (int i = 0; i < _reports.length; i++) {
+        final report = _reports[i];
+        if (!report.isSynced) {
+          final ok = await api.syncReport(report);
+          if (ok) {
+            if (report.photoPath != null) {
+              await api.uploadReportImage(report.id, report.photoPath!);
+            }
+            _reports[i] = report.copyWith(isSynced: true);
+            reportsSynced++;
+            syncedCount++;
+          }
+        }
+      }
+      if (reportsSynced > 0) {
+        await _persistReports();
+      }
+    } finally {
+      _isSyncing = false;
+      notifyListeners();
+    }
+    return syncedCount;
+  }
+
   Future<void> markAllSynced() async {
     _animals = _animals.map((a) => a.copyWith(isSynced: true)).toList();
     _reports = _reports.map((r) => r.copyWith(isSynced: true)).toList();
@@ -214,3 +299,4 @@ class OfflineStore extends ChangeNotifier {
     );
   }
 }
+

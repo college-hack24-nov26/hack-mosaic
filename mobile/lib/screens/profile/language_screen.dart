@@ -4,6 +4,7 @@ import '../../core/theme/app_typography.dart';
 import '../../core/theme/app_spacing.dart';
 import '../../core/localization/app_strings.dart';
 import '../../core/widgets/app_card.dart';
+import '../../data/local/offline_store.dart';
 
 class LanguageScreen extends StatefulWidget {
   const LanguageScreen({super.key});
@@ -33,10 +34,10 @@ class _LanguageScreenState extends State<LanguageScreen> {
           return Container(
             margin: const EdgeInsets.only(bottom: AppSpacing.md),
             child: AppCard(
-              onTap: () {
-                setState(() {
-                  AppStrings.setLanguage(lang['code']!);
-                });
+              onTap: () async {
+                await OfflineStore().setLanguage(lang['code']!);
+                if (!context.mounted) return;
+                setState(() {});
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text('Language updated to ${lang['name']}'),
@@ -95,3 +96,4 @@ class _LanguageScreenState extends State<LanguageScreen> {
     );
   }
 }
+

@@ -49,3 +49,4 @@ class UserModel {
     alertConsent: json['alert_consent'] as bool? ?? true,
   );
 }
+

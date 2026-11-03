@@ -67,6 +67,7 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
         });
       }
     } catch (e) {
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Photo error: $e')),
       );
@@ -100,7 +101,7 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
     if (store.isOnline) {
       ApiClient().syncAnimal(newAnimal).then((synced) {
         if (synced) {
-          store.markAllSynced();
+          store.markAnimalSynced(newAnimal.id);
         }
       });
     }
@@ -213,7 +214,8 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
             Text(AppStrings.t('breed'), style: AppTypography.cardTitle),
             const SizedBox(height: AppSpacing.sm),
             DropdownButtonFormField<String>(
-              value: _selectedBreed,
+              key: ValueKey(_selectedSpecies),
+              initialValue: _selectedBreed,
               decoration: const InputDecoration(),
               items: breeds.map((b) {
                 return DropdownMenuItem<String>(
@@ -256,23 +258,20 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
             Row(
               children: [
                 Expanded(
-                  child: RadioListTile<String>(
-                    title: Text(AppStrings.t('gender_female')),
-                    value: 'female',
-                    groupValue: _selectedSex,
-                    activeColor: AppColors.primary,
-                    contentPadding: EdgeInsets.zero,
-                    onChanged: (val) => setState(() => _selectedSex = val!),
+                  child: _buildChoiceCard(
+                    title: AppStrings.t('gender_female'),
+                    icon: Icons.female,
+                    isSelected: _selectedSex == 'female',
+                    onTap: () => setState(() => _selectedSex = 'female'),
                   ),
                 ),
+                const SizedBox(width: AppSpacing.md),
                 Expanded(
-                  child: RadioListTile<String>(
-                    title: Text(AppStrings.t('gender_male')),
-                    value: 'male',
-                    groupValue: _selectedSex,
-                    activeColor: AppColors.primary,
-                    contentPadding: EdgeInsets.zero,
-                    onChanged: (val) => setState(() => _selectedSex = val!),
+                  child: _buildChoiceCard(
+                    title: AppStrings.t('gender_male'),
+                    icon: Icons.male,
+                    isSelected: _selectedSex == 'male',
+                    onTap: () => setState(() => _selectedSex = 'male'),
                   ),
                 ),
               ],
@@ -378,3 +377,4 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
     );
   }
 }
+

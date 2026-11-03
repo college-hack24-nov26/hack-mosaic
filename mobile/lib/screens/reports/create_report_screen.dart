@@ -15,11 +15,15 @@ import '../../core/network/api_client.dart';
 
 class CreateReportScreen extends StatefulWidget {
   final String? preselectedAnimalId;
+  final String? initialPhotoPath;
+  final ScreeningResult? initialScreening;
   final VoidCallback? onReportSubmitted;
 
   const CreateReportScreen({
     super.key,
     this.preselectedAnimalId,
+    this.initialPhotoPath,
+    this.initialScreening,
     this.onReportSubmitted,
   });
 
@@ -35,11 +39,12 @@ class _CreateReportScreenState extends State<CreateReportScreen> {
   String _selectedCondition = 'lumpy_skin_disease';
   final Set<String> _selectedSymptoms = {'skin_nodules', 'fever'};
   String? _photoPath;
+  ScreeningResult? _screeningResult;
   bool _isSubmitting = false;
 
   // Real coordinates for Phaltan / Satara demonstration
-  double _currentLat = 17.9856;
-  double _currentLng = 74.4331;
+  final double _currentLat = 17.9856;
+  final double _currentLng = 74.4331;
   bool _hasGps = true;
 
   final List<Map<String, String>> _conditions = [
@@ -69,6 +74,8 @@ class _CreateReportScreenState extends State<CreateReportScreen> {
     } else if (animals.isNotEmpty) {
       _selectedAnimalId = animals.first.id;
     }
+    _photoPath = widget.initialPhotoPath;
+    _screeningResult = widget.initialScreening;
   }
 
   @override
@@ -85,6 +92,7 @@ class _CreateReportScreenState extends State<CreateReportScreen> {
         setState(() => _photoPath = picked.path);
       }
     } catch (e) {
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Camera error: $e')),
       );
@@ -115,15 +123,18 @@ class _CreateReportScreenState extends State<CreateReportScreen> {
       id: reportId,
       animalId: _selectedAnimalId!,
       animalName: selectedAnimal.displayName,
-      reportedAt: DateTime.now(),
+      reportedAt: DateTime.now().toUtc(),
       description: _descriptionController.text.trim().isNotEmpty
           ? _descriptionController.text.trim()
           : 'Reported with symptoms: ${_selectedSymptoms.join(", ")}',
+      descriptionLanguage: AppStrings.currentLang,
       symptomCodes: _selectedSymptoms.toList(),
       latitude: _hasGps ? _currentLat : null,
       longitude: _hasGps ? _currentLng : null,
+      villageId: _store.currentUser?.villageId,
       status: 'submitted',
       photoPath: _photoPath,
+      screening: _screeningResult,
       isSynced: false,
     );
 
@@ -131,9 +142,12 @@ class _CreateReportScreenState extends State<CreateReportScreen> {
 
     // Attempt background sync if online
     if (_store.isOnline) {
-      ApiClient().syncReport(newReport).then((synced) {
+      ApiClient().syncReport(newReport).then((synced) async {
         if (synced) {
-          _store.markAllSynced();
+          if (newReport.photoPath != null) {
+            await ApiClient().uploadReportImage(newReport.id, newReport.photoPath!);
+          }
+          await _store.markReportSynced(newReport.id);
         }
       });
     }
@@ -185,7 +199,8 @@ class _CreateReportScreenState extends State<CreateReportScreen> {
             )
           else
             DropdownButtonFormField<String>(
-              value: _selectedAnimalId,
+              key: ValueKey(_selectedAnimalId),
+              initialValue: _selectedAnimalId,
               decoration: const InputDecoration(),
               items: animals.map((a) {
                 return DropdownMenuItem<String>(
@@ -201,7 +216,7 @@ class _CreateReportScreenState extends State<CreateReportScreen> {
           Text('संशयित आजार / Suspected Category', style: AppTypography.sectionHeading),
           const SizedBox(height: AppSpacing.sm),
           DropdownButtonFormField<String>(
-            value: _selectedCondition,
+            initialValue: _selectedCondition,
             decoration: const InputDecoration(),
             items: _conditions.map((c) {
               return DropdownMenuItem<String>(
@@ -333,7 +348,7 @@ class _CreateReportScreenState extends State<CreateReportScreen> {
                 ),
                 Switch(
                   value: _hasGps,
-                  activeColor: AppColors.primary,
+                  activeThumbColor: AppColors.primary,
                   onChanged: (val) => setState(() => _hasGps = val),
                 ),
               ],

@@ -16,7 +16,7 @@ class SafetyDisclaimerCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.surfaceContainer,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-        border: Border.all(color: AppColors.primary.withOpacity(0.25), width: 1),
+        border: Border.all(color: AppColors.primary.withValues(alpha: 0.25), width: 1),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -55,3 +55,4 @@ class SafetyDisclaimerCard extends StatelessWidget {
     );
   }
 }
+

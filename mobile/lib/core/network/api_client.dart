@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart' as http;
+import 'package:uuid/uuid.dart';
 import '../../data/models/animal_model.dart';
 import '../../data/models/disease_report_model.dart';
 
@@ -64,18 +65,42 @@ class ApiClient {
         body: jsonEncode({
           'id': report.id,
           'animal_id': report.animalId,
-          'reported_at': report.reportedAt.toIso8601String(),
+          'reported_at': report.reportedAt.toUtc().toIso8601String(),
           'description': report.description,
+          'description_language': report.descriptionLanguage,
           'symptom_codes': report.symptomCodes,
           'location': report.latitude != null && report.longitude != null
               ? {'lat': report.latitude, 'lng': report.longitude, 'accuracy_m': 10.0}
               : null,
+          if (report.villageId != null) 'village_id': report.villageId,
           'expected_image_count': report.photoPath != null ? 1 : 0,
-          'screening': report.screening?.toJson(),
+          'screening': report.screening?.toApiJson(),
         }),
       ).timeout(const Duration(seconds: 4));
 
       return res.statusCode == 200 || res.statusCode == 201;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  Future<bool> uploadReportImage(String reportId, String filePath, {String? imageId}) async {
+    try {
+      final file = File(filePath);
+      if (!file.existsSync()) return false;
+
+      final request = http.MultipartRequest(
+        'POST',
+        Uri.parse('$baseUrl/reports/$reportId/images'),
+      );
+      if (authToken != null) {
+        request.headers['Authorization'] = 'Bearer $authToken';
+      }
+      request.fields['id'] = imageId ?? const Uuid().v4();
+      request.files.add(await http.MultipartFile.fromPath('file', filePath));
+
+      final streamedRes = await request.send().timeout(const Duration(seconds: 10));
+      return streamedRes.statusCode == 200 || streamedRes.statusCode == 201;
     } catch (_) {
       return false;
     }

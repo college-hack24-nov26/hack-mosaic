@@ -6,6 +6,7 @@ import '../../core/theme/app_spacing.dart';
 import '../../core/widgets/app_card.dart';
 import '../../core/widgets/app_button.dart';
 import '../../core/widgets/safety_disclaimer_card.dart';
+import '../../data/models/disease_report_model.dart';
 import '../reports/create_report_screen.dart';
 
 class ScanResultsScreen extends StatelessWidget {
@@ -67,7 +68,7 @@ class ScanResultsScreen extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                       decoration: BoxDecoration(
-                        color: AppColors.primary.withOpacity(0.12),
+                        color: AppColors.primary.withValues(alpha: 0.12),
                         borderRadius: BorderRadius.circular(4),
                       ),
                       child: Text(
@@ -157,10 +158,23 @@ class ScanResultsScreen extends StatelessWidget {
             icon: Icons.assignment_late_outlined,
             backgroundColor: AppColors.primary,
             onPressed: () {
+              final screeningResult = ScreeningResult(
+                modelVersion: modelVersion,
+                topLabel: 'lumpy_skin_disease',
+                topConfidence: confidence,
+                inconclusive: false,
+                scores: [
+                  {'label': 'lumpy_skin_disease', 'score': confidence},
+                  {'label': 'normal_skin', 'score': double.parse((1.0 - confidence).toStringAsFixed(2))},
+                ],
+                ranAt: DateTime.now().toUtc(),
+              );
               Navigator.of(context).pushReplacement(
                 MaterialPageRoute(
                   builder: (_) => CreateReportScreen(
                     preselectedAnimalId: animalId,
+                    initialPhotoPath: imagePath,
+                    initialScreening: screeningResult,
                   ),
                 ),
               );

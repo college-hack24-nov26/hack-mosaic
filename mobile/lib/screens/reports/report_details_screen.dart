@@ -241,9 +241,9 @@ class ReportDetailsScreen extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: AppSpacing.lg),
       padding: const EdgeInsets.all(AppSpacing.md),
       decoration: BoxDecoration(
-        color: AppColors.infoBlue.withOpacity(0.08),
+        color: AppColors.infoBlue.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-        border: Border.all(color: AppColors.infoBlue.withOpacity(0.3)),
+        border: Border.all(color: AppColors.infoBlue.withValues(alpha: 0.3)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

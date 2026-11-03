@@ -130,7 +130,14 @@ class AnimalDetailsScreen extends StatelessWidget {
                     data: _buildQrPayload(),
                     version: QrVersions.auto,
                     size: 190.0,
-                    foregroundColor: AppColors.textPrimary,
+                    eyeStyle: const QrEyeStyle(
+                      eyeShape: QrEyeShape.square,
+                      color: AppColors.textPrimary,
+                    ),
+                    dataModuleStyle: const QrDataModuleStyle(
+                      dataModuleShape: QrDataModuleShape.square,
+                      color: AppColors.textPrimary,
+                    ),
                   ),
                 ),
                 const SizedBox(height: 14),
@@ -258,7 +265,7 @@ class AnimalDetailsScreen extends StatelessWidget {
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
           decoration: BoxDecoration(
-            color: AppColors.successGreen.withOpacity(0.12),
+            color: AppColors.successGreen.withValues(alpha: 0.12),
             borderRadius: BorderRadius.circular(4),
           ),
           child: Text(

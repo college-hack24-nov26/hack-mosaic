@@ -185,7 +185,7 @@ class _AnimalsListScreenState extends State<AnimalsListScreen> {
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                           decoration: BoxDecoration(
-                            color: AppColors.cautionAmber.withOpacity(0.12),
+                            color: AppColors.cautionAmber.withValues(alpha: 0.12),
                             borderRadius: BorderRadius.circular(4),
                           ),
                           child: Row(
@@ -252,3 +252,4 @@ class _AnimalsListScreenState extends State<AnimalsListScreen> {
     );
   }
 }
+

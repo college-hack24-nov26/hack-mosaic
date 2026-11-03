@@ -38,6 +38,7 @@ class _DiseaseScannerScreenState extends State<DiseaseScannerScreen> {
         setState(() => _imagePath = picked.path);
       }
     } catch (e) {
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Camera error: $e')),
       );
@@ -95,7 +96,7 @@ class _DiseaseScannerScreenState extends State<DiseaseScannerScreen> {
           Text('जनावर निवडा / Select Animal', style: AppTypography.cardTitle),
           const SizedBox(height: AppSpacing.sm),
           DropdownButtonFormField<String>(
-            value: _selectedAnimalId,
+            initialValue: _selectedAnimalId,
             decoration: const InputDecoration(),
             items: animals.map((a) {
               return DropdownMenuItem<String>(
@@ -113,7 +114,7 @@ class _DiseaseScannerScreenState extends State<DiseaseScannerScreen> {
             child: Container(
               height: 280,
               decoration: BoxDecoration(
-                color: Colors.black.withOpacity(0.04),
+                color: Colors.black.withValues(alpha: 0.04),
                 borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
                 border: Border.all(color: AppColors.primary, width: 2),
                 image: _imagePath != null
@@ -129,7 +130,7 @@ class _DiseaseScannerScreenState extends State<DiseaseScannerScreen> {
                       children: [
                         Container(
                           padding: const EdgeInsets.all(16),
-                          decoration: BoxDecoration(
+                          decoration: const BoxDecoration(
                             color: AppColors.surfaceContainer,
                             shape: BoxShape.circle,
                           ),

@@ -76,3 +76,4 @@ class AppButton extends StatelessWidget {
     return Text(label, style: AppTypography.button.copyWith(color: textColor));
   }
 }
+

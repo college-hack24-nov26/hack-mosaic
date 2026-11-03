@@ -63,3 +63,4 @@ class AppTypography {
     letterSpacing: 0.3,
   );
 }
+

@@ -23,8 +23,17 @@ class ScreeningResult {
     'top_confidence': topConfidence,
     'inconclusive': inconclusive,
     'scores': scores,
-    'ran_at': ranAt.toIso8601String(),
+    'ran_at': ranAt.toUtc().toIso8601String(),
     'disclaimer': disclaimer,
+  };
+
+  Map<String, dynamic> toApiJson() => {
+    'model_version': modelVersion,
+    'top_label': topLabel,
+    'top_confidence': topConfidence,
+    'inconclusive': inconclusive,
+    'scores': scores,
+    'ran_at': ranAt.toUtc().toIso8601String(),
   };
 
   factory ScreeningResult.fromJson(Map<String, dynamic> json) => ScreeningResult(
@@ -47,9 +56,11 @@ class DiseaseReportModel {
   final String? animalName;
   final DateTime reportedAt;
   final String? description;
+  final String descriptionLanguage;
   final List<String> symptomCodes;
   final double? latitude;
   final double? longitude;
+  final String? villageId;
   final String status; // 'submitted', 'under_review', 'confirmed', 'rejected', 'flagged'
   final String? confirmedDiseaseCode;
   final String? vetNotes;
@@ -63,9 +74,11 @@ class DiseaseReportModel {
     this.animalName,
     required this.reportedAt,
     this.description,
+    this.descriptionLanguage = 'mr',
     required this.symptomCodes,
     this.latitude,
     this.longitude,
+    this.villageId,
     this.status = 'submitted',
     this.confirmedDiseaseCode,
     this.vetNotes,
@@ -78,11 +91,13 @@ class DiseaseReportModel {
     'id': id,
     'animal_id': animalId,
     'animal_name': animalName,
-    'reported_at': reportedAt.toIso8601String(),
+    'reported_at': reportedAt.toUtc().toIso8601String(),
     'description': description,
+    'description_language': descriptionLanguage,
     'symptom_codes': symptomCodes,
     'latitude': latitude,
     'longitude': longitude,
+    'village_id': villageId,
     'status': status,
     'confirmed_disease_code': confirmedDiseaseCode,
     'vet_notes': vetNotes,
@@ -97,9 +112,11 @@ class DiseaseReportModel {
     animalName: json['animal_name'] as String?,
     reportedAt: json['reported_at'] != null ? DateTime.parse(json['reported_at'] as String) : DateTime.now(),
     description: json['description'] as String?,
+    descriptionLanguage: json['description_language'] as String? ?? 'mr',
     symptomCodes: (json['symptom_codes'] as List<dynamic>?)?.map((e) => e.toString()).toList() ?? [],
     latitude: (json['latitude'] as num?)?.toDouble(),
     longitude: (json['longitude'] as num?)?.toDouble(),
+    villageId: json['village_id'] as String?,
     status: json['status'] as String? ?? 'submitted',
     confirmedDiseaseCode: json['confirmed_disease_code'] as String?,
     vetNotes: json['vet_notes'] as String?,
@@ -122,9 +139,11 @@ class DiseaseReportModel {
       animalName: animalName,
       reportedAt: reportedAt,
       description: description,
+      descriptionLanguage: descriptionLanguage,
       symptomCodes: symptomCodes,
       latitude: latitude,
       longitude: longitude,
+      villageId: villageId,
       status: status ?? this.status,
       confirmedDiseaseCode: confirmedDiseaseCode ?? this.confirmedDiseaseCode,
       vetNotes: vetNotes ?? this.vetNotes,
@@ -134,3 +153,4 @@ class DiseaseReportModel {
     );
   }
 }
+

@@ -99,10 +99,17 @@ class _FarmerHomeScreenState extends State<FarmerHomeScreen> {
                 isOnline: _store.isOnline,
                 pendingCount: _store.pendingSyncCount,
                 onSyncTap: () async {
-                  await _store.markAllSynced();
+                  final syncedCount = await _store.syncPendingWithBackend();
                   if (context.mounted) {
+                    final remaining = _store.pendingSyncCount;
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('All records successfully synchronized with Go backend!')),
+                      SnackBar(
+                        content: Text(
+                          remaining == 0
+                              ? 'Synced $syncedCount record(s) with Go backend!'
+                              : 'Backend unreachable ($syncedCount synced, $remaining queued safely on device).',
+                        ),
+                      ),
                     );
                   }
                 },
@@ -174,7 +181,7 @@ class _FarmerHomeScreenState extends State<FarmerHomeScreen> {
         borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
         boxShadow: [
           BoxShadow(
-            color: AppColors.primary.withOpacity(0.2),
+            color: AppColors.primary.withValues(alpha: 0.2),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -188,12 +195,12 @@ class _FarmerHomeScreenState extends State<FarmerHomeScreen> {
             children: [
               Text(
                 AppStrings.t('greeting'),
-                style: AppTypography.cardTitle.copyWith(color: Colors.white.withOpacity(0.9)),
+                style: AppTypography.cardTitle.copyWith(color: Colors.white.withValues(alpha: 0.9)),
               ),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
+                  color: Colors.white.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
                 ),
                 child: Text(
@@ -212,7 +219,7 @@ class _FarmerHomeScreenState extends State<FarmerHomeScreen> {
             const SizedBox(height: 2),
             Text(
               user!.farmName!,
-              style: AppTypography.bodySecondary.copyWith(color: Colors.white.withOpacity(0.85)),
+              style: AppTypography.bodySecondary.copyWith(color: Colors.white.withValues(alpha: 0.85)),
             ),
           ],
         ],
@@ -294,9 +301,9 @@ class _FarmerHomeScreenState extends State<FarmerHomeScreen> {
       margin: const EdgeInsets.only(bottom: AppSpacing.lg),
       padding: const EdgeInsets.all(AppSpacing.md),
       decoration: BoxDecoration(
-        color: AppColors.alertCritical.withOpacity(0.08),
+        color: AppColors.alertCritical.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-        border: Border.all(color: AppColors.alertCritical.withOpacity(0.4), width: 1.5),
+        border: Border.all(color: AppColors.alertCritical.withValues(alpha: 0.4), width: 1.5),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -407,7 +414,7 @@ class _FarmerHomeScreenState extends State<FarmerHomeScreen> {
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: color.withOpacity(0.12),
+                  color: color.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
                 ),
                 child: Icon(icon, color: color, size: 22),
@@ -493,3 +500,4 @@ class _FarmerHomeScreenState extends State<FarmerHomeScreen> {
     );
   }
 }
+

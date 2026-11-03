@@ -93,7 +93,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     style: AppTypography.caption.copyWith(fontSize: 11, height: 1.3),
                   ),
                   value: user?.alertConsent ?? true,
-                  activeColor: AppColors.primary,
+                  activeThumbColor: AppColors.primary,
                   onChanged: (val) {
                     if (user != null) {
                       final updated = UserModel(
@@ -141,7 +141,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                           decoration: BoxDecoration(
-                            color: (_store.pendingSyncCount > 0 ? AppColors.cautionAmber : AppColors.successGreen).withOpacity(0.12),
+                            color: (_store.pendingSyncCount > 0 ? AppColors.cautionAmber : AppColors.successGreen).withValues(alpha: 0.12),
                             borderRadius: BorderRadius.circular(4),
                           ),
                           child: Text(
@@ -158,11 +158,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       label: 'सर्व डेटा सर्व्हरवर पाठवा / Sync Now',
                       icon: Icons.sync,
                       isSecondary: true,
+                      isLoading: _store.isSyncing,
                       onPressed: () async {
-                        await _store.markAllSynced();
+                        final syncedCount = await _store.syncPendingWithBackend();
                         if (context.mounted) {
+                          final remaining = _store.pendingSyncCount;
                           ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Synced all records with Go Backend API!')),
+                            SnackBar(
+                              content: Text(
+                                remaining == 0
+                                    ? 'Synced $syncedCount record(s) with Go Backend API!'
+                                    : 'Backend unreachable ($syncedCount synced, $remaining queued safely on device).',
+                              ),
+                            ),
                           );
                         }
                       },
