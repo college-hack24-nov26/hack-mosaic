@@ -168,4 +168,26 @@ class ApiClient {
       return false;
     }
   }
+
+  /// Fetches the live stream of officer-approved outbreak alerts (`GET /api/v1/alerts/live`).
+  Future<List<Map<String, dynamic>>> fetchLiveAlerts() async {
+    try {
+      final res = await http
+          .get(Uri.parse('$baseUrl/alerts/live'))
+          .timeout(const Duration(seconds: 2));
+      if (res.statusCode != 200) {
+        await resolveBestBaseUrl();
+        return const [];
+      }
+      final body = jsonDecode(utf8.decode(res.bodyBytes)) as Map<String, dynamic>;
+      final list = (body['data'] as List? ?? const []);
+      return list
+          .whereType<Map>()
+          .map((e) => Map<String, dynamic>.from(e))
+          .toList();
+    } catch (_) {
+      await resolveBestBaseUrl();
+      return const [];
+    }
+  }
 }

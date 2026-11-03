@@ -3,6 +3,7 @@ import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_typography.dart';
 import '../../core/localization/app_strings.dart';
 import '../../core/auth/session_manager.dart';
+import '../../core/widgets/live_emergency_alert_banner.dart';
 import '../../data/local/offline_store.dart';
 import 'farmer_home_screen.dart';
 import '../animals/animals_list_screen.dart';
@@ -53,12 +54,12 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         return Scaffold(
           body: Column(
             children: [
+              const LiveEmergencyAlertBanner(),
               if (SessionManager.instance.status == SessionStatus.demoFarmer)
                 Container(
                   width: double.infinity,
                   color: AppColors.cautionAmber,
-                  padding: EdgeInsets.fromLTRB(
-                      12, MediaQuery.of(context).padding.top + 2, 12, 2),
+                  padding: const EdgeInsets.fromLTRB(12, 4, 12, 4),
                   child: Text(
                     AppStrings.t('demo_banner'),
                     textAlign: TextAlign.center,
@@ -68,7 +69,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
               Expanded(
                 child: MediaQuery.removePadding(
                   context: context,
-                  removeTop: SessionManager.instance.status == SessionStatus.demoFarmer,
+                  removeTop: true,
                   child: IndexedStack(
                     index: _currentIndex,
                     children: screens,

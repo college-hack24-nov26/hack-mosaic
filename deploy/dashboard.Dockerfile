@@ -185,22 +185,31 @@ const LIVE_BRIDGE_SCRIPT = `
 
     const origHandleBroadcast = window.handleBroadcast;
     window.handleBroadcast = function(e) {
+      if (e && e.preventDefault) e.preventDefault();
       const titleEl = document.getElementById('alert-title-input');
       const distEl = document.getElementById('alert-district-input');
       const sevEl = document.getElementById('alert-severity-input');
       const msgEl = document.getElementById('alert-msg-input');
-      if (titleEl && msgEl) {
-        fetch(API_BASE + '/alerts', {
-          method: 'POST',
-          headers: AUTH_HEADERS,
-          body: JSON.stringify({
-            title: titleEl.value,
-            affected_district: distEl ? distEl.value : 'Satara',
-            severity: sevEl ? sevEl.value : 'high',
-            message: msgEl.value
-          })
-        }).catch(function() {});
-      }
+      const titleVal = (titleEl && titleEl.value.trim()) ? titleEl.value.trim() : 'Urgent Lumpy Skin Disease (LSD) Quarantine Alert';
+      const distVal = (distEl && distEl.value) ? distEl.value.replace(' District', '').trim() : 'Satara';
+      const sevVal = (sevEl && sevEl.value) ? sevEl.value : 'high';
+      const msgVal = (msgEl && msgEl.value.trim()) ? msgEl.value.trim() : 'Confirmed LSD cluster detected within 5km radius. Isolate affected cattle immediately and halt livestock movement.';
+
+      fetch(API_BASE + '/alerts', {
+        method: 'POST',
+        headers: AUTH_HEADERS,
+        body: JSON.stringify({
+          title: titleVal,
+          title_en: titleVal,
+          title_mr: 'तातडीचा शासकीय रोग इशारा (' + distVal + '): ' + titleVal,
+          affected_district: distVal,
+          severity: sevVal,
+          message: msgVal,
+          body_en: msgVal,
+          body_mr: 'सावधान! ' + distVal + ' जिल्ह्यात पशुवैद्यकांनी पुष्टी केलेला लंपी त्वचा रोगाचा उद्रेक आढळला आहे. कृपया आपली आजारी जनावरे तात्काळ वेगळी ठेवा, गोठा निर्जंतुक करा आणि जनावरांची वाहतूक थांबवा. सूचना: ' + msgVal
+        })
+      }).catch(function(err) { console.warn('Alert push error:', err); });
+
       if (typeof origHandleBroadcast === 'function') {
         return origHandleBroadcast(e);
       }

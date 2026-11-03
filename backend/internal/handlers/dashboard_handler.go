@@ -220,13 +220,22 @@ func (h *DashboardHandler) CreateAlert(c *gin.Context) {
 		return
 	}
 
+	dist := strings.TrimSpace(req.AffectedDistrict)
+	if dist == "" {
+		dist = "Satara"
+	}
+	dis := strings.TrimSpace(req.DiseaseName)
+	if dis == "" {
+		dis = "Lumpy Skin Disease (LSD)"
+	}
+
 	titleEn := strings.TrimSpace(req.TitleEn)
 	if titleEn == "" {
 		titleEn = strings.TrimSpace(req.Title)
 	}
 	titleMr := strings.TrimSpace(req.TitleMr)
 	if titleMr == "" {
-		titleMr = titleEn
+		titleMr = "तातडीचा शासकीय रोग इशारा (" + dist + "): " + titleEn
 	}
 	bodyEn := strings.TrimSpace(req.BodyEn)
 	if bodyEn == "" {
@@ -234,11 +243,11 @@ func (h *DashboardHandler) CreateAlert(c *gin.Context) {
 	}
 	bodyMr := strings.TrimSpace(req.BodyMr)
 	if bodyMr == "" {
-		bodyMr = bodyEn
+		bodyMr = "सावधान! " + dist + " जिल्ह्यात पशुवैद्यकांनी पुष्टी केलेला लंपी त्वचा रोगाचा उद्रेक आढळला आहे. कृपया आपली आजारी जनावरे तात्काळ वेगळी ठेवा, गोठा निर्जंतुक करा आणि जनावरांची वाहतूक थांबवा. " + bodyEn
 	}
 
-	if titleMr == "" || bodyMr == "" {
-		response.Error(c, http.StatusUnprocessableEntity, "VALIDATION_ERROR", "title_mr and body_mr are required.", nil)
+	if titleEn == "" || bodyEn == "" {
+		response.Error(c, http.StatusUnprocessableEntity, "VALIDATION_ERROR", "title and message are required.", nil)
 		return
 	}
 
@@ -254,14 +263,6 @@ func (h *DashboardHandler) CreateAlert(c *gin.Context) {
 	severity := strings.TrimSpace(req.Severity)
 	if severity == "" {
 		severity = "high"
-	}
-	dist := strings.TrimSpace(req.AffectedDistrict)
-	if dist == "" {
-		dist = "Satara"
-	}
-	dis := strings.TrimSpace(req.DiseaseName)
-	if dis == "" {
-		dis = "Lumpy Skin Disease (LSD)"
 	}
 
 	al, err := h.store.CreateAlert(c.Request.Context(), repositories.CreateAlertParams{

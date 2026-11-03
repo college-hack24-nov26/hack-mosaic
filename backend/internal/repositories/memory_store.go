@@ -1364,6 +1364,7 @@ func (s *InMemoryStore) ListAlerts(ctx context.Context, districtID string) ([]mo
 	for _, al := range s.alerts {
 		out = append(out, *al)
 	}
+	sort.Slice(out, func(i, j int) bool { return out[i].CreatedAt.After(out[j].CreatedAt) })
 	if out == nil {
 		out = []models.AlertDTO{}
 	}
