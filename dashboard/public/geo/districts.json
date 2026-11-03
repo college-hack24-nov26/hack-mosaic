@@ -1,0 +1,234 @@
+{
+  "type": "FeatureCollection",
+  "crs": {
+    "type": "name",
+    "properties": {
+      "name": "urn:ogc:def:crs:OGC:1.3:CRS84"
+    }
+  },
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "district_id": "dist_pune",
+        "name": "Pune",
+        "state": "Maharashtra",
+        "division": "Pune",
+        "headquarters": "Pune",
+        "active_cases": 32,
+        "risk_level": "critical",
+        "fmd_cases": 18,
+        "lsd_cases": 14,
+        "surveillance_status": "Active Outbreak Zone"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [73.35, 18.95],
+            [73.55, 19.30],
+            [73.85, 19.35],
+            [74.15, 19.10],
+            [74.45, 18.95],
+            [74.85, 18.70],
+            [75.10, 18.30],
+            [74.90, 18.10],
+            [74.55, 18.00],
+            [74.20, 17.90],
+            [73.70, 18.05],
+            [73.40, 18.35],
+            [73.30, 18.65],
+            [73.35, 18.95]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "district_id": "dist_ahmednagar",
+        "name": "Ahmednagar",
+        "state": "Maharashtra",
+        "division": "Nashik",
+        "headquarters": "Ahmednagar",
+        "active_cases": 24,
+        "risk_level": "high",
+        "fmd_cases": 8,
+        "lsd_cases": 16,
+        "surveillance_status": "Enhanced Monitoring"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [74.15, 19.10],
+            [73.85, 19.35],
+            [74.10, 19.85],
+            [74.50, 19.95],
+            [75.10, 19.90],
+            [75.50, 19.50],
+            [75.40, 18.80],
+            [75.10, 18.30],
+            [74.85, 18.70],
+            [74.45, 18.95],
+            [74.15, 19.10]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "district_id": "dist_satara",
+        "name": "Satara",
+        "state": "Maharashtra",
+        "division": "Pune",
+        "headquarters": "Satara",
+        "active_cases": 15,
+        "risk_level": "medium",
+        "fmd_cases": 6,
+        "lsd_cases": 9,
+        "surveillance_status": "Containment Protocol Active"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [73.70, 18.05],
+            [74.20, 17.90],
+            [74.55, 18.00],
+            [74.75, 17.75],
+            [74.55, 17.30],
+            [74.10, 17.15],
+            [73.75, 17.35],
+            [73.60, 17.70],
+            [73.70, 18.05]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "district_id": "dist_solapur",
+        "name": "Solapur",
+        "state": "Maharashtra",
+        "division": "Pune",
+        "headquarters": "Solapur",
+        "active_cases": 19,
+        "risk_level": "medium",
+        "fmd_cases": 11,
+        "lsd_cases": 8,
+        "surveillance_status": "Containment Protocol Active"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [74.55, 18.00],
+            [74.90, 18.10],
+            [75.10, 18.30],
+            [75.60, 18.25],
+            [76.25, 18.05],
+            [76.30, 17.50],
+            [75.95, 17.20],
+            [75.30, 17.30],
+            [74.75, 17.75],
+            [74.55, 18.00]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "district_id": "dist_kolhapur",
+        "name": "Kolhapur",
+        "state": "Maharashtra",
+        "division": "Pune",
+        "headquarters": "Kolhapur",
+        "active_cases": 9,
+        "risk_level": "low",
+        "fmd_cases": 4,
+        "lsd_cases": 5,
+        "surveillance_status": "Routine Surveillance"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [73.75, 17.10],
+            [74.15, 17.05],
+            [74.55, 16.85],
+            [74.70, 16.40],
+            [74.45, 15.90],
+            [74.10, 15.80],
+            [73.80, 16.15],
+            [73.70, 16.70],
+            [73.75, 17.10]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "district_id": "dist_nashik",
+        "name": "Nashik",
+        "state": "Maharashtra",
+        "division": "Nashik",
+        "headquarters": "Nashik",
+        "active_cases": 28,
+        "risk_level": "critical",
+        "fmd_cases": 15,
+        "lsd_cases": 13,
+        "surveillance_status": "Ring Vaccination Enforced"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [73.30, 20.10],
+            [73.65, 20.75],
+            [74.40, 20.80],
+            [74.80, 20.40],
+            [74.65, 19.90],
+            [74.10, 19.85],
+            [73.85, 19.35],
+            [73.55, 19.70],
+            [73.30, 20.10]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "district_id": "dist_sangli",
+        "name": "Sangli",
+        "state": "Maharashtra",
+        "division": "Pune",
+        "headquarters": "Sangli",
+        "active_cases": 12,
+        "risk_level": "medium",
+        "fmd_cases": 7,
+        "lsd_cases": 5,
+        "surveillance_status": "Containment Protocol Active"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [74.10, 17.15],
+            [74.55, 17.30],
+            [75.30, 17.30],
+            [75.15, 16.80],
+            [74.60, 16.75],
+            [74.15, 17.05],
+            [74.10, 17.15]
+          ]
+        ]
+      }
+    }
+  ]
+}

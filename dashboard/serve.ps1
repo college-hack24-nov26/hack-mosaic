@@ -18,6 +18,12 @@ try {
             $filePath = Join-Path $baseDir "preview.html"
         } else {
             $filePath = Join-Path $baseDir $urlPath
+            if (-not (Test-Path $filePath -PathType Leaf)) {
+                $publicPath = Join-Path $baseDir "public\$urlPath"
+                if (Test-Path $publicPath -PathType Leaf) {
+                    $filePath = $publicPath
+                }
+            }
         }
 
         if (Test-Path $filePath -PathType Leaf) {

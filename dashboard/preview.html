@@ -1881,6 +1881,35 @@
       clusterLayers.push(c1_full);
       clusterLayers.push(c2_full);
 
+      // District Boundaries Layer (RFC 7946 GeoJSON)
+      var districtLayer = null;
+      fetch('/geo/districts.json')
+        .then(function(res) { return res.json(); })
+        .then(function(geoData) {
+          districtLayer = L.geoJSON(geoData, {
+            style: { color: '#16a34a', weight: 1, fillOpacity: 0.1 },
+            onEachFeature: function(feature, layer) {
+              if (feature.properties && feature.properties.name) {
+                layer.bindTooltip(
+                  "<div style='font-family:Figtree,sans-serif;font-size:12px;padding:2px;'>" +
+                  "<strong style='color:#16a34a;'>" + feature.properties.name + " District</strong><br>" +
+                  "<span style='color:#555;font-size:11px;'>Active Cases: <strong>" + (feature.properties.active_cases || 0) + "</strong></span><br>" +
+                  "<span style='color:#777;font-size:11px;'>Surveillance: " + (feature.properties.surveillance_status || 'Monitored') + "</span>" +
+                  "</div>",
+                  { sticky: true }
+                );
+              }
+            }
+          }).addTo(fullMap);
+
+          L.geoJSON(geoData, {
+            style: { color: '#16a34a', weight: 1, fillOpacity: 0.08 }
+          }).addTo(overviewMap);
+        })
+        .catch(function(err) {
+          console.warn('Could not load /geo/districts.json', err);
+        });
+
       // Add Vector Case Markers
       cases.forEach(function(c) {
         var mOverview = L.circleMarker(c.pos, {

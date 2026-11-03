@@ -8,6 +8,11 @@
     "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,
     "resolveJsonModule": true,
+    "baseUrl": ".",
+    "paths": {
+      "/geo/*": ["public/geo/*"],
+      "@/*": ["src/*"]
+    },
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react-jsx",

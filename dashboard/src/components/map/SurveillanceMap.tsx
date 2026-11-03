@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { MapContainer, TileLayer, Marker, Popup, Circle, useMap } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Popup, Circle, GeoJSON, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import { MapCasePin, OutbreakCluster } from '../../types';
 import { Layers, ShieldCheck, AlertCircle, Clock, Eye, Map, Globe, Sun } from 'lucide-react';
+import districtGeoJSON from '/geo/districts.json';
 
 interface SurveillanceMapProps {
   pins: MapCasePin[];
@@ -66,6 +67,7 @@ const createVetraIcon = (status: string) => {
 export const SurveillanceMap: React.FC<SurveillanceMapProps> = ({ pins, clusters, onSelectCase }) => {
   const [activeTile, setActiveTile] = useState<TileLayerType>('voyager');
   const [showClusters, setShowClusters] = useState(true);
+  const [showDistricts, setShowDistricts] = useState(true);
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [districtFilter, setDistrictFilter] = useState<string>('all');
 
@@ -161,6 +163,18 @@ export const SurveillanceMap: React.FC<SurveillanceMapProps> = ({ pins, clusters
             <Layers className="w-3.5 h-3.5 text-ink-secondary" />
             <span className="font-semibold text-ink">ML Hotspots</span>
           </label>
+
+          {/* District Boundaries Toggle */}
+          <label className="flex items-center gap-1.5 px-3 py-1.5 rounded-sm bg-parchment border border-border-hairline cursor-pointer select-none">
+            <input
+              type="checkbox"
+              checked={showDistricts}
+              onChange={(e) => setShowDistricts(e.target.checked)}
+              className="accent-brand-primary"
+            />
+            <span className="w-2.5 h-2.5 rounded-sm bg-[#16a34a]/30 border border-[#16a34a]"></span>
+            <span className="font-semibold text-ink">District Boundaries</span>
+          </label>
         </div>
       </div>
 
@@ -179,6 +193,26 @@ export const SurveillanceMap: React.FC<SurveillanceMapProps> = ({ pins, clusters
             url={TILE_SOURCES[activeTile].url}
             maxZoom={18}
           />
+
+          {/* Administrative District GeoJSON Boundaries */}
+          {showDistricts && (
+            <GeoJSON 
+              data={districtGeoJSON as any} 
+              style={{ color: '#16a34a', weight: 1, fillOpacity: 0.1 }}
+              onEachFeature={(feature, layer) => {
+                if (feature.properties && feature.properties.name) {
+                  layer.bindTooltip(
+                    `<div style="font-family: 'Figtree', sans-serif; font-size: 12px; padding: 2px;">
+                      <div style="font-weight: 700; color: #16a34a;">${feature.properties.name} District</div>
+                      <div style="color: #555; font-size: 11px;">Status: <strong>${feature.properties.surveillance_status || 'Monitored'}</strong></div>
+                      <div style="color: #777; font-size: 11px;">Active Cases: <strong>${feature.properties.active_cases || 0}</strong> • Risk: <strong>${feature.properties.risk_level || 'Normal'}</strong></div>
+                    </div>`,
+                    { sticky: true }
+                  );
+                }
+              }}
+            />
+          )}
 
           {/* ML Cluster Hotspots */}
           {showClusters &&

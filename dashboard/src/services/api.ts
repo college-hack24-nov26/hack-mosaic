@@ -16,6 +16,7 @@ import {
   mockAlerts, 
   mockCurrentUser 
 } from './mockData';
+import districtGeoJSON from '../data/districts.json';
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api/v1';
 
@@ -155,7 +156,30 @@ class ApiService {
     mockAlerts.unshift(newAlert);
     return newAlert;
   }
+  // Geographic / GeoJSON Boundary Data
+  async getDistrictGeoJSON(): Promise<any> {
+    try {
+      const response = await this.client.get('/dashboard/districts-geojson');
+      if (response.data && response.data.success && response.data.data) {
+        return response.data.data;
+      }
+    } catch {
+      // API fallback
+    }
+
+    try {
+      const res = await fetch('/geo/districts.json');
+      if (res.ok) {
+        return await res.json();
+      }
+    } catch {
+      // Static fallback
+    }
+
+    return districtGeoJSON;
+  }
 }
 
+export { districtGeoJSON };
 export const api = new ApiService();
 
