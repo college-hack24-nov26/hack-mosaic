@@ -51,8 +51,9 @@ func NewRouter(cfg *config.Config, store repositories.Store, authSvc *services.A
 			ref.GET("/symptoms", refH.Symptoms)
 		}
 
-		// Nearby Veterinarians (PostGIS spatial query)
+		// Nearby Veterinarians (PostGIS spatial query) & Live Farmer Alert Stream
 		v1.GET("/veterinarians/nearby", vetH.NearbyVeterinarians)
+		v1.GET("/alerts/live", dashH.ListAlerts)
 
 		// Authentication (API_CONTRACTS.md §3)
 		auth := v1.Group("/auth")
