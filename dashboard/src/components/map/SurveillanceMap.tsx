@@ -11,7 +11,7 @@ interface SurveillanceMapProps {
 
 type TileLayerType = 'osm' | 'maptiler' | 'satellite';
 
-const MAPTILER_KEY = 'cKTaQaghkXlhl6xd2pWw';
+const MAPTILER_KEY = 'cKTaQaghkXIhI6xd2pWw';
 
 const TILE_SOURCES: Record<TileLayerType, { url: string; attribution: string; maxZoom: number }> = {
   osm: {
@@ -74,6 +74,14 @@ export const SurveillanceMap: React.FC<SurveillanceMapProps> = ({ pins = [], clu
         attribution: initialSource.attribution,
         maxZoom: initialSource.maxZoom,
       }).addTo(map);
+
+      // Automatic fallback if tile provider fails
+      tileLayerRef.current.on('tileerror', () => {
+        console.warn('Tile load error on current layer, falling back to OpenStreetMap');
+        if (tileLayerRef.current && activeTile !== 'osm') {
+          tileLayerRef.current.setUrl(TILE_SOURCES.osm.url);
+        }
+      });
 
       // Layer Groups
       districtsLayerRef.current = L.layerGroup().addTo(map);
