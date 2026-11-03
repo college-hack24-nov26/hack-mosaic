@@ -213,7 +213,7 @@ class _CreateReportScreenState extends State<CreateReportScreen> {
           const SizedBox(height: AppSpacing.lg),
 
           // Step 2: Suspected Disease Category
-          Text('संशयित आजार / Suspected Category', style: AppTypography.sectionHeading),
+          Text(AppStrings.t('suspected_disease'), style: AppTypography.sectionHeading),
           const SizedBox(height: AppSpacing.sm),
           DropdownButtonFormField<String>(
             initialValue: _selectedCondition,
@@ -221,7 +221,7 @@ class _CreateReportScreenState extends State<CreateReportScreen> {
             items: _conditions.map((c) {
               return DropdownMenuItem<String>(
                 value: c['code'],
-                child: Text(c['name']!, style: AppTypography.bodyDefault.copyWith(fontSize: 13)),
+                child: Text(AppStrings.formatDisease(c['code']!), style: AppTypography.bodyDefault.copyWith(fontSize: 13)),
               );
             }).toList(),
             onChanged: (val) => setState(() => _selectedCondition = val!),
@@ -246,7 +246,7 @@ class _CreateReportScreenState extends State<CreateReportScreen> {
                       color: isSelected ? Colors.white : AppColors.primary,
                     ),
                     const SizedBox(width: 6),
-                    Text(s['name'] as String),
+                    Text(AppStrings.formatSymptom(s['code'] as String)),
                   ],
                 ),
                 selected: isSelected,
@@ -275,7 +275,7 @@ class _CreateReportScreenState extends State<CreateReportScreen> {
           const SizedBox(height: AppSpacing.lg),
 
           // Step 4: Photo Evidence Attachment
-          Text('जनावराचा फोटो / Photo Attachment', style: AppTypography.sectionHeading),
+          Text(AppStrings.t('photo_attachment'), style: AppTypography.sectionHeading),
           const SizedBox(height: AppSpacing.sm),
           GestureDetector(
             onTap: () => _showPhotoSheet(),
@@ -336,11 +336,11 @@ class _CreateReportScreenState extends State<CreateReportScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'स्थान नोंदणी (GPS Surveillance)',
+                        AppStrings.t('gps_location'),
                         style: AppTypography.cardTitle.copyWith(fontSize: 13, fontWeight: FontWeight.bold),
                       ),
                       Text(
-                        'अक्षांश: $_currentLat, रेखांश: $_currentLng (फलटण, सातारा)',
+                        '$_currentLat, $_currentLng (${AppStrings.t('location_phaltan_satara')})',
                         style: AppTypography.caption.copyWith(fontSize: 11),
                       ),
                     ],
@@ -362,8 +362,12 @@ class _CreateReportScreenState extends State<CreateReportScreen> {
           TextFormField(
             controller: _descriptionController,
             maxLines: 3,
-            decoration: const InputDecoration(
-              hintText: 'उदा. दोन दिवसांपासून ताप आहे, चारा खात नाही... (Any other observations)',
+            decoration: InputDecoration(
+              hintText: AppStrings.currentLang == 'en'
+                  ? 'e.g., High fever for 2 days, sudden drop in milk yield, off feed...'
+                  : (AppStrings.currentLang == 'hi'
+                      ? 'उदा. दो दिन से तेज़ बुखार है, दूध में कमी, चारा नहीं खा रहा...'
+                      : 'उदा. दोन दिवसांपासून तीव्र ताप आहे, दुधात घट झाली, चारा खात नाही...'),
             ),
           ),
           const SizedBox(height: AppSpacing.lg),

@@ -41,7 +41,7 @@ class _AnimalsListScreenState extends State<AnimalsListScreen> {
             actions: [
               IconButton(
                 icon: const Icon(Icons.add_circle, color: AppColors.primary, size: 28),
-                tooltip: 'नवीन जनावर जोडा / Add Animal',
+                tooltip: AppStrings.t('add_animal'),
                 onPressed: () {
                   Navigator.of(context).push(
                     MaterialPageRoute(builder: (_) => const AddAnimalScreen()),
@@ -60,7 +60,7 @@ class _AnimalsListScreenState extends State<AnimalsListScreen> {
                   children: [
                     TextField(
                       decoration: InputDecoration(
-                        hintText: 'नाव किंवा टॅग नंबर शोधा... / Search tag...',
+                        hintText: AppStrings.t('search_animals'),
                         prefixIcon: const Icon(Icons.search, color: AppColors.textMuted),
                         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                         suffixIcon: _searchQuery.isNotEmpty
@@ -77,11 +77,11 @@ class _AnimalsListScreenState extends State<AnimalsListScreen> {
                       scrollDirection: Axis.horizontal,
                       child: Row(
                         children: [
-                          _buildFilterChip('all', 'सर्व / All (${allAnimals.length})'),
+                          _buildFilterChip('all', '${AppStrings.t('filter_all')} (${allAnimals.length})'),
                           const SizedBox(width: AppSpacing.sm),
-                          _buildFilterChip('cattle', 'गाय/बैल / Cattle'),
+                          _buildFilterChip('cattle', AppStrings.t('species_cattle')),
                           const SizedBox(width: AppSpacing.sm),
-                          _buildFilterChip('buffalo', 'म्हैस / Buffalo'),
+                          _buildFilterChip('buffalo', AppStrings.t('species_buffalo')),
                         ],
                       ),
                     ),
@@ -194,7 +194,7 @@ class _AnimalsListScreenState extends State<AnimalsListScreen> {
                               const Icon(Icons.cloud_upload_outlined, size: 10, color: AppColors.cautionAmber),
                               const SizedBox(width: 3),
                               Text(
-                                'Pending Sync',
+                                AppStrings.t('pending_sync'),
                                 style: AppTypography.badge.copyWith(color: AppColors.cautionAmber, fontSize: 9),
                               ),
                             ],
@@ -204,12 +204,12 @@ class _AnimalsListScreenState extends State<AnimalsListScreen> {
                   ),
                   const SizedBox(height: 3),
                   Text(
-                    'टॅग: ${animal.tagNumber ?? "No Tag"} • जात: ${animal.breedCode?.toUpperCase() ?? "Crossbred"}',
+                    '${AppStrings.t('tag')}: ${animal.tagNumber ?? AppStrings.t('no_tag')} • ${AppStrings.t('breed')}: ${animal.breedCode?.toUpperCase() ?? "Crossbred"}',
                     style: AppTypography.bodySecondary.copyWith(fontSize: 12),
                   ),
                   const SizedBox(height: 2),
                   Text(
-                    'लिंग: ${animal.sex == "female" ? "मादी (Female)" : "नर (Male)"}',
+                    '${AppStrings.t('gender')}: ${animal.sex == "female" ? AppStrings.t('gender_female') : AppStrings.t('gender_male')}',
                     style: AppTypography.caption.copyWith(color: AppColors.textMuted, fontSize: 11),
                   ),
                 ],

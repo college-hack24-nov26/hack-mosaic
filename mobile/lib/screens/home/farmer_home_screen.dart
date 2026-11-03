@@ -12,6 +12,7 @@ import '../animals/add_animal_screen.dart';
 import '../animals/animal_details_screen.dart';
 import '../scanner/disease_scanner_screen.dart';
 import '../profile/language_screen.dart';
+import '../reports/reports_history_screen.dart';
 
 class FarmerHomeScreen extends StatefulWidget {
   final Function(int) onNavigateTab;
@@ -58,7 +59,7 @@ class _FarmerHomeScreenState extends State<FarmerHomeScreen> {
                       style: AppTypography.cardTitle.copyWith(fontWeight: FontWeight.bold),
                     ),
                     Text(
-                      user?.villageName ?? 'Phaltan, Satara (सातारा)',
+                      AppStrings.t('location_phaltan_satara'),
                       style: AppTypography.caption.copyWith(color: AppColors.textSecondary, fontSize: 11),
                     ),
                   ],
@@ -68,7 +69,7 @@ class _FarmerHomeScreenState extends State<FarmerHomeScreen> {
             actions: [
               IconButton(
                 icon: const Icon(Icons.language, color: AppColors.primary),
-                tooltip: 'भाषा बदला / Change Language',
+                tooltip: AppStrings.t('change_language'),
                 onPressed: () {
                   Navigator.of(context).push(
                     MaterialPageRoute(builder: (_) => const LanguageScreen()),
@@ -149,14 +150,18 @@ class _FarmerHomeScreenState extends State<FarmerHomeScreen> {
                       children: [
                         Expanded(
                           child: Text(
-                            'अलीकडील अहवाल / Recent Reports',
+                            AppStrings.t('recent_reports'),
                             style: AppTypography.sectionHeading,
                             overflow: TextOverflow.ellipsis,
                           ),
                         ),
                         TextButton(
-                          onPressed: () => widget.onNavigateTab(3),
-                          child: const Text('पहा सर्व / View All'),
+                          onPressed: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(builder: (_) => const ReportsHistoryScreen()),
+                            );
+                          },
+                          child: Text(AppStrings.t('view_all')),
                         ),
                       ],
                     ),
@@ -207,7 +212,7 @@ class _FarmerHomeScreenState extends State<FarmerHomeScreen> {
                   borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
                 ),
                 child: Text(
-                  'सातारा जिल्हा / Satara',
+                  AppStrings.t('district_satara'),
                   style: AppTypography.caption.copyWith(color: Colors.white, fontWeight: FontWeight.w600),
                 ),
               ),
@@ -300,40 +305,56 @@ class _FarmerHomeScreenState extends State<FarmerHomeScreen> {
   }
 
   Widget _buildSurveillanceAlertBanner() {
-    return Container(
-      margin: const EdgeInsets.only(bottom: AppSpacing.lg),
-      padding: const EdgeInsets.all(AppSpacing.md),
-      decoration: BoxDecoration(
-        color: AppColors.alertCritical.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-        border: Border.all(color: AppColors.alertCritical.withValues(alpha: 0.4), width: 1.5),
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Icon(Icons.warning_amber_rounded, color: AppColors.alertCritical, size: 26),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'रोग चेतावणी: लंपी त्वचा रोग (LSD)',
-                  style: AppTypography.cardTitle.copyWith(
-                    color: AppColors.alertCritical,
-                    fontSize: 15,
-                    fontWeight: FontWeight.bold,
+    return InkWell(
+      onTap: () => widget.onNavigateTab(3),
+      borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+      child: Container(
+        margin: const EdgeInsets.only(bottom: AppSpacing.lg),
+        padding: const EdgeInsets.all(AppSpacing.md),
+        decoration: BoxDecoration(
+          color: AppColors.alertCritical.withValues(alpha: 0.08),
+          borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+          border: Border.all(color: AppColors.alertCritical.withValues(alpha: 0.4), width: 1.5),
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Icon(Icons.warning_amber_rounded, color: AppColors.alertCritical, size: 26),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    AppStrings.t('alert_lsd_title'),
+                    style: AppTypography.cardTitle.copyWith(
+                      color: AppColors.alertCritical,
+                      fontSize: 15,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  'फलटण तालुक्यात ३ किमी अंतरावर पशुवैद्यकांनी पुष्टी केलेले रुग्ण आढळले आहेत. आपल्या जनावरांची नियमित तपासणी करा.',
-                  style: AppTypography.caption.copyWith(color: AppColors.textPrimary, height: 1.35),
-                ),
-              ],
+                  const SizedBox(height: 4),
+                  Text(
+                    AppStrings.t('alert_lsd_body'),
+                    style: AppTypography.caption.copyWith(color: AppColors.textPrimary, height: 1.35),
+                  ),
+                  const SizedBox(height: 6),
+                  Row(
+                    children: [
+                      Text(
+                        '${AppStrings.t('tab_outbreak_map')} >',
+                        style: AppTypography.badge.copyWith(
+                          color: AppColors.alertCritical,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -350,7 +371,7 @@ class _FarmerHomeScreenState extends State<FarmerHomeScreen> {
         _buildActionCard(
           icon: Icons.camera_alt,
           title: AppStrings.t('action_scan'),
-          subtitle: 'MobileNetV3 TFLite',
+          subtitle: AppStrings.t('action_scan_sub'),
           color: AppColors.primary,
           onTap: () {
             Navigator.of(context).push(
@@ -361,7 +382,7 @@ class _FarmerHomeScreenState extends State<FarmerHomeScreen> {
         _buildActionCard(
           icon: Icons.add_circle_outline,
           title: AppStrings.t('action_add_animal'),
-          subtitle: 'नोंदणी / Register',
+          subtitle: AppStrings.t('action_add_animal_sub'),
           color: AppColors.primaryLight,
           onTap: () {
             Navigator.of(context).push(
@@ -372,14 +393,14 @@ class _FarmerHomeScreenState extends State<FarmerHomeScreen> {
         _buildActionCard(
           icon: Icons.assignment_late_outlined,
           title: AppStrings.t('action_report'),
-          subtitle: 'लक्षणे व फोटो पाठवा',
+          subtitle: AppStrings.t('action_report_sub'),
           color: AppColors.cautionAmber,
           onTap: () => widget.onNavigateTab(2),
         ),
         _buildActionCard(
           icon: Icons.qr_code_2,
           title: AppStrings.t('action_passport'),
-          subtitle: 'ऑफलाइन आरोग्य पास',
+          subtitle: AppStrings.t('action_passport_sub'),
           color: AppColors.infoBlue,
           onTap: () {
             if (_store.animals.isNotEmpty) {
@@ -449,7 +470,7 @@ class _FarmerHomeScreenState extends State<FarmerHomeScreen> {
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 24),
           child: Text(
-            'अद्याप कोणताही अहवाल नाही.\nNo disease reports filed yet.',
+            AppStrings.t('no_reports_found'),
             textAlign: TextAlign.center,
             style: AppTypography.caption,
           ),

@@ -3,10 +3,13 @@ import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../core/localization/app_strings.dart';
 import '../../core/network/api_client.dart';
+import '../../core/services/location_service.dart';
 import '../models/user_model.dart';
 import '../models/animal_model.dart';
 import '../models/disease_report_model.dart';
 import '../models/notification_model.dart';
+import '../models/veterinarian_model.dart';
+import '../models/outbreak_zone_model.dart';
 
 class OfflineStore extends ChangeNotifier {
   static final OfflineStore _instance = OfflineStore._internal();
@@ -17,6 +20,9 @@ class OfflineStore extends ChangeNotifier {
   List<AnimalModel> _animals = [];
   List<DiseaseReportModel> _reports = [];
   List<NotificationModel> _notifications = [];
+  List<VeterinarianModel> _veterinarians = [];
+  List<OutbreakZoneModel> _outbreakZones = [];
+  List<DiseaseCasePin> _diseaseCases = [];
   bool _isOnline = true;
   bool _isSyncing = false;
 
@@ -24,8 +30,20 @@ class OfflineStore extends ChangeNotifier {
   List<AnimalModel> get animals => List.unmodifiable(_animals);
   List<DiseaseReportModel> get reports => List.unmodifiable(_reports);
   List<NotificationModel> get notifications => List.unmodifiable(_notifications);
+  List<VeterinarianModel> get veterinarians => List.unmodifiable(_veterinarians);
+  List<OutbreakZoneModel> get outbreakZones => List.unmodifiable(_outbreakZones);
+  List<DiseaseCasePin> get diseaseCases => List.unmodifiable(_diseaseCases);
   bool get isOnline => _isOnline;
   bool get isSyncing => _isSyncing;
+
+  List<VeterinarianModel> getNearbyVeterinarians(double userLat, double userLon) {
+    final list = _veterinarians.map((v) {
+      final dist = LocationService.calculateDistanceKm(userLat, userLon, v.latitude, v.longitude);
+      return v.copyWith(distanceKm: dist);
+    }).toList();
+    list.sort((a, b) => (a.distanceKm ?? 0).compareTo(b.distanceKm ?? 0));
+    return list;
+  }
 
   int get pendingSyncCount {
     final unsyncedAnimals = _animals.where((a) => !a.isSynced).length;
@@ -66,7 +84,7 @@ class OfflineStore extends ChangeNotifier {
         fullName: 'Ramesh Jadhav',
         role: 'farmer',
         villageId: 'v-phaltan-center',
-        villageName: 'Phaltan Rural (फलटण)',
+        villageName: 'Phaltan Rural',
         farmName: 'Jadhav Dairy Farm',
         latitude: 17.9856,
         longitude: 74.4331,
@@ -88,7 +106,7 @@ class OfflineStore extends ChangeNotifier {
           farmerId: _currentUser!.id,
           speciesCode: 'cattle',
           breedCode: 'gir',
-          name: 'Gauri (गौरी)',
+          name: 'Gauri',
           tagNumber: 'MH-SAT-2026-081',
           sex: 'female',
           birthDate: '2022-04-15',
@@ -100,7 +118,7 @@ class OfflineStore extends ChangeNotifier {
           farmerId: _currentUser!.id,
           speciesCode: 'cattle',
           breedCode: 'khillar',
-          name: 'Kapila (कपिला)',
+          name: 'Kapila',
           tagNumber: 'MH-SAT-2026-094',
           sex: 'female',
           birthDate: '2023-01-10',
@@ -112,7 +130,7 @@ class OfflineStore extends ChangeNotifier {
           farmerId: _currentUser!.id,
           speciesCode: 'buffalo',
           breedCode: 'murrah',
-          name: 'Krishna (कृष्णा)',
+          name: 'Krishna',
           tagNumber: 'MH-SAT-2026-112',
           sex: 'female',
           birthDate: '2021-08-20',
@@ -134,7 +152,7 @@ class OfflineStore extends ChangeNotifier {
         DiseaseReportModel(
           id: 'rep-01',
           animalId: 'cattle-01',
-          animalName: 'Gauri (गौरी)',
+          animalName: 'Gauri',
           reportedAt: DateTime.now().subtract(const Duration(days: 3)),
           description: 'High fever and circular nodules observed along the neck and back.',
           symptomCodes: ['skin_nodules', 'fever', 'reduced_milk'],
@@ -173,6 +191,151 @@ class OfflineStore extends ChangeNotifier {
         ),
       ];
       await _persistNotifications();
+    }
+
+    // 5. Load Verified Veterinarians (Phaltan / Satara District)
+    final vetsJson = prefs.getString('vets_list');
+    if (vetsJson != null) {
+      final List<dynamic> decoded = jsonDecode(vetsJson);
+      _veterinarians = decoded.map((e) => VeterinarianModel.fromJson(e)).toList();
+    } else {
+      _veterinarians = [
+        const VeterinarianModel(
+          id: 'vet-phaltan-01',
+          name: 'Dr. Sanjay Patil',
+          qualification: 'B.V.Sc & A.H., M.V.Sc (Surgery)',
+          registrationNumber: 'MSVC-14208',
+          clinicName: 'Govt. Taluka Veterinary Polyclinic',
+          address: 'Shivaji Chowk, Phaltan Rural',
+          latitude: 17.9892,
+          longitude: 74.4295,
+          phone: '+919822451102',
+          workingHours: '9:00 AM – 5:00 PM (Emergency 24x7)',
+          isVerified: true,
+        ),
+        const VeterinarianModel(
+          id: 'vet-barad-02',
+          name: 'Dr. Snehal More',
+          qualification: 'B.V.Sc & A.H.',
+          registrationNumber: 'MSVC-18934',
+          clinicName: 'Veterinary Dispensary Grade-1, Barad',
+          address: 'Pandharpur Road, Barad, Tal. Phaltan',
+          latitude: 17.9412,
+          longitude: 74.4921,
+          phone: '+919423367890',
+          workingHours: '8:30 AM – 4:30 PM',
+          isVerified: true,
+        ),
+        const VeterinarianModel(
+          id: 'vet-taradgaon-03',
+          name: 'Dr. Priya Shinde',
+          qualification: 'B.V.Sc & A.H., M.V.Sc (Medicine)',
+          registrationNumber: 'MSVC-20145',
+          clinicName: 'Livestock Healthcare Center, Taradgaon',
+          address: 'Taradgaon Center, Phaltan',
+          latitude: 18.0125,
+          longitude: 74.3410,
+          phone: '+919975411223',
+          workingHours: '9:00 AM – 5:00 PM',
+          isVerified: true,
+        ),
+        const VeterinarianModel(
+          id: 'vet-lonand-04',
+          name: 'Dr. Anand Deshmukh',
+          qualification: 'B.V.Sc & A.H.',
+          registrationNumber: 'MSVC-11520',
+          clinicName: 'Government Veterinary Hospital, Lonand',
+          address: 'Station Road, Lonand, Khandala-Phaltan Border',
+          latitude: 18.0415,
+          longitude: 74.1920,
+          phone: '+919850123456',
+          workingHours: '9:00 AM – 5:00 PM',
+          isVerified: true,
+        ),
+      ];
+      await _persistVeterinarians();
+    }
+
+    // 6. Load Outbreak Surveillance Zones
+    final outbreaksJson = prefs.getString('outbreaks_list');
+    if (outbreaksJson != null) {
+      final List<dynamic> decoded = jsonDecode(outbreaksJson);
+      _outbreakZones = decoded.map((e) => OutbreakZoneModel.fromJson(e)).toList();
+    } else {
+      _outbreakZones = [
+        OutbreakZoneModel(
+          id: 'zone-lsd-01',
+          diseaseCode: 'lumpy_skin_disease',
+          diseaseName: 'Lumpy Skin Disease (LSD)',
+          status: 'confirmed',
+          latitude: 17.9910,
+          longitude: 74.4320,
+          radiusMeters: 3200,
+          caseCount: 4,
+          detectedAt: DateTime.now().subtract(const Duration(days: 3)),
+          advisory: 'Cluster of 4 veterinarian-confirmed cases. Ring vaccination active in Phaltan rural cluster.',
+        ),
+        OutbreakZoneModel(
+          id: 'zone-fmd-02',
+          diseaseCode: 'foot_and_mouth',
+          diseaseName: 'Foot & Mouth Disease (FMD)',
+          status: 'suspected',
+          latitude: 17.9450,
+          longitude: 74.4890,
+          radiusMeters: 2000,
+          caseCount: 2,
+          detectedAt: DateTime.now().subtract(const Duration(days: 1)),
+          advisory: 'Suspected cluster under veterinarian review near Barad village.',
+        ),
+      ];
+      await _persistOutbreaks();
+    }
+
+    // 7. Load Individual Case Pins
+    final casesJson = prefs.getString('cases_list');
+    if (casesJson != null) {
+      final List<dynamic> decoded = jsonDecode(casesJson);
+      _diseaseCases = decoded.map((e) => DiseaseCasePin.fromJson(e)).toList();
+    } else {
+      _diseaseCases = [
+        DiseaseCasePin(
+          id: 'case-01',
+          reportId: 'rep-01',
+          diseaseCode: 'lumpy_skin_disease',
+          latitude: 17.9945,
+          longitude: 74.4310,
+          confirmedAt: DateTime.now().subtract(const Duration(days: 3)),
+          isConfirmed: true,
+        ),
+        DiseaseCasePin(
+          id: 'case-02',
+          reportId: 'rep-02',
+          diseaseCode: 'lumpy_skin_disease',
+          latitude: 17.9880,
+          longitude: 74.4365,
+          confirmedAt: DateTime.now().subtract(const Duration(days: 2)),
+          isConfirmed: true,
+        ),
+        DiseaseCasePin(
+          id: 'case-03',
+          reportId: 'rep-03',
+          diseaseCode: 'lumpy_skin_disease',
+          latitude: 17.9820,
+          longitude: 74.4280,
+          confirmedAt: DateTime.now().subtract(const Duration(days: 1)),
+          isConfirmed: true,
+        ),
+        DiseaseCasePin(
+          id: 'case-04',
+          reportId: 'rep-04',
+          diseaseCode: 'foot_and_mouth',
+          latitude: 17.9480,
+          longitude: 74.4850,
+          confirmedAt: DateTime.now().subtract(const Duration(days: 1)),
+          isConfirmed: false,
+        ),
+      ];
+      await _persistDiseaseCases();
     }
 
     notifyListeners();
@@ -296,6 +459,30 @@ class OfflineStore extends ChangeNotifier {
     await prefs.setString(
       'notifications_list',
       jsonEncode(_notifications.map((n) => n.toJson()).toList()),
+    );
+  }
+
+  Future<void> _persistVeterinarians() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(
+      'vets_list',
+      jsonEncode(_veterinarians.map((v) => v.toJson()).toList()),
+    );
+  }
+
+  Future<void> _persistOutbreaks() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(
+      'outbreaks_list',
+      jsonEncode(_outbreakZones.map((z) => z.toJson()).toList()),
+    );
+  }
+
+  Future<void> _persistDiseaseCases() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(
+      'cases_list',
+      jsonEncode(_diseaseCases.map((c) => c.toJson()).toList()),
     );
   }
 }

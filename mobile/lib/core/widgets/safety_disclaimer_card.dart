@@ -32,7 +32,7 @@ class SafetyDisclaimerCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'वैद्यकीय अस्वीकरण / Clinical Notice',
+                  AppStrings.t('clinical_notice'),
                   style: AppTypography.badge.copyWith(
                     color: AppColors.primary,
                     fontWeight: FontWeight.bold,

@@ -19,10 +19,9 @@ void main() {
     expect(find.byType(PashuWaniApp), findsOneWidget);
 
     // Allow async OfflineStore().initialize() to complete and schedule the 1600ms splash timer
-    for (int i = 0; i < 5; i++) {
+    for (int i = 0; i < 6; i++) {
       await tester.pump(const Duration(milliseconds: 500));
     }
-    await tester.pumpAndSettle();
 
     // Verify transition to MainNavigationScreen and FarmerHomeScreen content
     expect(find.byType(MainNavigationScreen), findsOneWidget);
@@ -157,5 +156,27 @@ void main() {
     expect(apiJson['inconclusive'], false);
     expect(apiJson['ran_at'], '2026-11-03T10:11:30.000Z');
     expect(apiJson.containsKey('disclaimer'), false);
+  });
+
+  test('Nearby veterinarians and outbreak zones load with distance calculation', () async {
+    final store = OfflineStore();
+    await store.initialize();
+
+    // Verify verified veterinarians
+    expect(store.veterinarians.length, greaterThanOrEqualTo(4));
+    final nearbyVets = store.getNearbyVeterinarians(17.9856, 74.4331);
+    expect(nearbyVets.first.name, 'Dr. Sanjay Patil');
+    expect(nearbyVets.first.isVerified, true);
+    expect(nearbyVets.first.distanceKm, lessThan(1.5));
+
+    // Verify outbreak surveillance zones
+    expect(store.outbreakZones.length, greaterThanOrEqualTo(2));
+    final confirmedZone = store.outbreakZones.firstWhere((z) => z.isConfirmed);
+    expect(confirmedZone.diseaseCode, 'lumpy_skin_disease');
+    expect(confirmedZone.caseCount, 4);
+    expect(confirmedZone.radiusMeters, 3200);
+
+    // Verify individual case pins
+    expect(store.diseaseCases.isNotEmpty, true);
   });
 }

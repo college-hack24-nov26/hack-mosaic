@@ -4,6 +4,7 @@ import 'package:image_picker/image_picker.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_typography.dart';
 import '../../core/theme/app_spacing.dart';
+import '../../core/localization/app_strings.dart';
 import '../../core/widgets/app_button.dart';
 import '../../core/widgets/app_card.dart';
 import '../../data/local/offline_store.dart';
@@ -48,7 +49,15 @@ class _DiseaseScannerScreenState extends State<DiseaseScannerScreen> {
   Future<void> _runScreening() async {
     if (_imagePath == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('कृपया आधी जनावराचा फोटो काढा (Please capture photo first)')),
+        SnackBar(
+          content: Text(
+            AppStrings.currentLang == 'en'
+                ? 'Please attach or capture an animal photo first'
+                : (AppStrings.currentLang == 'hi'
+                    ? 'कृपया पहले पशु का फोटो लें'
+                    : 'कृपया आधी जनावराचा फोटो काढा'),
+          ),
+        ),
       );
       return;
     }
@@ -61,19 +70,34 @@ class _DiseaseScannerScreenState extends State<DiseaseScannerScreen> {
     setState(() => _isAnalyzing = false);
 
     if (mounted) {
+      final isEng = AppStrings.currentLang == 'en';
+      final isHi = AppStrings.currentLang == 'hi';
+
       Navigator.of(context).push(
         MaterialPageRoute(
           builder: (_) => ScanResultsScreen(
             imagePath: _imagePath!,
             animalId: _selectedAnimalId,
-            predictedLabel: 'लंपी त्वचा रोग / Lumpy Skin Disease (LSD)',
+            predictedLabel: AppStrings.formatDisease('lumpy_skin_disease'),
             confidence: 0.84,
             modelVersion: 'mnv3s-2026.11.0',
-            observations: const [
-              'त्वचेवर गोलाकार गाठी (Cutaneous circumscribed nodules)',
-              'मान व खांद्यावर सूज (Subcutaneous edema on neck/flank)',
-              'प्राथमिक तपासणी: तातडीने पशुवैद्यकीय सल्ल्याची शिफारस',
-            ],
+            observations: isEng
+                ? const [
+                    'Circumscribed cutaneous skin nodules detected',
+                    'Subcutaneous edema along neck and flank',
+                    'Decision support: prompt veterinarian review advised',
+                  ]
+                : (isHi
+                    ? const [
+                        'त्वचा पर उभरी हुई गोलाकार गांठें',
+                        'गर्दन और पार्श्व भाग में सूजन',
+                        'त्वरित पशु चिकित्सक परामर्श अनुशंसित',
+                      ]
+                    : const [
+                        'त्वचेवर गोलाकार गाठी आढळल्या',
+                        'मान व खांद्यावर सूज आढळली',
+                        'प्राथमिक तपासणी: तातडीने पशुवैद्यकीय सल्ला आवश्यक',
+                      ]),
           ),
         ),
       );
@@ -87,13 +111,13 @@ class _DiseaseScannerScreenState extends State<DiseaseScannerScreen> {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: const Text('एआय तपासणी / AI Scanner'),
+        title: Text(AppStrings.t('ai_scanner')),
       ),
       body: ListView(
         padding: const EdgeInsets.all(AppSpacing.lg),
         children: [
           // Animal Selector
-          Text('जनावर निवडा / Select Animal', style: AppTypography.cardTitle),
+          Text(AppStrings.t('select_animal_title'), style: AppTypography.cardTitle),
           const SizedBox(height: AppSpacing.sm),
           DropdownButtonFormField<String>(
             initialValue: _selectedAnimalId,
@@ -199,7 +223,7 @@ class _DiseaseScannerScreenState extends State<DiseaseScannerScreen> {
 
           // Action Button
           AppButton(
-            label: 'तपासणी सुरू करा / Run Screening',
+            label: AppStrings.t('run_screening'),
             icon: Icons.psychology,
             isLoading: _isAnalyzing,
             onPressed: _runScreening,

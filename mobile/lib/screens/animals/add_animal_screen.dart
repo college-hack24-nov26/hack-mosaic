@@ -32,20 +32,20 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
 
   final Map<String, List<Map<String, String>>> _breedsBySpecies = {
     'cattle': [
-      {'code': 'gir', 'name': 'गीर (Gir)'},
-      {'code': 'khillar', 'name': 'खिल्लार (Khillar)'},
-      {'code': 'deoni', 'name': 'देवणी (Deoni)'},
-      {'code': 'dangi', 'name': 'डांगी (Dangi)'},
-      {'code': 'hf_cross', 'name': 'एचएफ क्रॉस (HF Cross)'},
-      {'code': 'jersey_cross', 'name': 'जर्सी क्रॉस (Jersey Cross)'},
-      {'code': 'other', 'name': 'इतर / देशी (Other/Indig)'},
+      {'code': 'gir', 'name': 'Gir'},
+      {'code': 'khillar', 'name': 'Khillar'},
+      {'code': 'deoni', 'name': 'Deoni'},
+      {'code': 'dangi', 'name': 'Dangi'},
+      {'code': 'hf_cross', 'name': 'HF Cross'},
+      {'code': 'jersey_cross', 'name': 'Jersey Cross'},
+      {'code': 'other', 'name': 'Other'},
     ],
     'buffalo': [
-      {'code': 'murrah', 'name': 'मुऱ्हा (Murrah)'},
-      {'code': 'jaffarabadi', 'name': 'जाफराबादी (Jaffarabadi)'},
-      {'code': 'pandharpuri', 'name': 'पंढरपुरी (Pandharpuri)'},
-      {'code': 'mehsana', 'name': 'मेहसाणा (Mehsana)'},
-      {'code': 'other', 'name': 'इतर (Other)'},
+      {'code': 'murrah', 'name': 'Murrah'},
+      {'code': 'jaffarabadi', 'name': 'Jaffarabadi'},
+      {'code': 'pandharpuri', 'name': 'Pandharpuri'},
+      {'code': 'mehsana', 'name': 'Mehsana'},
+      {'code': 'other', 'name': 'Other'},
     ],
   };
 
@@ -181,7 +181,7 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
               children: [
                 Expanded(
                   child: _buildChoiceCard(
-                    title: 'गाय / बैल\nCattle',
+                    title: AppStrings.t('species_cattle'),
                     icon: Icons.pets,
                     isSelected: _selectedSpecies == 'cattle',
                     onTap: () {
@@ -195,7 +195,7 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
                 const SizedBox(width: AppSpacing.md),
                 Expanded(
                   child: _buildChoiceCard(
-                    title: 'म्हैस\nBuffalo',
+                    title: AppStrings.t('species_buffalo'),
                     icon: Icons.agriculture,
                     isSelected: _selectedSpecies == 'buffalo',
                     onTap: () {
@@ -220,7 +220,7 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
               items: breeds.map((b) {
                 return DropdownMenuItem<String>(
                   value: b['code'],
-                  child: Text(b['name']!),
+                  child: Text(AppStrings.formatBreed(b['code']!)),
                 );
               }).toList(),
               onChanged: (val) {
@@ -234,8 +234,12 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
             const SizedBox(height: AppSpacing.sm),
             TextFormField(
               controller: _nameController,
-              decoration: const InputDecoration(
-                hintText: 'उदा. गौरी, कपिला, लक्ष्मी (e.g. Gauri)',
+              decoration: InputDecoration(
+                hintText: AppStrings.currentLang == 'en'
+                    ? 'e.g. Gauri, Kapila, Laxmi'
+                    : (AppStrings.currentLang == 'hi'
+                        ? 'उदा. गौरी, कपिला, लक्ष्मी'
+                        : 'उदा. गौरी, कपिला, लक्ष्मी'),
               ),
             ),
             const SizedBox(height: AppSpacing.lg),
@@ -279,13 +283,17 @@ class _AddAnimalScreenState extends State<AddAnimalScreen> {
             const SizedBox(height: AppSpacing.lg),
 
             // Markings
-            Text('ओळख खूण / Identification Markings', style: AppTypography.cardTitle),
+            Text(AppStrings.t('identification_markings'), style: AppTypography.cardTitle),
             const SizedBox(height: AppSpacing.sm),
             TextFormField(
               controller: _markingsController,
               maxLines: 2,
-              decoration: const InputDecoration(
-                hintText: 'उदा. कपाळावर पांढरा ठिपका, वळलेली शिंगे (White patch on forehead)',
+              decoration: InputDecoration(
+                hintText: AppStrings.currentLang == 'en'
+                    ? 'e.g., White star on forehead, curved horns'
+                    : (AppStrings.currentLang == 'hi'
+                        ? 'उदा. माथे पर सफेद तारा, मुड़े हुए सींग'
+                        : 'उदा. कपाळावर पांढरा ठिपका, वळलेली शिंगे'),
               ),
             ),
             const SizedBox(height: AppSpacing.xxl),

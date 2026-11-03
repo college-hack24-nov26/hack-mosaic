@@ -6,7 +6,7 @@ import '../../data/local/offline_store.dart';
 import 'farmer_home_screen.dart';
 import '../animals/animals_list_screen.dart';
 import '../reports/create_report_screen.dart';
-import '../reports/reports_history_screen.dart';
+import '../nearby/nearby_screen.dart';
 import '../profile/profile_screen.dart';
 
 class MainNavigationScreen extends StatefulWidget {
@@ -41,7 +41,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
       FarmerHomeScreen(onNavigateTab: _onTabTapped),
       const AnimalsListScreen(),
       CreateReportScreen(onReportSubmitted: () => _onTabTapped(3)),
-      const ReportsHistoryScreen(),
+      const NearbyScreen(),
       const ProfileScreen(),
     ];
 
@@ -105,10 +105,10 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                     isLabelVisible: activeCount > 0,
                     label: Text('$activeCount'),
                     backgroundColor: AppColors.alertCritical,
-                    child: const Icon(Icons.notifications_outlined),
+                    child: const Icon(Icons.explore_outlined),
                   ),
-                  activeIcon: const Icon(Icons.notifications),
-                  label: AppStrings.t('nav_alerts'),
+                  activeIcon: const Icon(Icons.explore),
+                  label: AppStrings.t('nav_nearby'),
                 ),
                 BottomNavigationBarItem(
                   icon: const Icon(Icons.account_circle_outlined),
