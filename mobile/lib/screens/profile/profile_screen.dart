@@ -78,18 +78,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
               const SizedBox(height: AppSpacing.lg),
 
               // Farmer Consent for Alerts (PPT S5 Non-negotiable requirement)
-              Text('रोग सूचना संमती / Outbreak Alert Consent', style: AppTypography.sectionHeading),
+              Text(AppStrings.t('alert_consent'), style: AppTypography.sectionHeading),
               const SizedBox(height: AppSpacing.sm),
               AppCard(
                 padding: const EdgeInsets.all(AppSpacing.md),
                 child: SwitchListTile(
                   contentPadding: EdgeInsets.zero,
                   title: Text(
-                    'परिसरातील रोग चेतावणी मिळवा\nReceive Local Outbreak Alerts',
+                    AppStrings.t('alert_consent_title'),
                     style: AppTypography.cardTitle.copyWith(fontSize: 14),
                   ),
                   subtitle: Text(
-                    'आपल्या शेताभोवती ५ किमी अंतरावर पशुवैद्यकांनी पुष्टी केलेले रुग्ण आढळल्यास त्वरित सूचना मिळवा.\n(Only vet-confirmed cases trigger alerts)',
+                    AppStrings.t('alert_consent_sub'),
                     style: AppTypography.caption.copyWith(fontSize: 11, height: 1.3),
                   ),
                   value: user?.alertConsent ?? true,
@@ -116,7 +116,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               const SizedBox(height: AppSpacing.lg),
 
               // Offline Sync Queue Management
-              Text('ऑफलाइन डेटा व्यवस्थापन / Sync Queue', style: AppTypography.sectionHeading),
+              Text(AppStrings.t('sync_queue'), style: AppTypography.sectionHeading),
               const SizedBox(height: AppSpacing.sm),
               AppCard(
                 padding: const EdgeInsets.all(AppSpacing.md),
@@ -133,7 +133,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             ),
                             const SizedBox(width: 10),
                             Text(
-                              _store.isOnline ? 'Online (Connected)' : 'Offline (Simulated)',
+                              _store.isOnline ? AppStrings.t('online_connected') : AppStrings.t('offline_simulated'),
                               style: AppTypography.cardTitle.copyWith(fontSize: 14),
                             ),
                           ],
@@ -145,7 +145,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             borderRadius: BorderRadius.circular(4),
                           ),
                           child: Text(
-                            '${_store.pendingSyncCount} Pending',
+                            '${_store.pendingSyncCount} ${AppStrings.t('pending_sync')}',
                             style: AppTypography.badge.copyWith(
                               color: _store.pendingSyncCount > 0 ? AppColors.cautionAmber : AppColors.successGreen,
                             ),
@@ -155,7 +155,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                     const SizedBox(height: 12),
                     AppButton(
-                      label: 'सर्व डेटा सर्व्हरवर पाठवा / Sync Now',
+                      label: AppStrings.t('sync_now'),
                       icon: Icons.sync,
                       isSecondary: true,
                       isLoading: _store.isSyncing,
@@ -181,7 +181,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               const SizedBox(height: AppSpacing.lg),
 
               // Language Preferences
-              Text('भाषा निवडा / App Language', style: AppTypography.sectionHeading),
+              Text(AppStrings.t('app_language'), style: AppTypography.sectionHeading),
               const SizedBox(height: AppSpacing.sm),
               AppCard(
                 onTap: () {
@@ -197,8 +197,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     Expanded(
                       child: Text(
                         AppStrings.currentLang == 'mr'
-                            ? 'मराठी (Marathi)'
-                            : (AppStrings.currentLang == 'hi' ? 'हिंदी (Hindi)' : 'English'),
+                            ? 'मराठी'
+                            : (AppStrings.currentLang == 'hi' ? 'हिंदी' : 'English'),
                         style: AppTypography.cardTitle.copyWith(fontSize: 14),
                       ),
                     ),

@@ -15,9 +15,9 @@ class LanguageScreen extends StatefulWidget {
 
 class _LanguageScreenState extends State<LanguageScreen> {
   final List<Map<String, String>> _languages = [
-    {'code': 'mr', 'name': 'मराठी', 'sub': 'Marathi (महाराष्ट्र)'},
-    {'code': 'en', 'name': 'English', 'sub': 'Standard English'},
-    {'code': 'hi', 'name': 'हिंदी', 'sub': 'Hindi'},
+    {'code': 'mr', 'name': 'मराठी', 'sub': 'महाराष्ट्र'},
+    {'code': 'en', 'name': 'English', 'sub': 'English'},
+    {'code': 'hi', 'name': 'हिंदी', 'sub': 'भारत'},
   ];
 
   @override
@@ -25,7 +25,7 @@ class _LanguageScreenState extends State<LanguageScreen> {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: const Text('भाषा निवडा / Choose Language'),
+        title: Text(AppStrings.t('choose_language')),
       ),
       body: ListView(
         padding: const EdgeInsets.all(AppSpacing.lg),

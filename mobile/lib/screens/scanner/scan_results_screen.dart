@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_typography.dart';
 import '../../core/theme/app_spacing.dart';
+import '../../core/localization/app_strings.dart';
 import '../../core/widgets/app_card.dart';
 import '../../core/widgets/app_button.dart';
 import '../../core/widgets/safety_disclaimer_card.dart';
@@ -34,7 +35,7 @@ class ScanResultsScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: const Text('तपासणी निकाल / Screening Result'),
+        title: Text(AppStrings.t('screening_result')),
       ),
       body: ListView(
         padding: const EdgeInsets.all(AppSpacing.lg),
@@ -62,8 +63,8 @@ class ScanResultsScreen extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      'प्राथमिक अंदाज (AI Screening)',
-                      style: AppTypography.cardTitle.copyWith(fontSize: 14),
+                      AppStrings.t('decision_support_banner'),
+                      style: AppTypography.cardTitle.copyWith(fontSize: 13),
                     ),
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -115,7 +116,7 @@ class ScanResultsScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 6),
                 Text(
-                  'सांख्यिकीय विश्वासार्हता / Statistical Probability',
+                  AppStrings.t('statistical_prob'),
                   style: AppTypography.caption,
                 ),
               ],
@@ -124,7 +125,7 @@ class ScanResultsScreen extends StatelessWidget {
           const SizedBox(height: AppSpacing.lg),
 
           // Visual Observations Card
-          Text('निरीक्षणे / Visual Observations', style: AppTypography.sectionHeading),
+          Text(AppStrings.t('visual_observations'), style: AppTypography.sectionHeading),
           const SizedBox(height: AppSpacing.sm),
           AppCard(
             padding: const EdgeInsets.all(AppSpacing.md),
@@ -154,7 +155,7 @@ class ScanResultsScreen extends StatelessWidget {
 
           // Proceed to Report Button
           AppButton(
-            label: 'पशुवैद्यक तपासणीसाठी पाठवा / File Report',
+            label: AppStrings.t('file_report'),
             icon: Icons.assignment_late_outlined,
             backgroundColor: AppColors.primary,
             onPressed: () {

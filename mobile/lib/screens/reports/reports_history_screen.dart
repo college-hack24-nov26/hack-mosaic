@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_typography.dart';
 import '../../core/theme/app_spacing.dart';
+import '../../core/localization/app_strings.dart';
 import '../../core/widgets/app_card.dart';
 import '../../core/widgets/status_badge.dart';
 import '../../data/local/offline_store.dart';
@@ -38,7 +39,7 @@ class _ReportsHistoryScreenState extends State<ReportsHistoryScreen> {
         return Scaffold(
           backgroundColor: AppColors.background,
           appBar: AppBar(
-            title: const Text('तपासणी अहवाल / Case History'),
+            title: Text(AppStrings.t('case_history')),
           ),
           body: Column(
             children: [
@@ -50,11 +51,11 @@ class _ReportsHistoryScreenState extends State<ReportsHistoryScreen> {
                   scrollDirection: Axis.horizontal,
                   child: Row(
                     children: [
-                      _buildFilterChip('all', 'सर्व / All (${allReports.length})'),
+                      _buildFilterChip('all', '${AppStrings.t('filter_all')} (${allReports.length})'),
                       const SizedBox(width: AppSpacing.sm),
-                      _buildFilterChip('pending', 'प्रलंबित / Pending'),
+                      _buildFilterChip('pending', AppStrings.t('filter_in_review')),
                       const SizedBox(width: AppSpacing.sm),
-                      _buildFilterChip('confirmed', 'पुष्टी झालेले / Confirmed'),
+                      _buildFilterChip('confirmed', AppStrings.t('filter_confirmed')),
                     ],
                   ),
                 ),
@@ -118,7 +119,7 @@ class _ReportsHistoryScreenState extends State<ReportsHistoryScreen> {
               children: [
                 Expanded(
                   child: Text(
-                    report.animalName ?? 'जनावर / Animal',
+                    report.animalName ?? AppStrings.t('animal'),
                     style: AppTypography.cardTitle.copyWith(fontSize: 16),
                   ),
                 ),
@@ -137,7 +138,7 @@ class _ReportsHistoryScreenState extends State<ReportsHistoryScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'दिनांक: ${report.reportedAt.toIso8601String().substring(0, 10)}',
+                  '${AppStrings.t('date')}: ${report.reportedAt.toIso8601String().substring(0, 10)}',
                   style: AppTypography.caption.copyWith(fontSize: 11),
                 ),
                 if (!report.isSynced)
@@ -146,14 +147,14 @@ class _ReportsHistoryScreenState extends State<ReportsHistoryScreen> {
                       const Icon(Icons.cloud_upload_outlined, size: 12, color: AppColors.cautionAmber),
                       const SizedBox(width: 4),
                       Text(
-                        'Pending Sync',
+                        AppStrings.t('pending_sync'),
                         style: AppTypography.badge.copyWith(color: AppColors.cautionAmber, fontSize: 10),
                       ),
                     ],
                   )
                 else
                   Text(
-                    'तपशील पहा >',
+                    '${AppStrings.t('view_details')} >',
                     style: AppTypography.badge.copyWith(color: AppColors.primary, fontSize: 11),
                   ),
               ],
@@ -174,7 +175,7 @@ class _ReportsHistoryScreenState extends State<ReportsHistoryScreen> {
             const Icon(Icons.assignment_outlined, size: 56, color: AppColors.textMuted),
             const SizedBox(height: 14),
             Text(
-              'कोणतेही अहवाल आढळले नाहीत.\nNo disease reports match this filter.',
+              AppStrings.t('no_reports_found'),
               textAlign: TextAlign.center,
               style: AppTypography.bodySecondary,
             ),

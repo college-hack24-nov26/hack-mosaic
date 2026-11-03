@@ -4,6 +4,7 @@ import 'package:qr_flutter/qr_flutter.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_typography.dart';
 import '../../core/theme/app_spacing.dart';
+import '../../core/localization/app_strings.dart';
 import '../../core/widgets/app_card.dart';
 import '../../core/widgets/app_button.dart';
 import '../../data/models/animal_model.dart';
@@ -116,7 +117,7 @@ class AnimalDetailsScreen extends StatelessWidget {
                     const Icon(Icons.qr_code_2, color: AppColors.primary, size: 24),
                     const SizedBox(width: 8),
                     Text(
-                      'ऑफलाइन आरोग्य पासपोर्ट / Digital QR',
+                      AppStrings.t('action_passport'),
                       style: AppTypography.cardTitle.copyWith(
                         color: AppColors.primary,
                         fontWeight: FontWeight.bold,
@@ -148,7 +149,7 @@ class AnimalDetailsScreen extends StatelessWidget {
                     borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
                   ),
                   child: Text(
-                    'अद्यतन दिनांक (Last Updated): ${DateTime.now().toIso8601String().substring(0, 10)}',
+                    '${AppStrings.t('date')}: ${DateTime.now().toIso8601String().substring(0, 10)}',
                     style: AppTypography.caption.copyWith(
                       color: AppColors.textPrimary,
                       fontWeight: FontWeight.bold,
@@ -157,7 +158,11 @@ class AnimalDetailsScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'पशुवैद्यक अधिकारी इंटरनेटशिवाय हा कोड स्कॅन करून इतिहास पाहू शकतात.\nField vets can scan offline to inspect verified vaccinations and history.',
+                  AppStrings.currentLang == 'en'
+                      ? 'Field veterinarians can scan this code offline to inspect verified records.'
+                      : (AppStrings.currentLang == 'hi'
+                          ? 'पशु चिकित्सक ऑफ़लाइन स्कैन करके रिकॉर्ड देख सकते हैं।'
+                          : 'पशुवैद्यक अधिकारी इंटरनेटशिवाय हा कोड स्कॅन करून इतिहास पाहू शकतात.'),
                   textAlign: TextAlign.center,
                   style: AppTypography.caption.copyWith(fontSize: 11, height: 1.3),
                 ),
@@ -167,43 +172,43 @@ class AnimalDetailsScreen extends StatelessWidget {
           const SizedBox(height: AppSpacing.lg),
 
           // Identity Specifications
-          Text('वैशिष्ट्ये / Details', style: AppTypography.sectionHeading),
+          Text(AppStrings.t('details'), style: AppTypography.sectionHeading),
           const SizedBox(height: AppSpacing.sm),
           AppCard(
             padding: const EdgeInsets.all(AppSpacing.md),
             child: Column(
               children: [
-                _buildInfoRow('लिंग / Sex', animal.sex == 'female' ? 'मादी (Female)' : 'नर (Male)'),
+                _buildInfoRow(AppStrings.t('gender'), animal.sex == 'female' ? AppStrings.t('gender_female') : AppStrings.t('gender_male')),
                 const Divider(height: 16),
-                _buildInfoRow('अंदाजे जन्मतारीख / Age', animal.birthDate ?? '2 years'),
+                _buildInfoRow(AppStrings.t('birth_date'), animal.birthDate ?? '2 years'),
                 const Divider(height: 16),
-                _buildInfoRow('ओळख खूण / Markings', animal.markings ?? 'कपाळावर पांढरा डाग'),
+                _buildInfoRow(AppStrings.t('identification_markings'), animal.markings ?? (AppStrings.currentLang == 'en' ? 'White forehead patch' : (AppStrings.currentLang == 'hi' ? 'माथे पर सफेद निशान' : 'कपाळावर पांढरा डाग'))),
                 const Divider(height: 16),
-                _buildInfoRow('सिंक स्थिती / Sync Status', animal.isSynced ? 'Synced with Cloud' : 'Queued on Device'),
+                _buildInfoRow(AppStrings.t('sync_status'), animal.isSynced ? AppStrings.t('synced_cloud') : AppStrings.t('queued_device')),
               ],
             ),
           ),
           const SizedBox(height: AppSpacing.lg),
 
           // Medical & Vaccination Timeline
-          Text('लसीकरण इतिहास / Vaccination History', style: AppTypography.sectionHeading),
+          Text(AppStrings.t('vaccination_history'), style: AppTypography.sectionHeading),
           const SizedBox(height: AppSpacing.sm),
           AppCard(
             padding: const EdgeInsets.all(AppSpacing.md),
             child: Column(
               children: [
                 _buildVaccinationItem(
-                  title: 'लाळ्या खुरकूत लस (FMD Raksha)',
+                  title: AppStrings.currentLang == 'en' ? 'Foot & Mouth Vaccine (FMD Raksha)' : (AppStrings.currentLang == 'hi' ? 'खुरपका-मुंहपका टीका (FMD)' : 'लाळ्या खुरकूत लस (FMD Raksha)'),
                   date: '12 जून 2026',
-                  status: 'प्रमाणित (Verified)',
-                  vet: 'डॉ. संजय पाटील',
+                  status: AppStrings.currentLang == 'en' ? 'Verified' : 'प्रमाणित',
+                  vet: AppStrings.currentLang == 'en' ? 'Dr. Sanjay Patil' : 'डॉ. संजय पाटील',
                 ),
                 const Divider(height: 20),
                 _buildVaccinationItem(
-                  title: 'लंपी त्वचा रोग लस (LSD Goat Pox)',
+                  title: AppStrings.currentLang == 'en' ? 'Lumpy Skin Disease Vaccine' : (AppStrings.currentLang == 'hi' ? 'लंपी त्वचा रोग टीका' : 'लंपी त्वचा रोग लस (LSD)'),
                   date: '05 सप्टेंबर 2026',
-                  status: 'प्रमाणित (Verified)',
-                  vet: 'डॉ. संजय पाटील',
+                  status: AppStrings.currentLang == 'en' ? 'Verified' : 'प्रमाणित',
+                  vet: AppStrings.currentLang == 'en' ? 'Dr. Sanjay Patil' : 'डॉ. संजय पाटील',
                 ),
               ],
             ),
@@ -212,7 +217,7 @@ class AnimalDetailsScreen extends StatelessWidget {
 
           // Report Illness Button for this Animal
           AppButton(
-            label: 'या जनावराचा आजार नोंदवा / Report Illness',
+            label: AppStrings.t('report_illness_btn'),
             icon: Icons.assignment_late_outlined,
             backgroundColor: AppColors.alertCritical,
             onPressed: () {

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_typography.dart';
 import '../../core/theme/app_spacing.dart';
+import '../../core/localization/app_strings.dart';
 import '../../core/widgets/app_card.dart';
 import '../../core/widgets/status_badge.dart';
 import '../../core/widgets/safety_disclaimer_card.dart';
@@ -18,7 +19,7 @@ class ReportDetailsScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: Text(report.animalName ?? 'तपासणी अहवाल / Report'),
+        title: Text(report.animalName ?? AppStrings.t('case_history')),
       ),
       body: ListView(
         padding: const EdgeInsets.all(AppSpacing.lg),
@@ -33,7 +34,7 @@ class ReportDetailsScreen extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      'केस स्थिती / Case Status',
+                      AppStrings.t('case_status'),
                       style: AppTypography.cardTitle,
                     ),
                     StatusBadge(status: report.status),
@@ -55,7 +56,7 @@ class ReportDetailsScreen extends StatelessWidget {
             _buildScreeningObservationsCard(),
 
           // Observed Symptoms
-          Text('नोंदवलेली लक्षणे / Observed Symptoms', style: AppTypography.sectionHeading),
+          Text(AppStrings.t('observed_symptoms'), style: AppTypography.sectionHeading),
           const SizedBox(height: AppSpacing.sm),
           AppCard(
             padding: const EdgeInsets.all(AppSpacing.md),
@@ -92,7 +93,7 @@ class ReportDetailsScreen extends StatelessWidget {
 
           // Photo Evidence (If attached)
           if (report.photoPath != null && File(report.photoPath!).existsSync()) ...[
-            Text('फोटो पुरावा / Image Evidence', style: AppTypography.sectionHeading),
+            Text(AppStrings.t('image_evidence'), style: AppTypography.sectionHeading),
             const SizedBox(height: AppSpacing.sm),
             ClipRRect(
               borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
@@ -107,7 +108,7 @@ class ReportDetailsScreen extends StatelessWidget {
           ],
 
           // Farmer Notes
-          Text('शेतकऱ्याची नोंद / Farmer Description', style: AppTypography.sectionHeading),
+          Text(AppStrings.t('farmer_description'), style: AppTypography.sectionHeading),
           const SizedBox(height: AppSpacing.sm),
           AppCard(
             padding: const EdgeInsets.all(AppSpacing.md),
@@ -213,7 +214,7 @@ class ReportDetailsScreen extends StatelessWidget {
               const Icon(Icons.medical_information, color: AppColors.primary, size: 24),
               const SizedBox(width: 10),
               Text(
-                'पशुवैद्यक तपासणी निष्कर्ष / Clinical Decision',
+                AppStrings.t('clinical_decision'),
                 style: AppTypography.cardTitle.copyWith(color: AppColors.primary, fontSize: 14),
               ),
             ],
@@ -221,13 +222,13 @@ class ReportDetailsScreen extends StatelessWidget {
           const SizedBox(height: 10),
           if (report.confirmedDiseaseCode != null) ...[
             Text(
-              'पुष्टी झालेला रोग: ${report.confirmedDiseaseCode?.replaceAll("_", " ").toUpperCase()}',
+              '${AppStrings.t('confirmed_disease')}: ${AppStrings.formatDisease(report.confirmedDiseaseCode!)}',
               style: AppTypography.cardTitle.copyWith(fontSize: 14, color: AppColors.alertCritical),
             ),
             const SizedBox(height: 4),
           ],
           Text(
-            report.vetNotes ?? 'पशुवैद्यकांनी केसची तपासणी केली आहे.',
+            report.vetNotes ?? AppStrings.t('vet_verified_notice'),
             style: AppTypography.bodyDefault.copyWith(fontSize: 13),
           ),
         ],
@@ -253,19 +254,19 @@ class ReportDetailsScreen extends StatelessWidget {
               const Icon(Icons.psychology, color: AppColors.infoBlue, size: 22),
               const SizedBox(width: 8),
               Text(
-                'एआय प्राथमिक निरीक्षण (Decision Support)',
+                AppStrings.t('decision_support_banner'),
                 style: AppTypography.cardTitle.copyWith(color: AppColors.infoBlue, fontSize: 14),
               ),
             ],
           ),
           const SizedBox(height: 8),
           Text(
-            'संशयित लक्षण: ${s.topLabel} (${(s.topConfidence * 100).toStringAsFixed(1)}% विश्वासार्हता)',
+            '${AppStrings.t('observed_symptoms')}: ${s.topLabel} (${(s.topConfidence * 100).toStringAsFixed(1)}%)',
             style: AppTypography.bodyDefault.copyWith(fontWeight: FontWeight.bold, fontSize: 13),
           ),
           const SizedBox(height: 4),
           Text(
-            'मॉडेल आवृत्ती: ${s.modelVersion} • हे वैद्यकीय निदान नाही.',
+            AppStrings.t('model_version_notice'),
             style: AppTypography.caption.copyWith(color: AppColors.textSecondary),
           ),
         ],
@@ -274,23 +275,6 @@ class ReportDetailsScreen extends StatelessWidget {
   }
 
   String _formatSymptomName(String code) {
-    switch (code) {
-      case 'skin_nodules':
-        return 'गाठी (Skin Nodules)';
-      case 'fever':
-        return 'ताप (Fever)';
-      case 'reduced_milk':
-        return 'दुधात घट (Drop in Milk)';
-      case 'lameness':
-        return 'लंगडणे (Lameness)';
-      case 'salivation':
-        return 'लाळ गळणे (Salivation)';
-      case 'nasal_discharge':
-        return 'नाकातून स्राव (Discharge)';
-      case 'appetite_loss':
-        return 'चारा न खाणे (Off Feed)';
-      default:
-        return code.replaceAll('_', ' ');
-    }
+    return AppStrings.formatSymptom(code);
   }
 }

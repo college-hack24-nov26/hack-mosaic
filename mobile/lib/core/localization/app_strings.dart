@@ -13,6 +13,30 @@ class AppStrings {
     return _translations[key]?[currentLang] ?? _translations[key]?['en'] ?? key;
   }
 
+  static String formatSymptom(String code) {
+    final key = 'symptom_$code';
+    if (_translations.containsKey(key)) {
+      return t(key);
+    }
+    return code.replaceAll('_', ' ');
+  }
+
+  static String formatDisease(String code) {
+    final key = 'disease_$code';
+    if (_translations.containsKey(key)) {
+      return t(key);
+    }
+    return code.replaceAll('_', ' ').toUpperCase();
+  }
+
+  static String formatBreed(String code) {
+    final key = 'breed_$code';
+    if (_translations.containsKey(key)) {
+      return t(key);
+    }
+    return code.replaceAll('_', ' ').toUpperCase();
+  }
+
   static const Map<String, Map<String, String>> _translations = {
     // App & Identity
     'app_name': {
@@ -26,7 +50,12 @@ class AppStrings {
       'hi': 'ऑफलाइन पशु स्वास्थ्य एवं रोग निगरानी',
     },
 
-    // Mandatory Regulatory Safety String
+    // Mandatory Regulatory Safety Strings (PPT S5)
+    'clinical_notice': {
+      'en': 'Clinical Notice',
+      'mr': 'वैद्यकीय अस्वीकरण',
+      'hi': 'चिकित्सीय अस्वीकरण',
+    },
     'safety_disclaimer': {
       'en': 'This is a preliminary check from your phone, not a diagnosis. A veterinarian will review your report.',
       'mr': 'हा तुमच्या फोनवरील प्राथमिक तपासणी अहवाल आहे, वैद्यकीय निदान नाही. पशुवैद्यकीय अधिकारी तुमच्या अहवालाची तपासणी करतील.',
@@ -38,59 +67,199 @@ class AppStrings {
       'hi': 'ऑफलाइन मोड सक्रिय। नेटवर्क आने पर रिपोर्ट अपने आप सिंक हो जाएगी।',
     },
 
-    // Navigation
+    // Navigation (compact names to prevent tab truncation)
     'nav_home': {'en': 'Home', 'mr': 'मुख्य', 'hi': 'होम'},
     'nav_animals': {'en': 'My Animals', 'mr': 'माझी जनावरे', 'hi': 'मेरे पशु'},
-    'nav_report': {'en': 'Report Illness', 'mr': 'आजार नोंदवा', 'hi': 'रोग रिपोर्ट'},
-    'nav_alerts': {'en': 'Outbreak Alerts', 'mr': 'रोग सूचना', 'hi': 'रोग अलर्ट'},
+    'nav_report': {'en': 'Report Illness', 'mr': 'रोग नोंदवा', 'hi': 'रोग रिपोर्ट'},
+    'nav_alerts': {'en': 'Alerts', 'mr': 'रोग सूचना', 'hi': 'रोग अलर्ट'},
     'nav_profile': {'en': 'Profile', 'mr': 'प्रोफाइल', 'hi': 'प्रोफाइल'},
+
+    // Locations
+    'location_phaltan_satara': {
+      'en': 'Phaltan, Satara',
+      'mr': 'फलटण, सातारा',
+      'hi': 'फलटन, सतारा',
+    },
+    'district_satara': {
+      'en': 'Satara District',
+      'mr': 'सातारा जिल्हा',
+      'hi': 'सतारा ज़िला',
+    },
+    'phaltan_rural': {
+      'en': 'Phaltan Rural',
+      'mr': 'फलटण ग्रामीण',
+      'hi': 'फलटन ग्रामीण',
+    },
 
     // Dashboard
     'greeting': {'en': 'Namaste, Farmer', 'mr': 'नमस्ते शेतकरी बांधव', 'hi': 'नमस्ते किसान भाई'},
     'registered_cattle': {'en': 'Registered Animals', 'mr': 'नोंदणीकृत जनावरे', 'hi': 'पंजीकृत पशु'},
-    'pending_reports': {'en': 'Pending Reports', 'mr': 'प्रलंबित तपासणी', 'hi': 'लंबित रिपोर्ट'},
+    'pending_reports': {'en': 'Pending Reports', 'mr': 'प्रलंबित अहवाल', 'hi': 'लंबित रिपोर्ट'},
     'active_alerts': {'en': 'Nearby Warnings', 'mr': 'परिसरातील सतर्कता', 'hi': 'क्षेत्रीय चेतावनी'},
     'quick_actions': {'en': 'Quick Actions', 'mr': 'त्वरित सेवा', 'hi': 'त्वरित सेवाएं'},
-    'action_scan': {'en': 'AI Image Scan', 'mr': 'एआय तपासणी (फोटो)', 'hi': 'एआई जांच (फोटो)'},
-    'action_add_animal': {'en': 'Register Animal', 'mr': 'जनावर नोंदवा', 'hi': 'पशु जोड़ें'},
-    'action_report': {'en': 'Report Disease', 'mr': 'रोग तक्रार नोंदवा', 'hi': 'रोग शिकायत दर्ज करें'},
-    'action_passport': {'en': 'Digital QR Passport', 'mr': 'डिजिटल क्यूआर पास', 'hi': 'डिजिटल क्यूआर पास'},
+    'recent_reports': {'en': 'Recent Reports', 'mr': 'अलीकडील अहवाल', 'hi': 'हाल की रिपोर्ट'},
+    'view_all': {'en': 'View All', 'mr': 'सर्व पहा', 'hi': 'सभी देखें'},
+    'view_details': {'en': 'View Details', 'mr': 'तपशील पहा', 'hi': 'विवरण देखें'},
 
-    // Animals
-    'animal_name': {'en': 'Animal Name / Call Name', 'mr': 'नाव / टोपणनाव', 'hi': 'पशु का नाम'},
+    // Quick Actions
+    'action_scan': {'en': 'AI Image Scan', 'mr': 'एआय तपासणी', 'hi': 'एआई जांच'},
+    'action_scan_sub': {'en': 'MobileNetV3 Vision', 'mr': 'मोबाईलनेट तपासणी', 'hi': 'मोबाइलनेट जांच'},
+    'action_add_animal': {'en': 'Register Animal', 'mr': 'जनावर नोंदवा', 'hi': 'पशु जोड़ें'},
+    'action_add_animal_sub': {'en': 'New Cattle Registration', 'mr': 'नवीन जनावर नोंदणी', 'hi': 'नया पशु पंजीकरण'},
+    'action_report': {'en': 'Report Disease', 'mr': 'रोग तक्रार नोंदवा', 'hi': 'रोग शिकायत दर्ज करें'},
+    'action_report_sub': {'en': 'Send Symptoms & Photo', 'mr': 'लक्षणे व फोटो पाठवा', 'hi': 'लक्षण और फोटो भेजें'},
+    'action_passport': {'en': 'Digital QR Passport', 'mr': 'डिजिटल क्यूआर पास', 'hi': 'डिजिटल क्यूआर पास'},
+    'action_passport_sub': {'en': 'Offline Health Pass', 'mr': 'ऑफलाइन आरोग्य पास', 'hi': 'ऑफलाइन स्वास्थ्य पास'},
+
+    // Surveillance Alerts
+    'alert_lsd_title': {
+      'en': 'Outbreak Alert: Lumpy Skin Disease (LSD)',
+      'mr': 'रोग चेतावणी: लंपी त्वचा रोग (LSD)',
+      'hi': 'रोग चेतावनी: लंपी त्वचा रोग (LSD)',
+    },
+    'alert_lsd_body': {
+      'en': 'Veterinarian-confirmed cases detected within 3 km in Phaltan. Check your animals regularly.',
+      'mr': 'फलटण तालुक्यात ३ किमी अंतरावर पशुवैद्यकांनी पुष्टी केलेले रुग्ण आढळले आहेत. आपल्या जनावरांची नियमित तपासणी करा.',
+      'hi': 'फलटन में ३ किमी के दायरे में पशु चिकित्सकों द्वारा पुष्ट मामले पाए गए हैं। अपने पशुओं की नियमित जांच करें।',
+    },
+
+    // Animals Screen
+    'animal_name': {'en': 'Animal Name', 'mr': 'जनावराचे नाव', 'hi': 'पशु का नाम'},
     'tag_number': {'en': 'Ear Tag / Bharat Pashudhan ID', 'mr': 'कानाचा टॅग / भारत पशुधन आयडी', 'hi': 'ईयर टैग / भारत पशुधन आईडी'},
+    'tag': {'en': 'Tag', 'mr': 'टॅग', 'hi': 'टैग'},
+    'no_tag': {'en': 'No Tag', 'mr': 'टॅग नाही', 'hi': 'टैग नहीं'},
     'species': {'en': 'Species', 'mr': 'प्रजाती', 'hi': 'प्रजाति'},
-    'species_cattle': {'en': 'Cattle (Cow/Bull)', 'mr': 'गाय / बैल', 'hi': 'गाय / बैल'},
-    'species_buffalo': {'en': 'Buffalo', 'mr': 'म्हैस / रेडा', 'hi': 'भैंस'},
-    'breed': {'en': 'Breed', 'mr': 'जात / ब्रीड', 'hi': 'नस्ल'},
+    'species_cattle': {'en': 'Cattle', 'mr': 'गाय / बैल', 'hi': 'गाय / बैल'},
+    'species_buffalo': {'en': 'Buffalo', 'mr': 'म्हैस', 'hi': 'भैंस'},
+    'breed': {'en': 'Breed', 'mr': 'जात', 'hi': 'नस्ल'},
+    'breed_gir': {'en': 'Gir', 'mr': 'गीर', 'hi': 'गीर'},
+    'breed_khillar': {'en': 'Khillar', 'mr': 'खिल्लार', 'hi': 'खिल्लार'},
+    'breed_deoni': {'en': 'Deoni', 'mr': 'देवणी', 'hi': 'देवणी'},
+    'breed_dangi': {'en': 'Dangi', 'mr': 'डांगी', 'hi': 'डांगी'},
+    'breed_hf_cross': {'en': 'HF Cross', 'mr': 'एचएफ क्रॉस', 'hi': 'एचएफ क्रॉस'},
+    'breed_jersey_cross': {'en': 'Jersey Cross', 'mr': 'जर्सी क्रॉस', 'hi': 'जर्सी क्रॉस'},
+    'breed_other': {'en': 'Indigenous / Other', 'mr': 'इतर / देशी', 'hi': 'अन्य देशी'},
+    'breed_murrah': {'en': 'Murrah', 'mr': 'मुऱ्हा', 'hi': 'मुर्रा'},
+    'breed_jaffarabadi': {'en': 'Jaffarabadi', 'mr': 'जाफराबादी', 'hi': 'जाफराबादी'},
+    'breed_pandharpuri': {'en': 'Pandharpuri', 'mr': 'पंढरपुरी', 'hi': 'पंढरपुरी'},
+    'breed_mehsana': {'en': 'Mehsana', 'mr': 'मेहसाणा', 'hi': 'मेहसाणा'},
     'gender': {'en': 'Sex', 'mr': 'लिंग', 'hi': 'लिंग'},
     'gender_female': {'en': 'Female', 'mr': 'मादी', 'hi': 'मादा'},
     'gender_male': {'en': 'Male', 'mr': 'नर', 'hi': 'नर'},
-    'birth_date': {'en': 'Approx. Birth Date / Age', 'mr': 'जन्मतारीख / वय', 'hi': 'जन्म तिथि / उम्र'},
+    'birth_date': {'en': 'Birth Date or Age', 'mr': 'जन्मतारीख किंवा वय', 'hi': 'जन्म तिथि या उम्र'},
     'add_animal_btn': {'en': 'Save Animal Record', 'mr': 'जनावर जतन करा', 'hi': 'पशु सुरक्षित करें'},
+    'add_animal': {'en': 'Add Animal', 'mr': 'जनावर जोडा', 'hi': 'पशु जोड़ें'},
     'empty_animals': {'en': 'No animals registered yet. Add your cattle to track health & vaccinations.', 'mr': 'अद्याप जनावरांची नोंद नाही. आरोग्य तपासणीसाठी जनावर जोडा.', 'hi': 'अभी कोई पशु पंजीकृत नहीं है। स्वास्थ्य जांच के लिए पशु जोड़ें।'},
+    'search_animals': {'en': 'Search by name or ear tag...', 'mr': 'नाव किंवा टॅग नंबर शोधा...', 'hi': 'नाम या टैग नंबर खोजें...'},
+    'identification_markings': {'en': 'Identification Markings', 'mr': 'ओळख खूण', 'hi': 'पहचान चिह्न'},
+    'details': {'en': 'Details', 'mr': 'वैशिष्ट्ये', 'hi': 'विवरण'},
+    'vaccination_history': {'en': 'Vaccination History', 'mr': 'लसीकरण इतिहास', 'hi': 'टीकाकरण इतिहास'},
+    'report_illness_btn': {'en': 'Report Illness for this Animal', 'mr': 'या जनावराचा आजार नोंदवा', 'hi': 'इस पशु का रोग दर्ज करें'},
+    'animal': {'en': 'Animal', 'mr': 'जनावर', 'hi': 'पशु'},
+
+    // Filters
+    'filter_all': {'en': 'All', 'mr': 'सर्व', 'hi': 'सभी'},
+    'filter_in_review': {'en': 'In Review', 'mr': 'तपासणी सुरू', 'hi': 'समीक्षा जारी'},
+    'filter_confirmed': {'en': 'Confirmed', 'mr': 'पुष्टी झालेले', 'hi': 'पुष्ट'},
 
     // Reporting
     'select_animal': {'en': '1. Select Affected Animal', 'mr': '१. आजारी जनावर निवडा', 'hi': '१. बीमार पशु चुनें'},
     'select_symptoms': {'en': '2. Select Observed Symptoms', 'mr': '२. दिसणारी लक्षणे निवडा', 'hi': '२. दिखाई देने वाले लक्षण चुनें'},
-    'symptom_skin_nodules': {'en': 'Skin Nodules / Lumps', 'mr': 'त्वचेवर गाठी / फोड', 'hi': 'त्वचा पर गांठें / छाले'},
-    'symptom_fever': {'en': 'High Fever', 'mr': 'तीव्र ताप', 'hi': 'तेज़ बुखार'},
-    'symptom_reduced_milk': {'en': 'Reduced Milk Yield', 'mr': 'दुधात अचानक घट', 'hi': 'दूध में अचानक गिरावट'},
-    'symptom_lameness': {'en': 'Limping / Lameness', 'mr': 'लंगडणे / चालण्यास त्रास', 'hi': 'लंगड़ापन / चलने में कष्ट'},
-    'symptom_salivation': {'en': 'Excessive Salivation', 'mr': 'तोंडातून लाळ गळणे', 'hi': 'मुंह से लार टपकना'},
-    'symptom_nasal_discharge': {'en': 'Nasal Discharge / Cough', 'mr': 'नाकातून स्राव / खोकला', 'hi': 'नाक से स्राव / खांसी'},
-    'symptom_appetite_loss': {'en': 'Loss of Appetite / Off Feed', 'mr': 'चारा न खाणे / भूक मंदावणे', 'hi': 'चारा न खाना / भूख न लगना'},
-    'report_description': {'en': '3. Additional Notes / Voice (Optional)', 'mr': '३. इतर माहिती किंवा लक्षणे', 'hi': '३. अतिरिक्त लक्षण या विवरण'},
+    'report_description': {'en': '3. Additional Notes (Optional)', 'mr': '३. इतर माहिती किंवा लक्षणे', 'hi': '३. अतिरिक्त लक्षण या विवरण'},
     'capture_photo': {'en': 'Take / Attach Photo', 'mr': 'जनावराचा फोटो काढा', 'hi': 'पशु का फोटो लें'},
     'gps_location': {'en': 'Location Captured', 'mr': 'स्थान (GPS) नोंदवले', 'hi': 'स्थान (GPS) दर्ज हुआ'},
     'submit_report': {'en': 'Submit Report to Vet', 'mr': 'पशुवैद्यकीय अधिकाऱ्यास पाठवा', 'hi': 'पशु चिकित्सक को भेजें'},
+    'suspected_disease': {'en': 'Suspected Disease Category', 'mr': 'संशयित आजार', 'hi': 'संभावित बीमारी'},
+    'photo_attachment': {'en': 'Photo Attachment', 'mr': 'जनावराचा फोटो', 'hi': 'पशु का फोटो'},
+    'ai_screening_detected': {'en': 'AI Screening Observation Available', 'mr': 'एआय तपासणी निरीक्षण उपलब्ध', 'hi': 'एआई जांच अवलोकन उपलब्ध'},
+
+    // Disease Catalog
+    'disease_lumpy_skin_disease': {
+      'en': 'Lumpy Skin Disease (LSD)',
+      'mr': 'लंपी त्वचा रोग (LSD)',
+      'hi': 'लंपी त्वचा रोग (LSD)',
+    },
+    'disease_foot_and_mouth': {
+      'en': 'Foot & Mouth Disease (FMD)',
+      'mr': 'लाळ्या खुरकूत (FMD)',
+      'hi': 'खुरपका-मुंहपका (FMD)',
+    },
+    'disease_hemorrhagic_septicemia': {
+      'en': 'Hemorrhagic Septicemia (HS)',
+      'mr': 'घटसर्प (HS)',
+      'hi': 'गलघोंटू (HS)',
+    },
+    'disease_black_quarter': {
+      'en': 'Black Quarter (BQ)',
+      'mr': 'फाशी / एकटांग्या (BQ)',
+      'hi': 'लंगड़ा बुखार (BQ)',
+    },
+    'disease_general_illness': {
+      'en': 'General Illness / Other',
+      'mr': 'इतर आजार',
+      'hi': 'अन्य बीमारी',
+    },
+
+    // Symptoms Catalog
+    'symptom_skin_nodules': {'en': 'Skin Nodules and Lumps', 'mr': 'त्वचेवर गाठी व फोड', 'hi': 'त्वचा पर गांठें और छाले'},
+    'symptom_fever': {'en': 'High Fever', 'mr': 'तीव्र ताप', 'hi': 'तेज़ बुखार'},
+    'symptom_reduced_milk': {'en': 'Sudden Drop in Milk', 'mr': 'दुधात अचानक घट', 'hi': 'दूध में अचानक गिरावट'},
+    'symptom_lameness': {'en': 'Limping or Lameness', 'mr': 'लंगडणे किंवा चालण्यास त्रास', 'hi': 'लंगड़ापन'},
+    'symptom_salivation': {'en': 'Excessive Salivation', 'mr': 'तोंडातून लाळ गळणे', 'hi': 'मुंह से अत्यधिक लार'},
+    'symptom_nasal_discharge': {'en': 'Nasal Discharge or Cough', 'mr': 'नाकातून स्राव किंवा खोकला', 'hi': 'नाक से स्राव या खांसी'},
+    'symptom_appetite_loss': {'en': 'Loss of Appetite', 'mr': 'चारा न खाणे किंवा भूक मंदावणे', 'hi': 'चारा न खाना या भूख न लगना'},
+
+    // Case Details & History
+    'case_history': {'en': 'Case History', 'mr': 'तपासणी अहवाल', 'hi': 'केस इतिहास'},
+    'case_status': {'en': 'Case Status', 'mr': 'केस स्थिती', 'hi': 'केस की स्थिति'},
+    'observed_symptoms': {'en': 'Observed Symptoms', 'mr': 'नोंदवलेली लक्षणे', 'hi': 'देखे गए लक्षण'},
+    'image_evidence': {'en': 'Image Evidence', 'mr': 'फोटो पुरावा', 'hi': 'फोटो साक्ष्य'},
+    'farmer_description': {'en': 'Farmer Description', 'mr': 'शेतकऱ्याची नोंद', 'hi': 'किसान का विवरण'},
+    'clinical_decision': {'en': 'Clinical Decision', 'mr': 'पशुवैद्यक तपासणी निष्कर्ष', 'hi': 'पशु चिकित्सक निष्कर्ष'},
+    'no_reports_found': {'en': 'No disease reports match this filter.', 'mr': 'या निकषासाठी कोणतेही अहवाल आढळले नाहीत.', 'hi': 'इस फ़िल्टर के लिए कोई रिपोर्ट नहीं मिली।'},
+    'date': {'en': 'Date', 'mr': 'दिनांक', 'hi': 'दिनांक'},
+    'confirmed_disease': {'en': 'Confirmed Disease', 'mr': 'पुष्टी झालेला रोग', 'hi': 'पुष्ट रोग'},
+    'vet_verified_notice': {'en': 'Veterinarian has inspected this case.', 'mr': 'पशुवैद्यकांनी केसची तपासणी केली आहे.', 'hi': 'पशु चिकित्सक द्वारा मामले की जांच पूर्ण।'},
 
     // Statuses
     'status_submitted': {'en': 'Submitted', 'mr': 'नोंदवले', 'hi': 'दर्ज हुआ'},
-    'status_under_review': {'en': 'Under Vet Review', 'mr': 'तपासणी सुरू', 'hi': 'समीक्षा जारी'},
-    'status_confirmed': {'en': 'Vet Confirmed Case', 'mr': 'तज्ज्ञांनी पुष्टी केली', 'hi': 'पुष्ट रोग'},
-    'status_rejected': {'en': 'Rejected / Not Infectious', 'mr': 'फेटाळले (संसर्ग नाही)', 'hi': 'अस्वीकृत (संक्रमण नहीं)'},
-    'status_flagged': {'en': 'Visit Required', 'mr': 'प्रत्यक्ष भेट आवश्यक', 'hi': 'प्रत्यक्ष जांच आवश्यक'},
+    'status_under_review': {'en': 'Under Review', 'mr': 'तपासणी सुरू', 'hi': 'समीक्षा जारी'},
+    'status_confirmed': {'en': 'Confirmed Case', 'mr': 'पुष्टी झालेला रुग्ण', 'hi': 'पुष्ट केस'},
+    'status_rejected': {'en': 'Rejected', 'mr': 'फेटाळले', 'hi': 'अस्वीकृत'},
+    'status_flagged': {'en': 'Visit Required', 'mr': 'प्रत्यक्ष भेट आवश्यक', 'hi': 'जांच आवश्यक'},
+
+    // Sync & Connectivity
+    'sync_status': {'en': 'Sync Status', 'mr': 'सिंक स्थिती', 'hi': 'सिंक स्थिति'},
+    'sync_queue': {'en': 'Offline Sync Queue', 'mr': 'ऑफलाइन सिंक रांग', 'hi': 'ऑफलाइन सिंक कतार'},
+    'sync_now': {'en': 'Sync All Records with Server', 'mr': 'सर्व डेटा सर्व्हरवर पाठवा', 'hi': 'सभी डेटा सर्वर पर सिंक करें'},
+    'pending_sync': {'en': 'Pending Sync', 'mr': 'सिंक प्रलंबित', 'hi': 'सिंक लंबित'},
+    'synced_cloud': {'en': 'Synced with Server', 'mr': 'सर्व्हरवर सुरक्षित', 'hi': 'सर्वर पर सुरक्षित'},
+    'queued_device': {'en': 'Queued on Device', 'mr': 'डिव्हाइसवर सुरक्षित', 'hi': 'डिवाइस पर सुरक्षित'},
+    'online_connected': {'en': 'Online (Connected)', 'mr': 'ऑनलाइन (इंटरनेट सुरू)', 'hi': 'ऑनलाइन (इंटरनेट सक्रिय)'},
+    'offline_simulated': {'en': 'Offline (Simulated)', 'mr': 'ऑफलाइन (स्थानिक मोड)', 'hi': 'ऑफलाइन (स्थानीय मोड)'},
+
+    // Screening / Scanner
+    'ai_scanner': {'en': 'AI Vision Scanner', 'mr': 'एआय तपासणी स्कॅनर', 'hi': 'एआई जांच स्कैनर'},
+    'select_animal_title': {'en': 'Select Animal', 'mr': 'जनावर निवडा', 'hi': 'पशु चुनें'},
+    'run_screening': {'en': 'Run Screening', 'mr': 'तपासणी सुरू करा', 'hi': 'जांच शुरू करें'},
+    'screening_result': {'en': 'Screening Result', 'mr': 'तपासणी निकाल', 'hi': 'जांच परिणाम'},
+    'statistical_prob': {'en': 'Statistical Confidence', 'mr': 'सांख्यिकीय विश्वासार्हता', 'hi': 'सांख्यिकीय विश्वसनीयता'},
+    'visual_observations': {'en': 'Visual Observations', 'mr': 'दृश्य निरीक्षणे', 'hi': 'दृश्य अवलोकन'},
+    'file_report': {'en': 'Send to Veterinarian', 'mr': 'पशुवैद्यकास पाठवा', 'hi': 'पशु चिकित्सक को भेजें'},
+    'decision_support_banner': {'en': 'AI Preliminary Observation (Decision Support)', 'mr': 'एआय प्राथमिक निरीक्षण (निर्णय साहाय्य)', 'hi': 'एआई प्रारंभिक अवलोकन (निर्णय सहायता)'},
+    'model_version_notice': {'en': 'Model: MobileNetV3 • Preliminary screening, not a diagnosis.', 'mr': 'मॉडेल आवृत्ती: मोबाईलनेट • हे वैद्यकीय निदान नाही.', 'hi': 'मॉडल: मोबाइलनेट • यह चिकित्सीय निदान नहीं है।'},
+
+    // Profile & Settings
+    'alert_consent': {'en': 'Outbreak Alert Consent', 'mr': 'रोग सूचना संमती', 'hi': 'रोग चेतावनी सहमति'},
+    'alert_consent_title': {'en': 'Receive Local Outbreak Alerts', 'mr': 'परिसरातील रोग चेतावणी मिळवा', 'hi': 'क्षेत्रीय रोग चेतावनी प्राप्त करें'},
+    'alert_consent_sub': {
+      'en': 'Receive immediate warnings when veterinarians confirm infectious cases within 5 km of your farm.',
+      'mr': 'आपल्या शेताभोवती ५ किमी अंतरावर पशुवैद्यकांनी पुष्टी केलेले रुग्ण आढळल्यास त्वरित सूचना मिळवा.',
+      'hi': 'अपने खेत से ५ किमी के दायरे में पशु चिकित्सकों द्वारा पुष्ट मामलों पर त्वरित चेतावनी प्राप्त करें।',
+    },
+    'app_language': {'en': 'App Language', 'mr': 'अ‍ॅप भाषा', 'hi': 'ऐप की भाषा'},
+    'change_language': {'en': 'Change Language', 'mr': 'भाषा बदला', 'hi': 'भाषा बदलें'},
+    'choose_language': {'en': 'Choose Language', 'mr': 'भाषा निवडा', 'hi': 'भाषा चुनें'},
 
     // Common Buttons
     'save': {'en': 'Save', 'mr': 'जतन करा', 'hi': 'सुरक्षित करें'},
