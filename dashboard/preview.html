@@ -8,10 +8,10 @@
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   
-  <!-- Google Fonts: Figtree & Inter -->
+  <!-- Google Fonts: Figtree, Inter & Noto Sans Devanagari (per DESIGN.md) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+Devanagari:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
   
   <!-- Leaflet CSS & JS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -38,8 +38,8 @@
             'border-hairline': '#a1a1a1',
           },
           fontFamily: {
-            figtree: ['Figtree', 'sans-serif'],
-            inter: ['Inter', 'sans-serif'],
+            figtree: ['Figtree', 'Noto Sans Devanagari', 'sans-serif'],
+            inter: ['Inter', 'Noto Sans Devanagari', 'sans-serif'],
             mono: ['JetBrains Mono', 'monospace'],
           },
           borderRadius: {
@@ -57,8 +57,9 @@
     body { 
       background-color: #f4eee5; 
       color: #141414; 
-      font-family: 'Figtree', sans-serif;
+      font-family: 'Figtree', 'Noto Sans Devanagari', sans-serif;
       overflow-x: hidden;
+      transition: background-color 0.25s ease, color 0.25s ease;
     }
 
     /* ========================================================================= */
@@ -351,27 +352,153 @@
     }
     .btn-primary:active { transform: translateY(0); scale: 0.98; }
 
-    /* Chips */
+    /* Vetra Secondary Button (DESIGN.md button-secondary: transparent/card fill, ink text, border-hairline) */
+    .btn-secondary-vetra {
+      background-color: #ffffff;
+      color: #141414;
+      border: 1px solid #a1a1a1;
+      border-radius: 8px;
+      font-family: 'Figtree', 'Noto Sans Devanagari', sans-serif;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: 0 1px 2px rgba(20, 20, 20, 0.05);
+    }
+    .btn-secondary-vetra:hover {
+      background-color: #f4eee5;
+      border-color: #141414;
+      transform: translateY(-1px);
+      box-shadow: 0 3px 8px rgba(20, 20, 20, 0.08);
+    }
+
+    /* Vet Role Badge (DESIGN.md vet-role-badge: small #2F6FDE outline tag, never a CTA button) */
+    .vet-role-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 1px 7px;
+      border-radius: 6px;
+      border: 1px solid #2F6FDE;
+      background-color: rgba(47, 111, 222, 0.06);
+      color: #2F6FDE;
+      font-family: 'Inter', sans-serif;
+      font-size: 10px;
+      font-weight: 600;
+    }
+
+    /* Chips (DESIGN.md: status-chip-healthy is stroke-not-fill with #94e130 border + #141414 text) */
     .chip-critical {
       display: inline-flex; align-items: center; gap: 4px; padding: 2px 10px; border-radius: 9999px;
       background-color: #C62828; color: #ffffff; font-size: 11px; font-weight: 700;
     }
     .chip-caution {
       display: inline-flex; align-items: center; gap: 4px; padding: 2px 10px; border-radius: 9999px;
-      background-color: rgba(242, 153, 74, 0.15); border: 1px solid rgba(242, 153, 74, 0.45);
+      background-color: #F2994A; color: #141414; font-size: 11px; font-weight: 700;
+    }
+    .chip-healthy, .chip-resolved {
+      display: inline-flex; align-items: center; gap: 4px; padding: 2px 10px; border-radius: 9999px;
+      background-color: rgba(148, 225, 48, 0.08); border: 1.5px solid #94e130;
       color: #141414; font-size: 11px; font-weight: 700;
     }
-    .chip-healthy {
-      display: inline-flex; align-items: center; gap: 4px; padding: 2px 10px; border-radius: 9999px;
-      background-color: rgba(148, 225, 48, 0.2); border: 1px solid #94e130;
-      color: #141414; font-size: 11px; font-weight: 700;
+
+    /* Map Taluka & District Centroid Micro-Labels */
+    .taluka-map-label {
+      background: rgba(244, 238, 229, 0.92) !important;
+      color: #141414 !important;
+      border: 1px solid #a1a1a1 !important;
+      border-radius: 6px !important;
+      padding: 1px 6px !important;
+      font-family: 'Figtree', sans-serif !important;
+      font-size: 10px !important;
+      font-weight: 700 !important;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.12) !important;
+      white-space: nowrap !important;
+      pointer-events: none !important;
+    }
+    .taluka-map-label::before {
+      display: none !important;
+    }
+
+    /* Vetra Dark Mode (DESIGN.md §Dark Mode: Night Vet Emergency / SOS Theme) */
+    body.vetra-dark {
+      background-color: #141414 !important;
+      color: #F2EDE6 !important;
+    }
+    body.vetra-dark header,
+    body.vetra-dark aside {
+      background: linear-gradient(180deg, #1F1F1F 0%, #181818 100%) !important;
+      border-color: #3A3A3A !important;
+      color: #F2EDE6 !important;
+      box-shadow: none !important;
+    }
+    body.vetra-dark .vetra-card,
+    body.vetra-dark .aero-card,
+    body.vetra-dark .bg-white {
+      background-color: #1F1F1F !important;
+      border-color: #3A3A3A !important;
+      color: #F2EDE6 !important;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35) !important;
+    }
+    body.vetra-dark .vetra-card::before,
+    body.vetra-dark .aero-card::before {
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.04) 0%, transparent 50%) !important;
+    }
+    body.vetra-dark .bg-parchment,
+    body.vetra-dark [class*="bg-parchment/"] {
+      background-color: #181818 !important;
+      border-color: #3A3A3A !important;
+      color: #F2EDE6 !important;
+    }
+    body.vetra-dark .text-ink,
+    body.vetra-dark .text-\[\#141414\],
+    body.vetra-dark .text-zinc-800,
+    body.vetra-dark .text-zinc-900,
+    body.vetra-dark .text-slate-900 {
+      color: #F2EDE6 !important;
+    }
+    body.vetra-dark .text-ink-secondary,
+    body.vetra-dark .text-zinc-600,
+    body.vetra-dark .text-zinc-700,
+    body.vetra-dark .text-stone-600 {
+      color: #C9C4BC !important;
+    }
+    body.vetra-dark .text-ink-metadata,
+    body.vetra-dark .text-zinc-500,
+    body.vetra-dark .text-zinc-400 {
+      color: #8A8680 !important;
+    }
+    body.vetra-dark table thead {
+      background: #181818 !important;
+      border-color: #3A3A3A !important;
+    }
+    body.vetra-dark table thead th {
+      color: #C9C4BC !important;
+      text-shadow: none !important;
+    }
+    body.vetra-dark select,
+    body.vetra-dark input[type="text"],
+    body.vetra-dark input[type="number"],
+    body.vetra-dark textarea,
+    body.vetra-dark .btn-secondary-vetra {
+      background-color: #181818 !important;
+      color: #F2EDE6 !important;
+      border-color: #3A3A3A !important;
+    }
+    body.vetra-dark .chip-healthy,
+    body.vetra-dark .chip-resolved {
+      color: #F2EDE6 !important;
     }
 
     /* Vetra Card */
     .vetra-card {
-      background-color: #ffffff; border-radius: 12px; border: 1px solid rgba(0,0,0,0.08);
+      background-color: #ffffff; border-radius: 12px; border: 1px solid rgba(161, 161, 161, 0.38);
       box-shadow: 0 2px 8px rgba(0,0,0,0.03); padding: 20px;
       transition: all 0.2s ease;
+    }
+    .vetra-card.p-0 {
+      padding: 0 !important;
     }
     .vetra-card:hover {
       box-shadow: 0 6px 16px rgba(0,0,0,0.06);
@@ -379,7 +506,7 @@
 
     /* Leaflet Customization */
     .leaflet-container { 
-      font-family: 'Figtree', sans-serif !important; 
+      font-family: 'Figtree', 'Noto Sans Devanagari', sans-serif !important; 
       border-radius: 12px; 
       background: #e5ebf0 !important;
       width: 100%;
@@ -391,7 +518,7 @@
       border-radius: 10px !important;
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18) !important;
       padding: 4px !important;
-      border: 1px solid rgba(0,0,0,0.08);
+      border: 1px solid #a1a1a1;
     }
     .leaflet-popup-tip { background: #ffffff !important; }
 
@@ -762,12 +889,17 @@
       </div>
     </div>
 
-    <!-- Right Controls: Live Sync + Export + Threat Warning + User Officer + Replay Intro -->
-    <div class="flex items-center gap-2.5">
-      <!-- Live DB & ML Sync Button -->
-      <button onclick="syncWithLiveBackend(true)" class="px-2.5 py-1 rounded bg-blue-50 hover:bg-blue-100 text-blue-900 border border-blue-200 font-bold text-xs flex items-center gap-1.5 cursor-pointer transition-colors shadow-2xs" title="Synchronize Live PostGIS Reports (:8080) & FastAPI XGBoost (:8001)">
-        <i data-lucide="refresh-cw" class="w-3.5 h-3.5 text-blue-700"></i>
+    <!-- Right Controls: Live Sync + Theme + Export + Threat Warning + User Officer + Replay Intro -->
+    <div class="flex items-center gap-2">
+      <!-- Live DB & ML Sync Button (DESIGN.md button-secondary) -->
+      <button onclick="syncWithLiveBackend(true)" class="btn-secondary-vetra px-2.5 py-1 text-xs cursor-pointer" title="Synchronize Live PostGIS Reports (:8080) & FastAPI XGBoost (:8001)">
+        <i data-lucide="refresh-cw" class="w-3.5 h-3.5 text-ink"></i>
         <span class="hidden sm:inline">Live DB Sync</span>
+      </button>
+
+      <!-- Vetra Daylight / Night Vet Mode Toggle (DESIGN.md §Dark Mode) -->
+      <button id="vetra-theme-toggle" onclick="toggleVetraTheme()" class="btn-secondary-vetra px-2.5 py-1 text-xs cursor-pointer" title="Toggle Vetra Daylight Parchment / Night Vet Emergency Theme (DESIGN.md)">
+        <span id="vetra-theme-label">☀️ Daylight</span>
       </button>
 
       <!-- Export Dossier Button -->
@@ -776,25 +908,25 @@
         <span>Export</span>
       </button>
 
-      <!-- 3 High/Crit Threats Badge -->
-      <button onclick="switchTab('map')" class="flex items-center gap-1.5 bg-red-50 text-[#C62828] border border-red-200 px-3 py-1 rounded font-bold text-xs cursor-pointer hover:bg-red-100 transition-colors">
-        <i data-lucide="alert-triangle" class="w-3.5 h-3.5 text-[#C62828]"></i>
+      <!-- 3 High/Crit Threats Badge (DESIGN.md alert-critical) -->
+      <button onclick="switchTab('map')" class="flex items-center gap-1.5 bg-[#C62828] text-white px-3 py-1 rounded-sm font-bold text-xs cursor-pointer hover:opacity-95 transition-opacity shadow-2xs">
+        <i data-lucide="alert-triangle" class="w-3.5 h-3.5 text-white"></i>
         <span>3 HIGH/CRIT THREATS</span>
       </button>
 
-      <!-- User Profile Badge (Dr. Vikram Deshmukh) -->
+      <!-- User Profile Badge (Dr. Vikram Deshmukh + DESIGN.md vet-role-badge) -->
       <div class="flex items-center gap-2 pl-3 border-l border-black/10">
         <div class="text-right">
-          <div class="font-bold text-xs text-[#141414]">Dr. Vikram Deshmukh</div>
-          <div class="text-[9px] text-zinc-500 uppercase font-semibold">GOVERNMENT_OFFICER</div>
+          <div class="font-bold text-xs text-ink">Dr. Vikram Deshmukh</div>
+          <div class="mt-0.5"><span class="vet-role-badge">VET OFFICER</span></div>
         </div>
-        <div class="w-8 h-8 rounded-full bg-blue-50 border border-blue-200 flex items-center justify-center text-[#2F6FDE]">
+        <div class="w-8 h-8 rounded-full bg-parchment border border-[#a1a1a1] flex items-center justify-center text-[#2F6FDE]">
           <i data-lucide="user" class="w-4 h-4"></i>
         </div>
       </div>
 
       <!-- Replay Intro Button -->
-      <button onclick="replayGovSplash()" class="p-1.5 rounded-lg hover:bg-parchment text-zinc-500 hover:text-black transition-colors" title="Replay Official Portal Intro">
+      <button onclick="replayGovSplash()" class="p-1.5 rounded-lg hover:bg-parchment text-zinc-500 hover:text-ink transition-colors cursor-pointer" title="Replay Official Portal Intro">
         <i data-lucide="shield-check" class="w-4 h-4 text-emerald-700"></i>
       </button>
     </div>
@@ -1043,13 +1175,13 @@
                   <span id="ml-badge-risk" class="chip-critical text-[10px] whitespace-nowrap shrink-0">HIGH (87%)</span>
                 </div>
                 <div class="flex items-center justify-between gap-2 pt-0.5">
-                  <span class="text-[10px] px-2 py-0.5 rounded bg-blue-100 text-blue-900 font-mono font-semibold whitespace-nowrap">v1.0 (180 Trees)</span>
+                  <span class="vet-role-badge font-mono whitespace-nowrap">v1.0 (180 Trees)</span>
                   <div class="flex items-center gap-1.5 shrink-0">
-                    <button onclick="openModelTestModal(); setTimeout(function(){ if(window.trainAndCalibrateOnLiveDB) window.trainAndCalibrateOnLiveDB(); }, 120);" title="Calibrate on Live PostGIS DB & Run FastAPI :8001" class="px-2.5 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded text-[10px] font-bold flex items-center gap-1 cursor-pointer transition-all shadow-2xs whitespace-nowrap">
+                    <button onclick="openModelTestModal(); setTimeout(function(){ if(window.trainAndCalibrateOnLiveDB) window.trainAndCalibrateOnLiveDB(); }, 120);" title="Calibrate on Live PostGIS DB & Run FastAPI :8001" class="btn-secondary-vetra px-2.5 py-1 text-[10px] cursor-pointer whitespace-nowrap">
                       <span>⚡ Calibrate DB</span>
                     </button>
-                    <button onclick="openModelTestModal()" title="Run Custom Feature Vector Test" class="px-2.5 py-1 bg-parchment hover:bg-white border border-black/15 rounded text-[10px] font-bold text-ink flex items-center gap-1 cursor-pointer transition-all whitespace-nowrap">
-                      <i data-lucide="play" class="w-3 h-3 text-[#16a34a]"></i> Simulator
+                    <button onclick="openModelTestModal()" title="Run Custom Feature Vector Test" class="btn-secondary-vetra px-2.5 py-1 text-[10px] cursor-pointer whitespace-nowrap">
+                      <i data-lucide="play" class="w-3 h-3 text-[#141414]"></i> Simulator
                     </button>
                   </div>
                 </div>
@@ -1726,8 +1858,8 @@
               <span id="cases-sync-subtitle" class="text-xs text-ink-metadata font-inter ml-2">Synced with Go PostGIS Backend (:8080) &amp; Mobile TFLite Scanner</span>
             </div>
             <div class="flex items-center gap-2">
-              <button onclick="syncWithLiveBackend(true)" class="px-3 py-1.5 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-900 border border-blue-200 font-bold text-xs flex items-center gap-1.5 cursor-pointer transition-all shadow-2xs">
-                <i data-lucide="refresh-cw" class="w-3.5 h-3.5 text-blue-700"></i> Sync Mobile Reports (:8080)
+              <button onclick="syncWithLiveBackend(true)" class="btn-secondary-vetra px-3 py-1.5 text-xs cursor-pointer">
+                <i data-lucide="refresh-cw" class="w-3.5 h-3.5 text-[#141414]"></i> Sync Mobile Reports (:8080)
               </button>
               <button onclick="exportData()" class="aero-btn aero-btn-excel text-xs flex items-center gap-1.5 cursor-pointer shadow-sm">
                 <i data-lucide="file-spreadsheet" class="w-4 h-4 text-emerald-200"></i> Export
@@ -3688,10 +3820,10 @@
         <div class="pt-2 flex flex-wrap justify-between items-center gap-2">
           <span class="text-[11px] text-zinc-500 italic">"Experimental estimate. Not a confirmed forecast."</span>
           <div class="flex items-center gap-2">
-            <button type="button" onclick="trainAndCalibrateOnLiveDB()" class="px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg shadow-sm flex items-center gap-1.5 cursor-pointer text-xs transition-all">
+            <button type="button" onclick="trainAndCalibrateOnLiveDB()" class="btn-secondary-vetra px-3.5 py-2 text-xs cursor-pointer">
               <span>⚡ Train / Calibrate on Live DB</span>
             </button>
-            <button type="button" onclick="runSimulatedInference()" class="px-4 py-2 bg-[#16a34a] hover:bg-[#15803d] text-white font-bold rounded-lg shadow-sm flex items-center gap-1.5 cursor-pointer text-xs transition-all">
+            <button type="button" onclick="runSimulatedInference()" class="btn-primary px-4 py-2 text-xs cursor-pointer h-auto">
               <i data-lucide="play" class="w-4 h-4"></i> Run XGBoost Inference
             </button>
           </div>
@@ -4296,6 +4428,17 @@
       document.body.removeChild(link);
     }
 
+    // Vetra Daylight / Night Vet Emergency Theme Toggle (DESIGN.md §Dark Mode)
+    function toggleVetraTheme() {
+      var isDark = document.body.classList.toggle('vetra-dark');
+      var lbl = document.getElementById('vetra-theme-label');
+      if (lbl) lbl.innerText = isDark ? '🌙 Night Vet' : '☀️ Daylight';
+      if (typeof showNotificationToast === 'function') {
+        showNotificationToast(isDark ? '🌙 Vetra Night Vet Emergency Mode Active (DESIGN.md)' : '☀️ Vetra Daylight Parchment Mode Active (DESIGN.md)');
+      }
+    }
+    window.toggleVetraTheme = toggleVetraTheme;
+
     // Global Boundary Layer References & Feature Lookups
     var boundaryLayers = {
       overview: { state: null, districts: null, talukas: null },
@@ -4303,6 +4446,61 @@
     };
     var districtFeatureBounds = {};
     var talukaFeatureBounds = {};
+    var activeSelectedDistrict = 'all';
+    var activeSelectedTaluka = 'all';
+
+    function getVetraTalukaStyle(feature) {
+      var props = (feature && feature.properties) || {};
+      var tName = (props.name || '').toLowerCase();
+      var dName = (props.district || '').toLowerCase();
+      var isSelectedTaluka = (activeSelectedTaluka !== 'all' && tName === activeSelectedTaluka.toLowerCase());
+      var isSelectedDistrict = (activeSelectedDistrict !== 'all' && dName === activeSelectedDistrict.toLowerCase());
+
+      if (isSelectedTaluka) {
+        return {
+          pane: 'talukaBoundaryPane',
+          color: '#141414',
+          weight: 2.8,
+          opacity: 1.0,
+          dashArray: null,
+          fillColor: '#94e130',
+          fillOpacity: 0.24
+        };
+      }
+      if (isSelectedDistrict) {
+        return {
+          pane: 'talukaBoundaryPane',
+          color: '#141414',
+          weight: 1.6,
+          opacity: 0.9,
+          dashArray: '3, 3',
+          fillColor: '#94e130',
+          fillOpacity: 0.09
+        };
+      }
+      var risk = props.risk_level || 'low';
+      var stroke = risk === 'critical' ? '#C62828' : (risk === 'high' ? '#d97706' : '#57534e');
+      return {
+        pane: 'talukaBoundaryPane',
+        color: stroke,
+        weight: 1.2,
+        opacity: 0.82,
+        dashArray: '2, 4',
+        fillColor: stroke,
+        fillOpacity: 0.04
+      };
+    }
+
+    function refreshTalukaStyles() {
+      ['overview', 'full'].forEach(function(k) {
+        var grp = boundaryLayers[k].talukas;
+        if (grp && typeof grp.eachLayer === 'function') {
+          grp.eachLayer(function(l) {
+            if (l.feature) l.setStyle(getVetraTalukaStyle(l.feature));
+          });
+        }
+      });
+    }
 
     function toggleBoundaryLayer(layerType, checked) {
       // Sync checkboxes across Overview and Full GIS maps
@@ -4329,7 +4527,7 @@
         }
       }
 
-      var labelMap = { state: 'Maharashtra State Boundary', districts: '36 District Boundaries', talukas: 'Taluka / Tehsil Boundaries' };
+      var labelMap = { state: 'Maharashtra State Boundary', districts: '35 District Boundaries', talukas: '37 Taluka / Tehsil Boundaries' };
       if (typeof showNotificationToast === 'function') {
         showNotificationToast((checked ? '✓ Enabled: ' : 'Hidden: ') + (labelMap[layerType] || layerType));
       }
@@ -4337,6 +4535,9 @@
     window.toggleBoundaryLayer = toggleBoundaryLayer;
 
     function zoomMapsToDistrict(distName) {
+      activeSelectedDistrict = distName || 'all';
+      activeSelectedTaluka = 'all';
+      refreshTalukaStyles();
       if (!distName || distName === 'all') {
         resetOverviewMapView('clusters');
         resetFullMapView('clusters');
@@ -4360,6 +4561,8 @@
     window.zoomMapsToDistrict = zoomMapsToDistrict;
 
     function zoomMapsToTaluka(talukaName) {
+      activeSelectedTaluka = talukaName || 'all';
+      refreshTalukaStyles();
       if (!talukaName || talukaName === 'all') {
         var distEl = document.getElementById('map-district-filter');
         if (distEl && distEl.value !== 'all') {
@@ -4373,6 +4576,8 @@
       toggleBoundaryLayer('talukas', true);
       var info = talukaFeatureBounds[talukaName.toLowerCase()];
       if (info && info.bounds) {
+        activeSelectedDistrict = info.district || activeSelectedDistrict;
+        refreshTalukaStyles();
         if (overviewMap) {
           overviewMap.invalidateSize(true);
           overviewMap.flyToBounds(info.bounds, { padding: [28, 28], maxZoom: 11, duration: 0.6 });
@@ -4380,6 +4585,9 @@
         if (fullMap) {
           fullMap.invalidateSize(true);
           fullMap.flyToBounds(info.bounds, { padding: [36, 36], maxZoom: 11, duration: 0.6 });
+          if (info.fullLayer && typeof info.fullLayer.openTooltip === 'function') {
+            setTimeout(function() { info.fullLayer.openTooltip(); }, 650);
+          }
         }
       }
     }
@@ -4392,6 +4600,9 @@
       var name = parts[1] || 'Maharashtra';
 
       if (kind === 'state') {
+        activeSelectedDistrict = 'all';
+        activeSelectedTaluka = 'all';
+        refreshTalukaStyles();
         var distFilter = document.getElementById('map-district-filter');
         var talFilter = document.getElementById('map-taluka-filter');
         if (distFilter) distFilter.value = 'all';
@@ -4407,15 +4618,18 @@
         applyGISFilters();
         zoomMapsToDistrict(name);
         if (typeof showNotificationToast === 'function') {
-          showNotificationToast('Scope focused on ' + name + ' District boundary');
+          showNotificationToast('✓ Scope focused on ' + name + ' District boundary');
         }
       } else if (kind === 'taluka') {
         var talFilter3 = document.getElementById('map-taluka-filter');
         if (talFilter3) talFilter3.value = name;
+        var info = talukaFeatureBounds[name.toLowerCase()];
+        var distFilter3 = document.getElementById('map-district-filter');
+        if (info && info.district && distFilter3) distFilter3.value = info.district;
         applyGISFilters();
         zoomMapsToTaluka(name);
         if (typeof showNotificationToast === 'function') {
-          showNotificationToast('Scope focused on ' + name + ' Taluka boundary');
+          showNotificationToast('✓ Scope focused on ' + name + ' Taluka boundary');
         }
       }
     }
@@ -4424,6 +4638,8 @@
     function onSelectGISDistrictFilter(distVal) {
       var talEl = document.getElementById('map-taluka-filter');
       if (talEl) talEl.value = 'all';
+      var scopeEl = document.getElementById('global-scope-select');
+      if (scopeEl) scopeEl.value = (distVal === 'all') ? 'state:Maharashtra' : ('district:' + distVal);
       applyGISFilters();
       zoomMapsToDistrict(distVal);
     }
@@ -4436,6 +4652,8 @@
         if (info && info.district && distEl) {
           distEl.value = info.district;
         }
+        var scopeEl = document.getElementById('global-scope-select');
+        if (scopeEl) scopeEl.value = 'taluka:' + talVal;
       }
       applyGISFilters();
       zoomMapsToTaluka(talVal);
@@ -4736,22 +4954,35 @@
         maxBoundsViscosity: 1.0,
         scrollWheelZoom: false // Disables mouse-wheel zooming while scrolling page
       }).setView(centerCoords, 8);
-      overviewTileLayer = L.tileLayer(defaultSource.url, { attribution: defaultSource.attr, maxZoom: 18 }).addTo(overviewMap);
+      overviewTileLayer = L.tileLayer(defaultSource.url, { attribution: defaultSource.attr, minZoom: 6, maxZoom: 18, noWrap: true }).addTo(overviewMap);
 
       // 2. Full GIS Surveillance Map
       fullMap = L.map('full-map', {
         minZoom: 6,
         maxZoom: 18,
         maxBounds: mhBounds,
-        maxBoundsViscosity: 0.95
+        maxBoundsViscosity: 1.0
       }).setView(centerCoords, 8);
-      fullTileLayer = L.tileLayer(defaultSource.url, { attribution: defaultSource.attr, maxZoom: 18 }).addTo(fullMap);
+      fullTileLayer = L.tileLayer(defaultSource.url, { attribution: defaultSource.attr, minZoom: 6, maxZoom: 18, noWrap: true }).addTo(fullMap);
 
-      // Create dedicated Leaflet panes for Administrative Boundaries so they sit below clusters & markers
+      // Guard both maps against ever zooming out below Maharashtra state level (zoom 6)
       [overviewMap, fullMap].forEach(function(m) {
         var sp = m.createPane('stateBoundaryPane'); sp.style.zIndex = 330; sp.style.pointerEvents = 'none';
         var dp = m.createPane('districtBoundaryPane'); dp.style.zIndex = 340;
         var tp = m.createPane('talukaBoundaryPane'); tp.style.zIndex = 350;
+        m.on('zoomend', function() {
+          if (m.getZoom() < 6) {
+            m.setView(centerCoords, 7, { animate: false });
+          }
+        });
+      });
+
+      // Ensure overviewMap & fullMap fill 100% of their card heights during & after intro splash
+      [120, 450, 1200, 2600].forEach(function(delayMs) {
+        setTimeout(function() {
+          if (overviewMap) overviewMap.invalidateSize(true);
+          if (fullMap) fullMap.invalidateSize(true);
+        }, delayMs);
       });
 
       // Automatically resize overviewMap & fullMap whenever their containers adjust
@@ -4810,14 +5041,14 @@
       clusterLayers.push(c2_full);
 
       // 1. Load Official Maharashtra State Boundary (/geo/state.json)
-      fetch('/geo/state.json')
+      fetch('/geo/state.json?v=2')
         .then(function(res) { return res.json(); })
         .then(function(stateGeo) {
           var stateStyle = {
             pane: 'stateBoundaryPane',
-            color: '#1e293b',
+            color: '#141414',
             weight: 2.6,
-            opacity: 0.85,
+            opacity: 0.88,
             dashArray: '8, 4',
             fillColor: '#64748b',
             fillOpacity: 0.015,
@@ -4829,12 +5060,12 @@
         .catch(function(err) { console.warn('Could not load /geo/state.json', err); });
 
       // 2. Load All 35 Official Maharashtra District Boundaries (/geo/districts.json)
-      fetch('/geo/districts.json')
+      fetch('/geo/districts.json?v=35')
         .then(function(res) { return res.json(); })
         .then(function(distGeo) {
           function getDistrictStyle(feature) {
             var risk = (feature.properties && feature.properties.risk_level) || 'low';
-            var fillCol = risk === 'critical' ? '#ef4444' : (risk === 'high' ? '#f59e0b' : '#64748b');
+            var fillCol = risk === 'critical' ? '#C62828' : (risk === 'high' ? '#F2994A' : '#64748b');
             var fillOp = (risk === 'critical' || risk === 'high') ? 0.045 : 0.015;
             return {
               pane: 'districtBoundaryPane',
@@ -4854,20 +5085,20 @@
               } catch(e) {}
               layer.bindTooltip(
                 "<div style='font-family:Figtree,sans-serif;font-size:12px;padding:3px;'>" +
-                "<strong style='color:#0f172a;'>" + dName + " District</strong> <span style='font-size:10px;color:#64748b;'>(Maharashtra)</span><br>" +
-                "<span style='color:#334155;font-size:11px;'>Active Cases: <strong>" + (feature.properties.active_cases || 0) + "</strong> &bull; Risk: <strong style='text-transform:uppercase;'>" + (feature.properties.risk_level || 'low') + "</strong></span><br>" +
-                "<span style='color:#64748b;font-size:10px;'>" + (feature.properties.surveillance_status || 'Routine District Surveillance') + "</span>" +
+                "<strong style='color:#141414;'>" + dName + " District</strong> <span style='font-size:10px;color:#737373;'>(Maharashtra)</span><br>" +
+                "<span style='color:#4e4d4c;font-size:11px;'>Active Cases: <strong>" + (feature.properties.active_cases || 0) + "</strong> &bull; Risk: <strong style='text-transform:uppercase;'>" + (feature.properties.risk_level || 'low') + "</strong></span><br>" +
+                "<span style='color:#737373;font-size:10px;'>" + (feature.properties.surveillance_status || 'Routine District Surveillance') + "</span>" +
                 "</div>",
                 { sticky: true }
               );
               layer.on('mouseover', function() {
-                layer.setStyle({ weight: 2.4, color: '#2563eb', fillOpacity: 0.11 });
+                layer.setStyle({ weight: 2.4, color: '#141414', fillOpacity: 0.11 });
               });
               layer.on('mouseout', function() {
                 layer.setStyle(getDistrictStyle(feature));
               });
               layer.on('click', function() {
-                mapRef.flyToBounds(layer.getBounds(), { padding: [26, 26], maxZoom: 9, duration: 0.55 });
+                onSelectGISDistrictFilter(dName);
               });
             }
           }
@@ -4883,61 +5114,100 @@
         })
         .catch(function(err) { console.warn('Could not load /geo/districts.json', err); });
 
-      // 3. Load Official Maharashtra Taluka / Tehsil Boundaries (/geo/talukas.json)
-      fetch('/geo/talukas.json')
+      // 3. Load All 37 Verified Maharashtra Taluka / Tehsil Boundaries (/geo/talukas.json)
+      fetch('/geo/talukas.json?v=37')
         .then(function(res) { return res.json(); })
         .then(function(talGeo) {
-          function getTalukaStyle(feature) {
-            var risk = (feature.properties && feature.properties.risk_level) || 'low';
-            var stroke = risk === 'critical' ? '#b91c1c' : (risk === 'high' ? '#d97706' : '#0f766e');
-            return {
-              pane: 'talukaBoundaryPane',
-              color: stroke,
-              weight: 1.3,
-              opacity: 0.85,
-              dashArray: '2, 4',
-              fillColor: stroke,
-              fillOpacity: 0.05
-            };
-          }
-          function bindTalukaFeature(feature, layer, mapRef) {
+          function bindTalukaFeature(feature, layer, mapRef, isFull) {
             if (feature.properties && feature.properties.name) {
               var tName = feature.properties.name;
               var dName = feature.properties.district || 'Maharashtra';
               try {
-                talukaFeatureBounds[tName.toLowerCase()] = {
-                  bounds: layer.getBounds(),
-                  district: dName
-                };
+                var key = tName.toLowerCase();
+                if (!talukaFeatureBounds[key]) {
+                  talukaFeatureBounds[key] = {
+                    bounds: layer.getBounds(),
+                    district: dName,
+                    fullLayer: null
+                  };
+                }
+                if (isFull) {
+                  talukaFeatureBounds[key].fullLayer = layer;
+                }
               } catch(e) {}
               layer.bindTooltip(
                 "<div style='font-family:Figtree,sans-serif;font-size:12px;padding:3px;'>" +
-                "<strong style='color:#0f766e;'>" + tName + " Taluka</strong> <span style='font-size:10px;color:#475569;'>(" + dName + " District)</span><br>" +
-                "<span style='color:#1e293b;font-size:11px;'>Active Cases: <strong>" + (feature.properties.active_cases || 0) + "</strong> &bull; Vet: <strong>" + (feature.properties.vet_officer || 'Assigned') + "</strong></span><br>" +
-                "<span style='color:#64748b;font-size:10px;'>" + (feature.properties.surveillance_status || 'Monitored') + "</span>" +
+                "<strong style='color:#141414;'>" + tName + " Taluka</strong> <span style='font-size:10px;color:#737373;'>(" + dName + " District)</span><br>" +
+                "<span style='color:#4e4d4c;font-size:11px;'>Active Cases: <strong>" + (feature.properties.active_cases || 0) + "</strong> &bull; Vet: <strong>" + (feature.properties.vet_officer || 'Assigned') + "</strong></span><br>" +
+                "<span style='color:#737373;font-size:10px;'>" + (feature.properties.surveillance_status || 'Monitored') + "</span>" +
                 "</div>",
                 { sticky: true }
               );
               layer.on('mouseover', function() {
-                layer.setStyle({ weight: 2.3, color: '#0d9488', fillOpacity: 0.16 });
+                layer.setStyle({ weight: 2.5, color: '#141414', fillColor: '#94e130', fillOpacity: 0.22 });
               });
               layer.on('mouseout', function() {
-                layer.setStyle(getTalukaStyle(feature));
+                layer.setStyle(getVetraTalukaStyle(feature));
               });
               layer.on('click', function() {
-                mapRef.flyToBounds(layer.getBounds(), { padding: [32, 32], maxZoom: 11, duration: 0.55 });
+                onSelectGISTalukaFilter(tName);
               });
             }
           }
           boundaryLayers.overview.talukas = L.geoJSON(talGeo, {
-            style: getTalukaStyle,
-            onEachFeature: function(f, l) { bindTalukaFeature(f, l, overviewMap); }
+            style: getVetraTalukaStyle,
+            onEachFeature: function(f, l) { bindTalukaFeature(f, l, overviewMap, false); }
           }).addTo(overviewMap);
 
           boundaryLayers.full.talukas = L.geoJSON(talGeo, {
-            style: getTalukaStyle,
-            onEachFeature: function(f, l) { bindTalukaFeature(f, l, fullMap); }
+            style: getVetraTalukaStyle,
+            onEachFeature: function(f, l) { bindTalukaFeature(f, l, fullMap, true); }
           }).addTo(fullMap);
+
+          // Dynamically populate #map-taluka-filter and #global-scope-select with all 37 verified Talukas grouped by District
+          if (talGeo && Array.isArray(talGeo.features)) {
+            var byDist = {};
+            talGeo.features.forEach(function(ft) {
+              if (!ft.properties || !ft.properties.name) return;
+              var d = ft.properties.district || 'Other';
+              if (!byDist[d]) byDist[d] = [];
+              byDist[d].push(ft.properties);
+            });
+            var talSelect = document.getElementById('map-taluka-filter');
+            if (talSelect) {
+              var currentVal = talSelect.value || 'all';
+              talSelect.innerHTML = '<option value="all">All Talukas (' + talGeo.features.length + ' Mapped)</option>';
+              Object.keys(byDist).forEach(function(d) {
+                var og = document.createElement('optgroup');
+                og.label = d + ' District (' + byDist[d].length + ' Talukas)';
+                byDist[d].forEach(function(tp) {
+                  var opt = document.createElement('option');
+                  opt.value = tp.name;
+                  opt.textContent = tp.name + ' Taluka (' + (tp.active_cases || 0) + ' cases)';
+                  og.appendChild(opt);
+                });
+                talSelect.appendChild(og);
+              });
+              talSelect.value = currentVal;
+            }
+            var scopeSelect = document.getElementById('global-scope-select');
+            if (scopeSelect) {
+              var oldGroups = scopeSelect.querySelectorAll('optgroup');
+              if (oldGroups.length >= 2) {
+                var talGroup = oldGroups[1];
+                talGroup.label = 'Surveillance Talukas / Tehsils (' + talGeo.features.length + ' Official OSM Boundaries)';
+                talGroup.innerHTML = '';
+                Object.keys(byDist).forEach(function(d) {
+                  byDist[d].forEach(function(tp) {
+                    var opt = document.createElement('option');
+                    opt.value = 'taluka:' + tp.name;
+                    opt.textContent = tp.name + ' Taluka (' + d + ')';
+                    talGroup.appendChild(opt);
+                  });
+                });
+              }
+            }
+          }
         })
         .catch(function(err) { console.warn('Could not load /geo/talukas.json', err); });
 

@@ -120,28 +120,30 @@ export const RiskIntelligenceCard: React.FC<RiskIntelligenceCardProps> = ({
     <div className="vetra-card flex flex-col justify-between">
       <div>
         {/* Model Header */}
-        <div className="flex items-center justify-between pb-3 border-b border-black/5">
-          <div className="flex items-center gap-2">
-            <div className="p-2 bg-red-100 rounded-lg">
-              <ShieldAlert className="w-5 h-5 text-[#C62828]" />
-            </div>
-            <div>
-              <div className="flex items-center gap-1.5">
-                <h3 className="font-figtree font-bold text-sm text-ink">
+        <div className="pb-3 border-b border-black/5 space-y-2">
+          <div className="flex items-start justify-between gap-2">
+            <div className="flex items-center gap-2 min-w-0">
+              <div className="p-2 bg-red-100 rounded-lg shrink-0">
+                <ShieldAlert className="w-5 h-5 text-[#C62828]" />
+              </div>
+              <div className="min-w-0">
+                <h3 className="font-figtree font-bold text-sm text-ink whitespace-nowrap">
                   XGBoost Outbreak Risk Model
                 </h3>
-                <span className="text-[10px] px-1.5 py-0.5 rounded bg-blue-100 text-blue-900 font-mono font-semibold">
-                  v1.0 (300 Trees)
-                </span>
+                <p className="text-[11px] text-ink-metadata font-inter whitespace-nowrap">
+                  96.27% Acc • 94.74% Recall • 0.9914 ROC-AUC
+                </p>
               </div>
-              <p className="text-[11px] text-ink-metadata font-inter">
-                96.27% Acc • 94.74% Recall • 0.9914 ROC-AUC
-              </p>
             </div>
+            <span className={`text-[11px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider whitespace-nowrap shrink-0 ${colors.badge}`}>
+              {prediction.outbreak_risk_level} ({Math.round(prediction.risk_probability * 100)}%)
+            </span>
           </div>
-          <span className={`text-[11px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider ${colors.badge}`}>
-            {prediction.outbreak_risk_level} ({Math.round(prediction.risk_probability * 100)}%)
-          </span>
+          <div className="flex items-center justify-between gap-2">
+            <span className="text-[10px] px-2 py-0.5 rounded border border-[#2F6FDE] bg-[#2F6FDE]/5 text-[#2F6FDE] font-mono font-semibold whitespace-nowrap">
+              v1.0 (180 Trees)
+            </span>
+          </div>
         </div>
 
         {/* District Selector & Real-Time Probability Gauge */}

@@ -448,6 +448,8 @@ try {
                 }
             }
 
+            $response.Headers.Add("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0")
+            $response.Headers.Add("Pragma", "no-cache")
             if (Test-Path $filePath -PathType Leaf) {
                 $bytes = [System.IO.File]::ReadAllBytes($filePath)
                 $ext = [System.IO.Path]::GetExtension($filePath).ToLower()
