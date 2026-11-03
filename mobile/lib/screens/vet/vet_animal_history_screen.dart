@@ -494,35 +494,86 @@ class _VetAnimalHistoryScreenState extends State<VetAnimalHistoryScreen> with Si
   }
 
   Widget _buildObservationItem(RecordItem item) {
+    final recType = (item.s('record_type') ?? 'observation').toUpperCase();
+    final tempC = item.s('temperature_c');
+    final weightKg = item.s('weight_kg');
+    final vetName = item.s('recorded_by_name');
+    final isIllness = recType == 'ILLNESS';
+
     return Container(
       padding: const EdgeInsets.all(AppSpacing.md),
       decoration: BoxDecoration(
         color: AppColors.surface,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-        border: Border.all(color: AppColors.border),
+        border: Border.all(
+          color: isIllness ? AppColors.alertCritical.withValues(alpha: 0.35) : AppColors.border,
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Icon(Icons.notes, size: 18, color: AppColors.primary),
-              if (item.s('recorded_at') != null)
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                decoration: BoxDecoration(
+                  color: isIllness
+                      ? AppColors.alertCritical.withValues(alpha: 0.12)
+                      : AppColors.primary.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      isIllness ? Icons.monitor_heart : Icons.fact_check_outlined,
+                      size: 13,
+                      color: isIllness ? AppColors.alertCritical : AppColors.primary,
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      recType,
+                      style: AppTypography.badge.copyWith(
+                        fontSize: 10,
+                        color: isIllness ? AppColors.alertCritical : AppColors.primary,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const Spacer(),
+              if (item.s('recorded_at') != null && item.s('recorded_at')!.length >= 10)
                 Text(
                   item.s('recorded_at')!.substring(0, 10),
                   style: AppTypography.caption,
                 ),
             ],
           ),
-          const SizedBox(height: 6),
+          const SizedBox(height: 8),
           Text(item.s('summary') ?? '', style: AppTypography.bodyDefault),
+          if ((tempC != null && tempC.isNotEmpty) || (weightKg != null && weightKg.isNotEmpty) || (vetName != null && vetName.isNotEmpty)) ...[
+            const SizedBox(height: 8),
+            Wrap(
+              spacing: 8,
+              runSpacing: 6,
+              children: [
+                if (tempC != null && tempC.isNotEmpty)
+                  _chip('🌡️ $tempC °C'),
+                if (weightKg != null && weightKg.isNotEmpty)
+                  _chip('⚖️ $weightKg kg'),
+                if (vetName != null && vetName.isNotEmpty)
+                  _chip('👨‍⚕️ $vetName'),
+              ],
+            ),
+          ],
         ],
       ),
     );
   }
 
   Widget _buildTreatmentItem(RecordItem item) {
+    final vetName = item.s('prescribed_by_name');
+    final notes = item.s('notes') ?? item.s('instructions');
     return Container(
       padding: const EdgeInsets.all(AppSpacing.md),
       decoration: BoxDecoration(
@@ -534,20 +585,31 @@ class _VetAnimalHistoryScreenState extends State<VetAnimalHistoryScreen> with Si
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(item.s('treatment_name') ?? 'Treatment', style: AppTypography.cardTitle),
+              const Icon(Icons.medication_liquid, size: 18, color: AppColors.primary),
+              const SizedBox(width: 6),
+              Expanded(
+                child: Text(
+                  item.s('treatment_name') ?? item.s('medication_name') ?? 'Treatment',
+                  style: AppTypography.cardTitle,
+                ),
+              ),
               if (item.s('started_on') != null)
                 Text(item.s('started_on')!, style: AppTypography.caption),
             ],
           ),
           if (item.s('dosage') != null && item.s('dosage')!.isNotEmpty) ...[
-            const SizedBox(height: 4),
+            const SizedBox(height: 6),
             Text('${AppStrings.t('treat_dosage')}: ${item.s('dosage')}', style: AppTypography.bodySecondary),
           ],
-          if (item.s('notes') != null && item.s('notes')!.isNotEmpty) ...[
+          if (notes != null && notes.isNotEmpty) ...[
             const SizedBox(height: 4),
-            Text(item.s('notes')!, style: AppTypography.caption),
+            Text(notes, style: AppTypography.caption),
+          ],
+          if (vetName != null && vetName.isNotEmpty) ...[
+            const SizedBox(height: 6),
+            _chip('👨‍⚕️ $vetName'),
           ],
         ],
       ),
@@ -566,9 +628,13 @@ class _VetAnimalHistoryScreenState extends State<VetAnimalHistoryScreen> with Si
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(item.s('vaccine_name') ?? 'Vaccine', style: AppTypography.cardTitle),
+              const Icon(Icons.vaccines, size: 18, color: AppColors.primary),
+              const SizedBox(width: 6),
+              Expanded(
+                child: Text(item.s('vaccine_name') ?? 'Vaccine', style: AppTypography.cardTitle),
+              ),
               if (item.s('administered_on') != null)
                 Text(item.s('administered_on')!, style: AppTypography.caption),
             ],
@@ -576,6 +642,10 @@ class _VetAnimalHistoryScreenState extends State<VetAnimalHistoryScreen> with Si
           if (item.s('batch_number') != null) ...[
             const SizedBox(height: 4),
             Text('Batch: ${item.s('batch_number')}', style: AppTypography.caption),
+          ],
+          if (item.s('notes') != null && item.s('notes')!.isNotEmpty) ...[
+            const SizedBox(height: 4),
+            Text(item.s('notes')!, style: AppTypography.caption),
           ],
           if (item.s('next_due_on') != null) ...[
             const SizedBox(height: 4),
@@ -605,6 +675,7 @@ class _VetAnimalHistoryScreenState extends State<VetAnimalHistoryScreen> with Si
         final repId = r.s('id') ?? '';
         final status = r.s('status') ?? 'submitted';
         final statusColor = AppColors.statusColor(status);
+        final sub = r.s('description') ?? r.s('symptoms') ?? r.s('confirmed_disease_code') ?? '';
 
         return Card(
           elevation: 0.5,
@@ -619,7 +690,7 @@ class _VetAnimalHistoryScreenState extends State<VetAnimalHistoryScreen> with Si
                     )
                 : null,
             title: Text('${AppStrings.t('report_label')} #${repId.length > 8 ? repId.substring(0, 8) : repId}'),
-            subtitle: Text(r.s('symptoms') ?? ''),
+            subtitle: Text(sub, maxLines: 2, overflow: TextOverflow.ellipsis),
             trailing: Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
               decoration: BoxDecoration(

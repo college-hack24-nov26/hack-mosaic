@@ -42,7 +42,7 @@ class AppTheme {
           foregroundColor: Colors.white,
           textStyle: AppTypography.button,
           elevation: 0,
-          minimumSize: const Size(double.infinity, 50),
+          minimumSize: const Size(64, 48),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
           ),
@@ -53,7 +53,7 @@ class AppTheme {
           foregroundColor: AppColors.primary,
           side: const BorderSide(color: AppColors.primary, width: 1.5),
           textStyle: AppTypography.button.copyWith(color: AppColors.primary),
-          minimumSize: const Size(double.infinity, 50),
+          minimumSize: const Size(64, 48),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
           ),

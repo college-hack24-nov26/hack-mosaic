@@ -251,6 +251,7 @@ class _VetReportDetailsScreenState extends State<VetReportDetailsScreen> {
   }
 
   Widget _buildStatusHeaderCard(VetReport r, Color statusColor) {
+    final shortId = r.id.length > 12 ? '${r.id.substring(0, 8)}…${r.id.substring(r.id.length - 4)}' : r.id;
     return Container(
       padding: const EdgeInsets.all(AppSpacing.md),
       decoration: BoxDecoration(
@@ -261,20 +262,24 @@ class _VetReportDetailsScreenState extends State<VetReportDetailsScreen> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                '${AppStrings.t('submitted_label')}: ${r.reportedAt.day}/${r.reportedAt.month}/${r.reportedAt.year} ${r.reportedAt.hour.toString().padLeft(2, '0')}:${r.reportedAt.minute.toString().padLeft(2, '0')}',
-                style: AppTypography.caption,
-              ),
-              const SizedBox(height: 4),
-              Text(
-                'ID: ${r.id}',
-                style: AppTypography.caption.copyWith(fontWeight: FontWeight.bold),
-              ),
-            ],
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '${AppStrings.t('submitted_label')}: ${r.reportedAt.day}/${r.reportedAt.month}/${r.reportedAt.year} ${r.reportedAt.hour.toString().padLeft(2, '0')}:${r.reportedAt.minute.toString().padLeft(2, '0')}',
+                  style: AppTypography.caption,
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  'ID: #$shortId',
+                  style: AppTypography.caption.copyWith(fontWeight: FontWeight.bold),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ),
           ),
+          const SizedBox(width: AppSpacing.sm),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             decoration: BoxDecoration(
@@ -306,12 +311,21 @@ class _VetReportDetailsScreenState extends State<VetReportDetailsScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Row(
-                children: [
-                  const Icon(Icons.pets, color: AppColors.primary, size: 20),
-                  const SizedBox(width: 8),
-                  Text(AppStrings.t('animal_section'), style: AppTypography.sectionHeading),
-                ],
+              Flexible(
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.pets, color: AppColors.primary, size: 20),
+                    const SizedBox(width: 8),
+                    Flexible(
+                      child: Text(
+                        AppStrings.t('animal_section'),
+                        style: AppTypography.sectionHeading,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                ),
               ),
               TextButton.icon(
                 onPressed: () => Navigator.of(context).push(
@@ -360,17 +374,24 @@ class _VetReportDetailsScreenState extends State<VetReportDetailsScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(farmer.fullName, style: AppTypography.cardTitle),
-                  if (farmer.phone != null) ...[
-                    const SizedBox(height: 2),
-                    Text(farmer.phone!, style: AppTypography.bodySecondary),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      farmer.fullName,
+                      style: AppTypography.cardTitle,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    if (farmer.phone != null) ...[
+                      const SizedBox(height: 2),
+                      Text(farmer.phone!, style: AppTypography.bodySecondary),
+                    ],
                   ],
-                ],
+                ),
               ),
-              if (farmer.phone != null)
+              if (farmer.phone != null) ...[
+                const SizedBox(width: AppSpacing.sm),
                 ElevatedButton.icon(
                   onPressed: () => _makePhoneCall(farmer.phone!),
                   icon: const Icon(Icons.phone, size: 16, color: Colors.white),
@@ -378,10 +399,12 @@ class _VetReportDetailsScreenState extends State<VetReportDetailsScreen> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primary,
                     foregroundColor: Colors.white,
+                    minimumSize: const Size(0, 38),
                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                     textStyle: AppTypography.button.copyWith(fontSize: 12),
                   ),
                 ),
+              ],
             ],
           ),
         ],
@@ -403,18 +426,29 @@ class _VetReportDetailsScreenState extends State<VetReportDetailsScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Row(
-                children: [
-                  const Icon(Icons.location_on, color: AppColors.primary, size: 20),
-                  const SizedBox(width: 8),
-                  Text(AppStrings.t('gps_location'), style: AppTypography.sectionHeading),
-                ],
+              Flexible(
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.location_on, color: AppColors.primary, size: 20),
+                    const SizedBox(width: 8),
+                    Flexible(
+                      child: Text(
+                        AppStrings.t('gps_location'),
+                        style: AppTypography.sectionHeading,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                ),
               ),
+              const SizedBox(width: AppSpacing.sm),
               OutlinedButton.icon(
                 onPressed: () => _openCoordinates(loc.lat, loc.lng),
                 icon: const Icon(Icons.map, size: 16),
                 label: Text(AppStrings.t('open_maps')),
                 style: OutlinedButton.styleFrom(
+                  minimumSize: const Size(0, 36),
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                 ),
               ),

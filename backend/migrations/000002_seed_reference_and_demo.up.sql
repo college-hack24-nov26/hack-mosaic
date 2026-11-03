@@ -247,12 +247,35 @@ INSERT INTO health_records (id, animal_id, recorded_by_user_id, source_report_id
     ('77777777-7777-4777-8777-777777777002',
      '33333333-3333-4333-8333-333333333003',
      '22222222-2222-4222-8222-222222222101',
-     '44444444-4444-4444-8444-444444444003', 'illness', 'Clinical examination confirmed LSD nodules; isolation started.', 360.0, 39.8, NOW() - INTERVAL '45 hours')
+     '44444444-4444-4444-8444-444444444003', 'illness', 'Clinical examination confirmed LSD nodules; isolation started.', 360.0, 39.8, NOW() - INTERVAL '45 hours'),
+    ('77777777-7777-4777-8777-777777777006',
+     '33333333-3333-4333-8333-333333333002',
+     '22222222-2222-4222-8222-222222222101',
+     '44444444-4444-4444-8444-444444444002', 'illness', 'Oral vesicles on tongue and interdigital cleft lesions observed. Suspected FMD; mouth wash with 1% potassium permanganate initiated.', 440.0, 39.9, NOW() - INTERVAL '12 hours'),
+    ('77777777-7777-4777-8777-777777777007',
+     '33333333-3333-4333-8333-333333333004',
+     '22222222-2222-4222-8222-222222222101',
+     '44444444-4444-4444-8444-444444444004', 'illness', 'Confirmed LSD cutaneous nodules over prescapular lymph nodes. Strict shed isolation and vector control started.', 355.0, 39.7, NOW() - INTERVAL '21 hours')
 ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO vaccination_records (id, animal_id, disease_id, vaccine_name, batch_number, dose_number, administered_on, next_due_on, administered_by_user_id, notes) VALUES
     ('77777777-7777-4777-8777-777777777101',
      '33333333-3333-4333-8333-333333333001',
+     (SELECT id FROM diseases WHERE code = 'foot_and_mouth_disease'),
+     'Raksha-Ovac Trivalent FMD', 'FMD-MH-2026-09', 1, CURRENT_DATE - 90, CURRENT_DATE + 90,
+     '22222222-2222-4222-8222-222222222101', 'NADCP Round 5 vaccination completed'),
+    ('77777777-7777-4777-8777-777777777104',
+     '33333333-3333-4333-8333-333333333002',
+     (SELECT id FROM diseases WHERE code = 'hemorrhagic_septicemia'),
+     'Raksha-HS+BQ Combined Vaccine', 'HSBQ-MH-2026-14', 1, CURRENT_DATE - 75, CURRENT_DATE + 290,
+     '22222222-2222-4222-8222-222222222101', 'Pre-monsoon buffalo prophylaxis'),
+    ('77777777-7777-4777-8777-777777777105',
+     '33333333-3333-4333-8333-333333333003',
+     (SELECT id FROM diseases WHERE code = 'foot_and_mouth_disease'),
+     'Raksha-Ovac Trivalent FMD', 'FMD-MH-2026-09', 1, CURRENT_DATE - 95, CURRENT_DATE + 85,
+     '22222222-2222-4222-8222-222222222101', 'Annual FMD booster'),
+    ('77777777-7777-4777-8777-777777777106',
+     '33333333-3333-4333-8333-333333333004',
      (SELECT id FROM diseases WHERE code = 'foot_and_mouth_disease'),
      'Raksha-Ovac Trivalent FMD', 'FMD-MH-2026-09', 1, CURRENT_DATE - 90, CURRENT_DATE + 90,
      '22222222-2222-4222-8222-222222222101', 'NADCP Round 5 vaccination completed')
@@ -266,7 +289,23 @@ INSERT INTO treatments (id, animal_id, report_id, prescribed_by_vet_id, medicati
      'Meloxicam + Enrofloxacin Supportive Protocol',
      '15 ml IM once daily', 5,
      'Keep animal in mosquito-screened shed; apply herbal wound spray on ruptured nodules.',
-     CURRENT_DATE - 2, CURRENT_DATE + 3, 'Fever subsiding after 48 hours.')
+     CURRENT_DATE - 2, CURRENT_DATE + 3, 'Fever subsiding after 48 hours.'),
+    ('77777777-7777-4777-8777-777777777203',
+     '33333333-3333-4333-8333-333333333002',
+     '44444444-4444-4444-8444-444444444002',
+     '22222222-2222-4222-8222-222222222101',
+     'Boric Acid + Glycerin Oral Paint & Meloxicam',
+     '15 ml IM + Topical oral application TDS', 5,
+     'Provide soft green fodder and clean water. Wash hooves with 2% copper sulphate solution.',
+     CURRENT_DATE - 1, CURRENT_DATE + 4, 'Salivation reduced; animal able to drink water.'),
+    ('77777777-7777-4777-8777-777777777204',
+     '33333333-3333-4333-8333-333333333004',
+     '44444444-4444-4444-8444-444444444004',
+     '22222222-2222-4222-8222-222222222101',
+     'Enrofloxacin LA + Chlorpheniramine Maleate',
+     '12 ml IM OD × 4 days', 4,
+     'Strict isolation from healthy cattle; apply neem-camphor oil around shed.',
+     CURRENT_DATE - 1, CURRENT_DATE + 3, 'Under active veterinary supervision.')
 ON CONFLICT (id) DO NOTHING;
 
 -- 10. Active Outbreak Cluster (Based solely on veterinarian-confirmed cases 3 & 4)
