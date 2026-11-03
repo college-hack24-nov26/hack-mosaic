@@ -39,7 +39,7 @@ export const SurveillanceMap: React.FC<SurveillanceMapProps> = ({ pins = [], clu
   const clustersLayerRef = useRef<any>(null);
   const districtsLayerRef = useRef<any>(null);
 
-  const [activeTile, setActiveTile] = useState<TileLayerType>('osm');
+  const [activeTile, setActiveTile] = useState<TileLayerType>('maptiler');
   const [showClusters, setShowClusters] = useState(true);
   const [showDistricts, setShowDistricts] = useState(true);
   const [statusFilter, setStatusFilter] = useState<string>('all');

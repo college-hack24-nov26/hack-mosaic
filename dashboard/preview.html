@@ -603,7 +603,7 @@
   <!-- ========================================================================= -->
   <!-- 1. NETFLIX-STYLE CINEMATIC LOGO INTRO PAGE                                -->
   <!-- ========================================================================= -->
-  <div id="pashuvani-gov-splash">
+  <div id="pashuvani-gov-splash" onclick="dismissGovSplash()" class="cursor-pointer" title="Click anywhere to enter dashboard">
     <div class="gov-guilloche-pattern"></div>
     <div class="gov-ambient-light"></div>
 
@@ -685,7 +685,15 @@
         </div>
       </div>
 
-      <div class="mt-3 text-[9px] text-zinc-400 font-mono">
+      
+      <div class="mt-4 flex items-center justify-center gap-3">
+        <button onclick="event.stopPropagation(); dismissGovSplash();" class="aero-btn aero-btn-lime px-6 py-2.5 text-xs font-extrabold flex items-center gap-2 cursor-pointer shadow-md">
+          <span>Enter Surveillance Console</span>
+          <i data-lucide="arrow-right" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+      <div class="mt-3 text-[9px] text-zinc-500 font-mono">
         Krishi Bhawan &bull; National Animal Health Disease Surveillance Network
       </div>
     </div>
@@ -3341,12 +3349,8 @@
       setTimeout(dismissGovSplash, 2400);
     }
 
-    // Auto-launch splash dismissal after 2.4s
-    setTimeout(dismissGovSplash, 2400);
-    }
-
-    // Auto-launch splash after 2.8s
-    setTimeout(dismissNetflixSplash, 2800);
+        // Auto-launch splash dismissal after 1.8s
+    setTimeout(dismissGovSplash, 1800);
 
     // Live IST Clock
     function updateLiveClock() {
@@ -3777,7 +3781,7 @@
     // ---------------------------------------------------------------------------
     window.addEventListener('DOMContentLoaded', function() {
       var centerCoords = [18.5204, 74.2500]; // Maharashtra Center Coordinates
-      var defaultSource = tileSources.osm;
+      var defaultSource = tileSources.maptiler;
 
       // 1. Overview Tab Mini-Map
       overviewMap = L.map('overview-map', { zoomControl: false }).setView(centerCoords, 8);
