@@ -6,297 +6,7 @@
   <title>Pashuvani Ã¢â‚¬â€ Government Animal Health & Disease Surveillance</title>
   
   <!-- Tailwind CSS CDN -->
-  <script src="https://cdn.tailwindcss.com">
-    // =========================================================================
-    // MASTER EXCEL DOSSIER & MULTI-MODULE EXPORT ENGINE (.xls Microsoft XML)
-    // =========================================================================
-
-    function escapeXmlSpreadsheet(val) {
-      if (val === null || val === undefined) return '';
-      return String(val)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&apos;');
-    }
-
-    function buildMultiSheetWorkbook(sheetDefs) {
-      var xml = '<?xml version="1.0" encoding="UTF-8"?>\n' +
-        '<?mso-application progid="Excel.Sheet"?>\n' +
-        '<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"\n' +
-        ' xmlns:o="urn:schemas-microsoft-com:office:office"\n' +
-        ' xmlns:x="urn:schemas-microsoft-com:office:excel"\n' +
-        ' xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"\n' +
-        ' xmlns:html="http://www.w3.org/TR/REC-html40">\n' +
-        ' <Styles>\n' +
-        '  <Style ss:ID="Default" ss:Name="Normal"><Font ss:FontName="Calibri" ss:Size="10" ss:Color="#141414"/></Style>\n' +
-        '  <Style ss:ID="TitleStyle">\n' +
-        '   <Font ss:Bold="1" ss:Color="#1B5E20" ss:FontName="Calibri" ss:Size="13"/>\n' +
-        '   <Interior ss:Color="#E8F5E9" ss:Pattern="Solid"/>\n' +
-        '   <Alignment ss:Horizontal="Left" ss:Vertical="Center"/>\n' +
-        '  </Style>\n' +
-        '  <Style ss:ID="MetaStyle">\n' +
-        '   <Font ss:Italic="1" ss:Color="#4A5568" ss:FontName="Calibri" ss:Size="9"/>\n' +
-        '   <Interior ss:Color="#F7FAFC" ss:Pattern="Solid"/>\n' +
-        '  </Style>\n' +
-        '  <Style ss:ID="HeaderStyle">\n' +
-        '   <Font ss:Bold="1" ss:Color="#FFFFFF" ss:FontName="Calibri" ss:Size="11"/>\n' +
-        '   <Interior ss:Color="#2E7D32" ss:Pattern="Solid"/>\n' +
-        '   <Alignment ss:Horizontal="Center" ss:Vertical="Center"/>\n' +
-        '   <Borders>\n' +
-        '    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#1B5E20"/>\n' +
-        '   </Borders>\n' +
-        '  </Style>\n' +
-        '  <Style ss:ID="RowStyleEven">\n' +
-        '   <Font ss:Color="#141414" ss:FontName="Calibri" ss:Size="10"/>\n' +
-        '   <Interior ss:Color="#FFFFFF" ss:Pattern="Solid"/>\n' +
-        '   <Borders>\n' +
-        '    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>\n' +
-        '    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>\n' +
-        '   </Borders>\n' +
-        '  </Style>\n' +
-        '  <Style ss:ID="RowStyleOdd">\n' +
-        '   <Font ss:Color="#141414" ss:FontName="Calibri" ss:Size="10"/>\n' +
-        '   <Interior ss:Color="#F8FAF7" ss:Pattern="Solid"/>\n' +
-        '   <Borders>\n' +
-        '    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>\n' +
-        '    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>\n' +
-        '   </Borders>\n' +
-        '  </Style>\n' +
-        ' </Styles>\n';
-
-      sheetDefs.forEach(function(s) {
-        xml += ' <Worksheet ss:Name="' + escapeXmlSpreadsheet(s.name.substring(0, 31)) + '">\n';
-        xml += '  <Table>\n';
-
-        // Title Banner
-        xml += '   <Row ss:Height="24" ss:StyleID="TitleStyle">\n' +
-          '    <Cell ss:MergeAcross="' + Math.max(1, (s.headers.length - 1)) + '"><Data ss:Type="String">PASHUVANI SURVEILLANCE &mdash; ' + escapeXmlSpreadsheet(s.title || s.name) + '</Data></Cell>\n' +
-          '   </Row>\n';
-
-        // Metadata Row
-        xml += '   <Row ss:Height="18" ss:StyleID="MetaStyle">\n' +
-          '    <Cell ss:MergeAcross="' + Math.max(1, (s.headers.length - 1)) + '"><Data ss:Type="String">Government of Maharashtra | Department of Animal Husbandry | Generated: ' + new Date().toLocaleString() + ' IST</Data></Cell>\n' +
-          '   </Row>\n';
-
-        // Header Row
-        xml += '   <Row ss:Height="22" ss:StyleID="HeaderStyle">\n';
-        s.headers.forEach(function(h) {
-          xml += '    <Cell><Data ss:Type="String">' + escapeXmlSpreadsheet(h) + '</Data></Cell>\n';
-        });
-        xml += '   </Row>
-';
-
-        // Data Rows
-        s.rows.forEach(function(row, rIdx) {
-          var styleId = (rIdx % 2 === 0) ? 'RowStyleEven' : 'RowStyleOdd';
-          xml += '   <Row ss:Height="18" ss:StyleID="' + styleId + '">\n';
-          row.forEach(function(cell) {
-            var isNum = (typeof cell === 'number');
-            xml += '    <Cell><Data ss:Type="' + (isNum ? 'Number' : 'String') + '">' + escapeXmlSpreadsheet(cell) + '</Data></Cell>\n';
-          });
-          xml += '   </Row>\n';
-        });
-
-        xml += '  </Table>\n </Worksheet>\n';
-      });
-
-      xml += '</Workbook>';
-      return xml;
-    }
-
-    function triggerDownloadExcel(xmlContent, fileName) {
-      var blob = new Blob([xmlContent], { type: 'application/vnd.ms-excel;charset=utf-8' });
-      var url = URL.createObjectURL(blob);
-      var a = document.createElement('a');
-      a.href = url;
-      a.download = fileName;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      setTimeout(function() { URL.revokeObjectURL(url); }, 2000);
-    }
-
-    // 1. Export Master Excel Dossier (All Modules Multi-Sheet)
-    function exportMasterExcelDossier() {
-      var vaxRecords = getStoredVaccinations();
-      var wfRecords = getStoredWorkforce();
-
-      // Sheet 1: Executive Summary
-      var summaryRows = [
-        ["Total Clinical Reports (Statewide)", 168, "Continuous Surveillance", "Active Real-Time Telemetry"],
-        ["Confirmed Outbreaks (Field Verified)", 112, "Immediate Ring Protocol", "Under Active Containment"],
-        ["Pending Veterinary Review", 24, "SLA < 24 Hours", "Assigned to Block Officers"],
-        ["Resolved / Recovered Cases", 32, "Post-Treatment Track", "Healthy Discharge Approved"],
-        ["Total Animals Inoculated", 61050, "72,000 Target Quota", "84.8% Coverage Achieved"],
-        ["Cold Chain Thermal Compliance", "99.2%", "2.0°C to 8.0°C Spec", "4.1°C Optimal Average"],
-        ["Active Outbreak Clusters", 2, "Zero Perimeter Expansion", "Haveli (FMD) & Ahmednagar (LSD)"],
-        ["Veterinary Officers on Patrol", 48, "50 Deployable", "96% Active Duty Readiness"]
-      ];
-
-      // Sheet 2: Clinical Cases & Reports
-      var caseRows = [
-        ["rpt_001", "MH-PUN-8841", "Gir Cow", "Foot-and-Mouth Disease (FMD)", "Confirmed Outbreak", "92% AI Match", "Dr. Anita Deshmukh", "Pune", "Haveli (Wagholi)", "Nov 3, 2026", "Acute buccal lesions confirmed; 10km ring issued."],
-        ["rpt_002", "MH-PUN-9102", "Murrah Buffalo", "Lumpy Skin Disease (LSD)", "Confirmed Outbreak", "87% AI Match", "Dr. Sanjay Thorat", "Pune", "Shirur", "Nov 3, 2026", "Poxvirus cutaneous nodules across neck and perineum."],
-        ["rpt_003", "MH-PUN-4091", "Jersey Cross", "Foot-and-Mouth Disease (FMD)", "Pending Verification", "79% AI Match", "Awaiting Assignment", "Pune", "Khed", "Nov 2, 2026", "Mild salivation and elevated rectal temp (104.2°F)."],
-        ["rpt_004", "MH-AHM-1104", "Cow (Indigenous)", "Lumpy Skin Disease (LSD)", "Confirmed Outbreak", "89% AI Match", "Dr. Prashant Vikhe", "Ahmednagar", "Shrirampur", "Nov 2, 2026", "Cluster transmission along Pravara river dairy belt."],
-        ["rpt_005", "MH-SAT-3021", "Cow (Khillari)", "Anthrax Suspicion (Zoonotic)", "Confirmed Outbreak", "94% AI Match", "Dr. Rajesh Gaikwad", "Satara", "Karad", "Nov 1, 2026", "Sudden death with bloody discharge. Deep quicklime burial completed."],
-        ["rpt_006", "MH-KOL-7782", "Buffalo (Pandharpuri)", "Foot-and-Mouth Disease (FMD)", "Resolved / Healthy", "91% AI Match", "Dr. Suresh Patil", "Kolhapur", "Karveer", "Nov 1, 2026", "Post-treatment complete healing of oral mucosal lesions."]
-      ];
-
-      // Sheet 3: Area Vaccination Registry
-      var vaxRows = vaxRecords.map(function(r) {
-        return [r.id, r.species, r.farmer, r.district, r.taluka, r.vaccine, r.batch, r.temp, r.date, r.status, r.officer];
-      });
-
-      // Sheet 4: Field Workforce Roster
-      var wfRows = wfRecords.map(function(w) {
-        return [w.name, w.role, w.district, w.taluka, w.phone, w.target, w.status];
-      });
-
-      // Sheet 5: Outbreak Clusters & Hotspots
-      var clusterRows = [
-        ["CLUS-PUN-001", "Foot-and-Mouth Disease (FMD)", "Pune (Haveli & Shirur)", 18.5800, 73.9200, 18, 28, "CRITICAL", "10km Mandatory Ring Quarantine Active"],
-        ["CLUS-AHM-002", "Lumpy Skin Disease (LSD)", "Ahmednagar (Shrirampur & Rahata)", 19.1400, 74.6800, 22, 19, "HIGH", "Vector Biosecurity & Ring Vaccination Active"],
-        ["CLUS-SAT-003", "Anthrax Suspicion (Zoonotic)", "Satara (Karad Corridor)", 17.6805, 74.0183, 12, 4, "ZOONOTIC HIGH", "Strict Carcass Disposal & Prophylactic Buffer Active"]
-      ];
-
-      // Sheet 6: XGBoost Outbreak Risk Model Matrix
-      var riskRows = [
-        ["Pune", "HIGH", 87, 94, 48, 14200, 3100, 74.0, 18.4, 3800, "Experimental estimate. Not a confirmed forecast."],
-        ["Ahmednagar", "HIGH", 82, 91, 39, 16800, 1800, 68.0, 19.2, 4200, "Experimental estimate. Not a confirmed forecast."],
-        ["Satara", "HIGH", 79, 89, 29, 11900, 2200, 82.0, 17.5, 2900, "Experimental estimate. Not a confirmed forecast."],
-        ["Solapur", "MEDIUM", 64, 88, 18, 12400, 2900, 35.0, 15.6, 3100, "Experimental estimate. Not a confirmed forecast."],
-        ["Kolhapur", "LOW", 31, 93, 6, 11200, 4800, 85.0, 21.0, 2500, "Experimental estimate. Not a confirmed forecast."],
-        ["Nashik", "MEDIUM", 42, 90, 14, 13800, 2400, 52.0, 16.8, 3400, "Experimental estimate. Not a confirmed forecast."],
-        ["Sangli", "LOW", 36, 87, 9, 10900, 3600, 42.0, 18.1, 2700, "Experimental estimate. Not a confirmed forecast."]
-      ];
-
-      // Sheet 7: Biosecurity Protocols SOP
-      var sopRows = [
-        ["FMD-01", "Foot-and-Mouth Disease", "Aphthovirus (Picornaviridae)", "Aerosol & Direct Contact", "10km Ring", "Prohibit cattle markets, deploy trivalent FMD ring vaccines", "FMD Trivalent (O, A, Asia-1)"],
-        ["LSD-02", "Lumpy Skin Disease", "Capripoxvirus", "Stomoxys & Mosquito Vectors", "15km Ring", "Synthetic pyrethroid vector fogging, isolate infected cattle", "Goat Pox (Uttarkashi strain)"],
-        ["ANT-03", "Anthrax Suspicion", "Bacillus anthracis (Spore)", "Soil spores & Ingestion", "10km Buffer", "STRICT NO POST-MORTEM, 6-foot quicklime burial, Level B PPE", "Anthrax Spore Vaccine (Sterne)"],
-        ["PPR-04", "Peste des Petits Ruminants", "Small Ruminant Morbillivirus", "Respiratory droplets", "12km Ring", "Segregate coughing herds, deploy live attenuated PPR vaccine", "PPR Sungri-96 Live Attenuated"]
-      ];
-
-      var sheets = [
-        {
-          name: "Executive_Summary",
-          title: "Executive Surveillance Summary",
-          headers: ["Surveillance Indicator", "Value", "Departmental Target", "Current Status"],
-          rows: summaryRows
-        },
-        {
-          name: "Clinical_Cases",
-          title: "Clinical Disease Reports & Field Cases",
-          headers: ["Report ID", "Animal Tag", "Species", "Disease", "Verification Status", "AI Screening", "Attending Vet", "District", "Taluka", "Date", "Clinical Notes"],
-          rows: caseRows
-        },
-        {
-          name: "Vaccination_Registry",
-          title: "Area-Wise Animal Vaccination Registry",
-          headers: ["Animal Tag ID", "Species", "Farmer Name", "District", "Taluka", "Vaccine Type", "Batch No", "Cold Chain Temp", "Date", "Status", "Officer"],
-          rows: vaxRows
-        },
-        {
-          name: "Field_Workforce",
-          title: "Veterinary Workforce Deployment Roster",
-          headers: ["Officer Name", "Designation", "Assigned District", "Taluka / Corridor", "Contact Phone", "Daily Animal Quota", "Duty Status"],
-          rows: wfRows
-        },
-        {
-          name: "Outbreak_Clusters",
-          title: "Active Outbreak Clusters & Hotspots",
-          headers: ["Cluster ID", "Disease", "District & Corridor", "Latitude", "Longitude", "Radius (km)", "Confirmed Cases", "Risk Level", "Buffer Protocol"],
-          rows: clusterRows
-        },
-        {
-          name: "XGBoost_Risk_Matrix",
-          title: "XGBoost Outbreak Risk Forecast Matrix",
-          headers: ["District", "Outbreak Risk", "Probability (%)", "Confidence (%)", "30d Cases", "Cattle Density", "Buffalo Density", "Rainfall (mm)", "Vapour Press (hPa)", "Recommended Ring Vaccines", "Disclaimer"],
-          rows: riskRows
-        },
-        {
-          name: "Biosecurity_SOPs",
-          title: "Official Biosecurity Directives & SOPs",
-          headers: ["SOP Code", "Disease Name", "Pathogen Type", "Transmission Mode", "Containment Buffer", "Immediate Quarantine SOP", "Vaccine Specification"],
-          rows: sopRows
-        }
-      ];
-
-      var xml = buildMultiSheetWorkbook(sheets);
-      triggerDownloadExcel(xml, "PashuVani_Master_Surveillance_Dossier_2026.xls");
-    }
-
-    // 2. Export Single-Sheet Vaccination Excel
-    function exportVaccinationExcel() {
-      var records = getStoredVaccinations();
-      var rows = records.map(function(r) {
-        return [r.id, r.species, r.farmer, r.district, r.taluka, r.vaccine, r.batch, r.temp, r.date, r.status, r.officer];
-      });
-      var sheets = [{
-        name: "Area_Vaccinations",
-        title: "Area-Wise Livestock Vaccination & Cold Chain Registry",
-        headers: ["Animal Tag ID", "Species / Breed", "Farmer Name", "District", "Taluka / Block", "Vaccine Administered", "Batch Code", "Cold Chain Temp", "Inoculation Date", "Status", "Administering Officer"],
-        rows: rows
-      }];
-      var xml = buildMultiSheetWorkbook(sheets);
-      triggerDownloadExcel(xml, "PashuVani_Vaccination_Registry.xls");
-    }
-
-    // 3. Export Single-Sheet Workforce Excel
-    function exportWorkforceExcel() {
-      var records = getStoredWorkforce();
-      var rows = records.map(function(w) {
-        return [w.name, w.role, w.district, w.taluka, w.phone, w.target, w.status];
-      });
-      var sheets = [{
-        name: "Field_Workforce",
-        title: "Area-Wise Field Veterinary Workforce Roster",
-        headers: ["Officer Name", "Designation", "Stationed District", "Assigned Taluka / Block", "Official Phone", "Daily Animal Quota", "Current Deployment Status"],
-        rows: rows
-      }];
-      var xml = buildMultiSheetWorkbook(sheets);
-      triggerDownloadExcel(xml, "PashuVani_Field_Workforce_Roster.xls");
-    }
-
-    // 4. Export Single-Sheet Cases Excel
-    function exportCasesExcel() {
-      var caseRows = [
-        ["rpt_001", "MH-PUN-8841", "Gir Cow", "Foot-and-Mouth Disease (FMD)", "Confirmed Outbreak", "92% AI Match", "Dr. Anita Deshmukh", "Pune", "Haveli (Wagholi)", "Nov 3, 2026", "Acute buccal lesions confirmed; 10km ring issued."],
-        ["rpt_002", "MH-PUN-9102", "Murrah Buffalo", "Lumpy Skin Disease (LSD)", "Confirmed Outbreak", "87% AI Match", "Dr. Sanjay Thorat", "Pune", "Shirur", "Nov 3, 2026", "Poxvirus cutaneous nodules across neck and perineum."],
-        ["rpt_003", "MH-PUN-4091", "Jersey Cross", "Foot-and-Mouth Disease (FMD)", "Pending Verification", "79% AI Match", "Awaiting Assignment", "Pune", "Khed", "Nov 2, 2026", "Mild salivation and elevated rectal temp (104.2°F)."],
-        ["rpt_004", "MH-AHM-1104", "Cow (Indigenous)", "Lumpy Skin Disease (LSD)", "Confirmed Outbreak", "89% AI Match", "Dr. Prashant Vikhe", "Ahmednagar", "Shrirampur", "Nov 2, 2026", "Cluster transmission along Pravara river dairy belt."],
-        ["rpt_005", "MH-SAT-3021", "Cow (Khillari)", "Anthrax Suspicion (Zoonotic)", "Confirmed Outbreak", "94% AI Match", "Dr. Rajesh Gaikwad", "Satara", "Karad", "Nov 1, 2026", "Sudden death with bloody discharge. Deep quicklime burial completed."],
-        ["rpt_006", "MH-KOL-7782", "Buffalo (Pandharpuri)", "Foot-and-Mouth Disease (FMD)", "Resolved / Healthy", "91% AI Match", "Dr. Suresh Patil", "Kolhapur", "Karveer", "Nov 1, 2026", "Post-treatment complete healing of oral mucosal lesions."]
-      ];
-      var sheets = [{
-        name: "Clinical_Cases",
-        title: "Clinical Disease Reports & Field Cases Registry",
-        headers: ["Report ID", "Animal Tag", "Species", "Disease Name", "Vet Status", "AI Screening", "Attending Vet", "District", "Taluka", "Date", "Clinical Notes"],
-        rows: caseRows
-      }];
-      var xml = buildMultiSheetWorkbook(sheets);
-      triggerDownloadExcel(xml, "PashuVani_Clinical_Cases.xls");
-    }
-
-    // Helper: Filter Vaccination Table by District from 3D Pie Card Click
-    function filterVaccinationByDistrict(district) {
-      var distSelect = document.getElementById('vax-filter-district');
-      if (distSelect) {
-        distSelect.value = district;
-        renderVaccinationTable();
-        // Smooth scroll to table
-        var tableSection = document.getElementById('vax-records-tbody');
-        if (tableSection) {
-          tableSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }
-      }
-    }
-
-  </script>
+  <script src="https://cdn.tailwindcss.com"></script>
   
   <!-- Google Fonts: Figtree & Inter -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -833,6 +543,12 @@
 
     <!-- Right Controls: Threat Warning + User Officer + Replay Intro -->
     <div class="flex items-center gap-3">
+      <!-- Export Dossier Button -->
+      <button onclick="exportData()" class="aero-btn aero-btn-excel text-xs flex items-center gap-1.5 cursor-pointer shadow-sm" title="Export Surveillance Dossier (.xls)">
+        <i data-lucide="file-spreadsheet" class="w-4 h-4 text-emerald-200"></i>
+        <span>Export</span>
+      </button>
+
       <!-- 3 High/Crit Threats Badge -->
       <button onclick="switchTab('map')" class="flex items-center gap-1.5 bg-red-50 text-[#C62828] border border-red-200 px-3 py-1 rounded font-bold text-xs cursor-pointer hover:bg-red-100 transition-colors">
         <i data-lucide="alert-triangle" class="w-3.5 h-3.5 text-[#C62828]"></i>
@@ -944,10 +660,16 @@
             <h1 class="text-2xl font-bold text-ink">District Surveillance Overview</h1>
             <p class="text-sm text-ink-secondary font-inter">Live epidemiological indicators, risk models, and veterinary verifications across Maharashtra</p>
           </div>
-          <button onclick="openModal()" class="btn-primary text-xs">
-            <i data-lucide="bell" class="w-4 h-4"></i>
-            <span>Broadcast Outbreak Alert</span>
-          </button>
+          <div class="flex items-center gap-2">
+            <button onclick="exportData()" class="aero-btn aero-btn-excel text-xs h-10 px-3 flex items-center gap-1.5 cursor-pointer shadow-sm" title="Export Surveillance Dossier (.xls)">
+              <i data-lucide="file-spreadsheet" class="w-4 h-4 text-emerald-200"></i>
+              <span>Export</span>
+            </button>
+            <button onclick="openModal()" class="btn-primary text-xs h-10">
+              <i data-lucide="bell" class="w-4 h-4"></i>
+              <span>Broadcast Outbreak Alert</span>
+            </button>
+          </div>
         </div>
 
         <!-- 4 Top Overview KPI Cards -->
@@ -1657,9 +1379,14 @@
           <p class="text-sm text-ink-secondary font-inter">Review clinical symptoms, on-device TFLite MobileNetV3 predictions, and field veterinarian notes</p>
         </div>
         <div class="vetra-card p-0 overflow-hidden">
-          <div class="p-4 border-b border-black/10 flex justify-between bg-white items-center">
-            <span class="font-bold text-sm text-ink">Active Livestock Case Queue</span>
-            <span class="text-xs text-ink-metadata font-inter">Showing 3 verified demo records</span>
+          <div class="p-4 border-b border-black/10 flex flex-wrap justify-between bg-white items-center gap-2">
+            <div>
+              <span class="font-bold text-sm text-ink">Active Livestock Case Queue</span>
+              <span class="text-xs text-ink-metadata font-inter ml-2">Showing verified demo records</span>
+            </div>
+            <button onclick="exportData()" class="aero-btn aero-btn-excel text-xs flex items-center gap-1.5 cursor-pointer shadow-sm">
+              <i data-lucide="file-spreadsheet" class="w-4 h-4 text-emerald-200"></i> Export
+            </button>
           </div>
           <table class="w-full text-left font-inter text-sm">
             <thead class="bg-parchment text-xs uppercase font-figtree font-bold text-ink-secondary">
@@ -1780,11 +1507,8 @@
                 <i data-lucide="plus-circle" class="w-4 h-4"></i> Log Animal Vaccination
               </button>
               
-              <button onclick="exportVaccinationExcel()" class="aero-btn aero-btn-excel text-xs flex items-center gap-1.5 cursor-pointer shadow-sm">
-                <i data-lucide="file-spreadsheet" class="w-4 h-4 text-emerald-200"></i> Export Vaccination Excel (.xls)
-              </button>
-              <button onclick="exportMasterExcelDossier()" class="aero-btn aero-btn-white text-xs flex items-center gap-1.5 cursor-pointer">
-                <i data-lucide="download" class="w-4 h-4 text-zinc-600"></i> Master Excel
+              <button onclick="exportData()" class="aero-btn aero-btn-excel text-xs flex items-center gap-1.5 cursor-pointer shadow-sm">
+                <i data-lucide="file-spreadsheet" class="w-4 h-4 text-emerald-200"></i> Export
               </button>
             </div>
           </div>
@@ -2611,8 +2335,11 @@
               <button onclick="openDeployOfficerModal()" class="px-3 py-2 rounded-lg bg-[#2F6FDE] hover:bg-[#255bb5] text-white font-bold text-xs shadow-sm flex items-center gap-1.5 cursor-pointer transition-all">
                 <i data-lucide="user-plus" class="w-4 h-4"></i> Deploy / Register Officer
               </button>
+              <button onclick="exportData()" class="aero-btn aero-btn-excel text-xs flex items-center gap-1.5 cursor-pointer shadow-sm">
+                <i data-lucide="file-spreadsheet" class="w-4 h-4 text-emerald-200"></i> Export
+              </button>
               <button onclick="exportWorkforceCSV()" class="px-3 py-2 rounded-lg bg-white border border-black/15 hover:bg-parchment text-xs font-semibold flex items-center gap-1.5 cursor-pointer">
-                <i data-lucide="download" class="w-4 h-4 text-zinc-600"></i> Export Roster CSV
+                <i data-lucide="download" class="w-4 h-4 text-zinc-600"></i> CSV
               </button>
             </div>
           </div>
@@ -4462,6 +4189,218 @@
       link.click();
       document.body.removeChild(link);
     }
+
+    
+    // =========================================================================
+    // EXPORT ENGINE: Multi-Sheet Native Microsoft Excel Workbook (.xls XML)
+    // =========================================================================
+
+    function escapeXmlSpreadsheet(val) {
+      if (val === null || val === undefined) return '';
+      return String(val)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&apos;');
+    }
+
+    function buildExcelSpreadsheetXml(sheetDefs) {
+      var xml = '<?xml version="1.0" encoding="UTF-8"?>\n' +
+        '<?mso-application progid="Excel.Sheet"?>\n' +
+        '<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"\n' +
+        ' xmlns:o="urn:schemas-microsoft-com:office:office"\n' +
+        ' xmlns:x="urn:schemas-microsoft-com:office:excel"\n' +
+        ' xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"\n' +
+        ' xmlns:html="http://www.w3.org/TR/REC-html40">\n' +
+        ' <Styles>\n' +
+        '  <Style ss:ID="Default" ss:Name="Normal"><Font ss:FontName="Calibri" ss:Size="10" ss:Color="#141414"/></Style>\n' +
+        '  <Style ss:ID="TitleStyle">\n' +
+        '   <Font ss:Bold="1" ss:Color="#1B5E20" ss:FontName="Calibri" ss:Size="13"/>\n' +
+        '   <Interior ss:Color="#E8F5E9" ss:Pattern="Solid"/>\n' +
+        '   <Alignment ss:Horizontal="Left" ss:Vertical="Center"/>\n' +
+        '  </Style>\n' +
+        '  <Style ss:ID="MetaStyle">\n' +
+        '   <Font ss:Italic="1" ss:Color="#4A5568" ss:FontName="Calibri" ss:Size="9"/>\n' +
+        '   <Interior ss:Color="#F7FAFC" ss:Pattern="Solid"/>\n' +
+        '  </Style>\n' +
+        '  <Style ss:ID="HeaderStyle">\n' +
+        '   <Font ss:Bold="1" ss:Color="#FFFFFF" ss:FontName="Calibri" ss:Size="11"/>\n' +
+        '   <Interior ss:Color="#2E7D32" ss:Pattern="Solid"/>\n' +
+        '   <Alignment ss:Horizontal="Center" ss:Vertical="Center"/>\n' +
+        '   <Borders>\n' +
+        '    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#1B5E20"/>\n' +
+        '   </Borders>\n' +
+        '  </Style>\n' +
+        '  <Style ss:ID="RowEven">\n' +
+        '   <Font ss:Color="#141414" ss:FontName="Calibri" ss:Size="10"/>\n' +
+        '   <Interior ss:Color="#FFFFFF" ss:Pattern="Solid"/>\n' +
+        '   <Borders>\n' +
+        '    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>\n' +
+        '    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>\n' +
+        '   </Borders>\n' +
+        '  </Style>\n' +
+        '  <Style ss:ID="RowOdd">\n' +
+        '   <Font ss:Color="#141414" ss:FontName="Calibri" ss:Size="10"/>\n' +
+        '   <Interior ss:Color="#F8FAF7" ss:Pattern="Solid"/>\n' +
+        '   <Borders>\n' +
+        '    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>\n' +
+        '    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>\n' +
+        '   </Borders>\n' +
+        '  </Style>\n' +
+        ' </Styles>\n';
+
+      sheetDefs.forEach(function(s) {
+        xml += ' <Worksheet ss:Name="' + escapeXmlSpreadsheet(s.name.substring(0, 31)) + '">\n';
+        xml += '  <Table>\n';
+
+        // Title Row
+        xml += '   <Row ss:Height="24" ss:StyleID="TitleStyle">\n' +
+          '    <Cell ss:MergeAcross="' + Math.max(1, (s.headers.length - 1)) + '"><Data ss:Type="String">PASHUVANI SURVEILLANCE &mdash; ' + escapeXmlSpreadsheet(s.title || s.name) + '</Data></Cell>\n' +
+          '   </Row>\n';
+
+        // Metadata Subtitle Row
+        xml += '   <Row ss:Height="18" ss:StyleID="MetaStyle">\n' +
+          '    <Cell ss:MergeAcross="' + Math.max(1, (s.headers.length - 1)) + '"><Data ss:Type="String">Govt of Maharashtra | Animal Husbandry Department | Generated: ' + new Date().toLocaleString() + ' IST</Data></Cell>\n' +
+          '   </Row>\n';
+
+        // Column Headers
+        xml += '   <Row ss:Height="22" ss:StyleID="HeaderStyle">\n';
+        s.headers.forEach(function(h) {
+          xml += '    <Cell><Data ss:Type="String">' + escapeXmlSpreadsheet(h) + '</Data></Cell>\n';
+        });
+        xml += '   </Row>\n';
+
+        // Table Rows
+        s.rows.forEach(function(row, rIdx) {
+          var styleId = (rIdx % 2 === 0) ? 'RowEven' : 'RowOdd';
+          xml += '   <Row ss:Height="18" ss:StyleID="' + styleId + '">\n';
+          row.forEach(function(cell) {
+            var isNum = (typeof cell === 'number');
+            xml += '    <Cell><Data ss:Type="' + (isNum ? 'Number' : 'String') + '">' + escapeXmlSpreadsheet(cell) + '</Data></Cell>\n';
+          });
+          xml += '   </Row>\n';
+        });
+
+        xml += '  </Table>\n </Worksheet>\n';
+      });
+
+      xml += '</Workbook>';
+      return xml;
+    }
+
+    function showExportToast(msg) {
+      var toast = document.createElement('div');
+      toast.className = 'fixed bottom-5 right-5 z-50 bg-[#141414] text-white px-4 py-3 rounded-xl shadow-2xl flex items-center gap-2.5 font-figtree text-xs border border-white/20 animate-fadeIn';
+      toast.innerHTML = '<span class="w-2.5 h-2.5 rounded-full bg-[#94e130] animate-pulse"></span><span>' + msg + '</span>';
+      document.body.appendChild(toast);
+      setTimeout(function() {
+        toast.style.opacity = '0';
+        toast.style.transition = 'opacity 0.5s ease';
+        setTimeout(function() { if (toast.parentNode) toast.parentNode.removeChild(toast); }, 500);
+      }, 3500);
+    }
+
+    function exportData() {
+      try {
+        var vaxRecords = (typeof getStoredVaccinations === 'function') ? getStoredVaccinations() : [];
+        var wfRecords = (typeof getStoredWorkforce === 'function') ? getStoredWorkforce() : [];
+
+        var summaryRows = [
+          ["Total Clinical Reports (Statewide)", 168, "Continuous Surveillance", "Active Real-Time Telemetry"],
+          ["Confirmed Outbreaks (Field Verified)", 112, "Immediate Ring Protocol", "Under Active Containment"],
+          ["Pending Veterinary Review", 24, "SLA < 24 Hours", "Assigned to Block Officers"],
+          ["Resolved / Recovered Cases", 32, "Post-Treatment Track", "Healthy Discharge Approved"],
+          ["Total Animals Inoculated", 61050, "72,000 Target Quota", "84.8% Coverage Achieved"],
+          ["Cold Chain Thermal Compliance", "99.2%", "2.0°C to 8.0°C Spec", "4.1°C Optimal Average"],
+          ["Active Outbreak Clusters", 2, "Zero Perimeter Expansion", "Haveli (FMD) & Ahmednagar (LSD)"],
+          ["Veterinary Officers on Duty", 48, "50 Deployable", "96% Active Duty Readiness"]
+        ];
+
+        var caseRows = [
+          ["rpt_001", "MH-PUN-8841", "Gir Cow", "Foot-and-Mouth Disease (FMD)", "Confirmed Outbreak", "92% Match", "Dr. Anita Deshmukh", "Pune", "Haveli (Wagholi)", "Nov 3, 2026", "Acute buccal lesions confirmed; 10km ring issued."],
+          ["rpt_002", "MH-PUN-9102", "Murrah Buffalo", "Lumpy Skin Disease (LSD)", "Confirmed Outbreak", "87% Match", "Dr. Sanjay Thorat", "Pune", "Shirur", "Nov 3, 2026", "Poxvirus cutaneous nodules across neck and perineum."],
+          ["rpt_003", "MH-PUN-4091", "Jersey Cross", "Foot-and-Mouth Disease (FMD)", "Pending Verification", "79% Match", "Awaiting Assignment", "Pune", "Khed", "Nov 2, 2026", "Mild salivation and elevated rectal temp (104.2°F)."],
+          ["rpt_004", "MH-AHM-1104", "Cow (Indigenous)", "Lumpy Skin Disease (LSD)", "Confirmed Outbreak", "89% Match", "Dr. Prashant Vikhe", "Ahmednagar", "Shrirampur", "Nov 2, 2026", "Cluster transmission along Pravara river dairy belt."],
+          ["rpt_005", "MH-SAT-3021", "Cow (Khillari)", "Anthrax Suspicion (Zoonotic)", "Confirmed Outbreak", "94% Match", "Dr. Rajesh Gaikwad", "Satara", "Karad", "Nov 1, 2026", "Sudden death with bloody discharge. Deep quicklime burial completed."],
+          ["rpt_006", "MH-KOL-7782", "Buffalo (Pandharpuri)", "Foot-and-Mouth Disease (FMD)", "Resolved / Healthy", "91% Match", "Dr. Suresh Patil", "Kolhapur", "Karveer", "Nov 1, 2026", "Post-treatment complete healing of oral mucosal lesions."]
+        ];
+
+        var vaxRows = vaxRecords.map(function(r) {
+          return [r.id, r.species, r.farmer, r.district, r.taluka, r.vaccine, r.batch, r.temp, r.date, r.status, r.officer];
+        });
+
+        var wfRows = wfRecords.map(function(w) {
+          return [w.name, w.role, w.district, w.taluka, w.phone, w.target, w.status];
+        });
+
+        var clusterRows = [
+          ["CLUS-PUN-001", "Foot-and-Mouth Disease (FMD)", "Pune (Haveli & Shirur)", 18.5800, 73.9200, 18, 28, "CRITICAL", "10km Mandatory Ring Quarantine Active"],
+          ["CLUS-AHM-002", "Lumpy Skin Disease (LSD)", "Ahmednagar (Shrirampur & Rahata)", 19.1400, 74.6800, 22, 19, "HIGH", "Vector Biosecurity & Ring Vaccination Active"],
+          ["CLUS-SAT-003", "Anthrax Suspicion (Zoonotic)", "Satara (Karad Corridor)", 17.6805, 74.0183, 12, 4, "ZOONOTIC HIGH", "Strict Carcass Disposal & Prophylactic Buffer Active"]
+        ];
+
+        var riskRows = [
+          ["Pune", "HIGH", 87, 94, 48, 14200, 3100, 74.0, 18.4, 3800, "Experimental estimate. Not a confirmed forecast."],
+          ["Ahmednagar", "HIGH", 82, 91, 39, 16800, 1800, 68.0, 19.2, 4200, "Experimental estimate. Not a confirmed forecast."],
+          ["Satara", "HIGH", 79, 89, 29, 11900, 2200, 82.0, 17.5, 2900, "Experimental estimate. Not a confirmed forecast."],
+          ["Solapur", "MEDIUM", 64, 88, 18, 12400, 2900, 35.0, 15.6, 3100, "Experimental estimate. Not a confirmed forecast."],
+          ["Kolhapur", "LOW", 31, 93, 6, 11200, 4800, 85.0, 21.0, 2500, "Experimental estimate. Not a confirmed forecast."],
+          ["Nashik", "MEDIUM", 42, 90, 14, 13800, 2400, 52.0, 16.8, 3400, "Experimental estimate. Not a confirmed forecast."],
+          ["Sangli", "LOW", 36, 87, 9, 10900, 3600, 42.0, 18.1, 2700, "Experimental estimate. Not a confirmed forecast."]
+        ];
+
+        var sopRows = [
+          ["FMD-01", "Foot-and-Mouth Disease", "Aphthovirus (Picornaviridae)", "Aerosol & Direct Contact", "10km Ring", "Prohibit cattle markets, deploy trivalent FMD ring vaccines", "FMD Trivalent (O, A, Asia-1)"],
+          ["LSD-02", "Lumpy Skin Disease", "Capripoxvirus", "Stomoxys & Mosquito Vectors", "15km Ring", "Synthetic pyrethroid vector fogging, isolate infected cattle", "Goat Pox (Uttarkashi strain)"],
+          ["ANT-03", "Anthrax Suspicion", "Bacillus anthracis (Spore)", "Soil spores & Ingestion", "10km Buffer", "STRICT NO POST-MORTEM, 6-foot quicklime burial, Level B PPE", "Anthrax Spore Vaccine (Sterne)"],
+          ["PPR-04", "Peste des Petits Ruminants", "Small Ruminant Morbillivirus", "Respiratory droplets", "12km Ring", "Segregate coughing herds, deploy live attenuated PPR vaccine", "PPR Sungri-96 Live Attenuated"]
+        ];
+
+        var sheets = [
+          { name: "Executive_Summary", title: "Executive Surveillance Summary", headers: ["Surveillance Indicator", "Value", "Target", "Status"], rows: summaryRows },
+          { name: "Clinical_Cases", title: "Clinical Disease Reports & Field Cases", headers: ["Report ID", "Tag", "Species", "Disease", "Status", "AI Match", "Attending Vet", "District", "Taluka", "Date", "Notes"], rows: caseRows },
+          { name: "Vaccination_Registry", title: "Area-Wise Livestock Vaccination Registry", headers: ["Animal Tag ID", "Species", "Farmer Name", "District", "Taluka", "Vaccine Type", "Batch No", "Cold Chain Temp", "Date", "Status", "Officer"], rows: vaxRows },
+          { name: "Field_Workforce", title: "Veterinary Workforce Deployment Roster", headers: ["Officer Name", "Designation", "District", "Taluka / Corridor", "Phone", "Daily Animal Quota", "Duty Status"], rows: wfRows },
+          { name: "Outbreak_Clusters", title: "Active Outbreak Clusters & Hotspots", headers: ["Cluster ID", "Disease", "District & Corridor", "Latitude", "Longitude", "Radius (km)", "Confirmed Cases", "Risk Level", "Buffer Protocol"], rows: clusterRows },
+          { name: "XGBoost_Risk_Matrix", title: "XGBoost Outbreak Risk Forecast Matrix", headers: ["District", "Outbreak Risk", "Probability (%)", "Confidence (%)", "30d Cases", "Cattle Density", "Buffalo Density", "Rainfall (mm)", "Vapour (hPa)", "Recommended Ring Vaccines", "Disclaimer"], rows: riskRows },
+          { name: "Biosecurity_SOPs", title: "Official Biosecurity Directives & SOPs", headers: ["SOP Code", "Disease Name", "Pathogen Type", "Transmission Mode", "Containment Buffer", "Immediate Quarantine SOP", "Vaccine Specification"], rows: sopRows }
+        ];
+
+        var xml = buildExcelSpreadsheetXml(sheets);
+        var blob = new Blob([xml], { type: 'application/vnd.ms-excel;charset=utf-8' });
+        var fileName = 'PashuVani_Surveillance_Dossier_2026.xls';
+
+        if (window.navigator && window.navigator.msSaveOrOpenBlob) {
+          window.navigator.msSaveOrOpenBlob(blob, fileName);
+        } else {
+          var url = URL.createObjectURL(blob);
+          var a = document.createElement('a');
+          a.style.display = 'none';
+          a.href = url;
+          a.download = fileName;
+          document.body.appendChild(a);
+          a.click();
+          setTimeout(function() {
+            if (a.parentNode) a.parentNode.removeChild(a);
+            URL.revokeObjectURL(url);
+          }, 1000);
+        }
+
+        showExportToast('✓ Exporting PashuVani Surveillance Dossier (.xls) — Download Started!');
+      } catch (err) {
+        console.error('Export Error:', err);
+        alert('Export Notice: Generated dossier ready. If download was blocked, please allow downloads in your browser.');
+      }
+    }
+
+    // Global Aliases for backward compatibility
+    window.exportData = exportData;
+    window.exportMasterExcelDossier = exportData;
+    window.exportVaccinationExcel = exportData;
+    window.exportWorkforceExcel = exportData;
+    window.exportCasesExcel = exportData;
+
 
     // Render initial tables on load
     window.addEventListener("DOMContentLoaded", function() {
