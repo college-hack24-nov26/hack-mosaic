@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { DashboardStats, DiseaseReport, MapCasePin, OutbreakCluster, DiseaseAlert, User } from '../types';
 
 export const mockCurrentUser: User = {

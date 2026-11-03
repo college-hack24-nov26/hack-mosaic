@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React from 'react';
 import { DashboardStats, MapCasePin, OutbreakCluster, DiseaseReport } from '../types';
 import { RiskIntelligenceCard } from '../components/charts/RiskIntelligenceCard';

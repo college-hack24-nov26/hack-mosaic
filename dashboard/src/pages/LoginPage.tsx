@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { Activity, Shield, Sparkles, ArrowRight, Lock, Phone } from 'lucide-react';

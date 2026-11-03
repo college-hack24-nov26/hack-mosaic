@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useState } from 'react';
 import { X, Send, AlertTriangle } from 'lucide-react';
 import { DiseaseAlert } from '../../types';

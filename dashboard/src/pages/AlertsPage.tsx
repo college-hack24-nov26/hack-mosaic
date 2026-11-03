@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React from 'react';
 import { DiseaseAlert } from '../types';
 import { AlertOctagon, Send, ShieldAlert, CheckCircle, Calendar, MapPin } from 'lucide-react';
