@@ -24,6 +24,7 @@ type Config struct {
 	MigrationsDir     string
 	AutoMigrate       bool
 	AutoSeed          bool
+	MLServiceURL      string
 }
 
 // Load reads environment variables with sensible defaults for local development.
@@ -72,6 +73,7 @@ func Load() *Config {
 		MigrationsDir:     getEnv("MIGRATIONS_DIR", "./migrations"),
 		AutoMigrate:       getEnvBool("AUTO_MIGRATE", true),
 		AutoSeed:          getEnvBool("AUTO_SEED", true),
+		MLServiceURL:      getEnv("ML_SERVICE_URL", "http://localhost:8001"),
 	}
 }
 

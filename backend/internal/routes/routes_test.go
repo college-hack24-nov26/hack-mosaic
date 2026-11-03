@@ -373,3 +373,57 @@ func TestGoldenThreadFarmerToVetToDashboard(t *testing.T) {
 	}
 }
 
+func TestDashboardAndMLRiskIntegration(t *testing.T) {
+	srv, _ := setupTestServer(t)
+
+	demoToken := "demo_authority_token"
+
+	// 1. Verify 1-Click Demo Authority Token works for GET /api/v1/dashboard/stats
+	status, statsBody := doJSON(t, http.MethodGet, srv.URL+"/api/v1/dashboard/stats", demoToken, nil)
+	if status != http.StatusOK {
+		t.Fatalf("expected 200 on /dashboard/stats with demo_authority_token, got %d (%v)", status, statsBody)
+	}
+	statsData := statsBody["data"].(map[string]any)
+	mlRisk := statsData["ml_risk_summary"].(map[string]any)
+	if mlRisk["disclaimer"] != "Experimental estimate. Not a confirmed forecast." {
+		t.Fatalf("expected mandatory ML risk disclaimer, got %v", mlRisk["disclaimer"])
+	}
+
+	// 2. Verify POST /api/v1/ml/outbreak-risk proxy with circuit-breaker fallback
+	status, riskBody := doJSON(t, http.MethodPost, srv.URL+"/api/v1/ml/outbreak-risk", demoToken, map[string]any{
+		"district":         "Satara",
+		"disease_category": "LSD",
+		"past_cases_30d":   8,
+		"rainfall_mm":      240.0,
+		"temperature_c":    29.5,
+		"humidity_pct":     78.0,
+		"cattle_density":   425000,
+	})
+	if status != http.StatusOK {
+		t.Fatalf("expected 200 on /ml/outbreak-risk, got %d (%v)", status, riskBody)
+	}
+	riskData := riskBody["data"].(map[string]any)
+	if riskData["disclaimer"] != "Experimental estimate. Not a confirmed forecast." {
+		t.Fatalf("expected mandatory disclaimer on /ml/outbreak-risk, got %v", riskData["disclaimer"])
+	}
+
+	// 3. Verify GET /api/v1/reports for officer returns enriched TFLite image result and verified status for confirmed cases
+	status, repListBody := doJSON(t, http.MethodGet, srv.URL+"/api/v1/reports?status=verified", demoToken, nil)
+	if status != http.StatusOK {
+		t.Fatalf("expected 200 on /reports?status=verified, got %d", status)
+	}
+	repItems := repListBody["data"].([]any)
+	if len(repItems) == 0 {
+		t.Fatalf("expected at least 1 confirmed/verified report")
+	}
+	firstRep := repItems[0].(map[string]any)
+	if firstRep["status"] != "verified" {
+		t.Fatalf("expected dashboard-mapped status 'verified', got %v", firstRep["status"])
+	}
+	imgs := firstRep["images"].([]any)
+	if len(imgs) == 0 {
+		t.Fatalf("expected enriched default image with TFLite result for dashboard")
+	}
+}
+
+

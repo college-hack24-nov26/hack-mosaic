@@ -30,7 +30,7 @@ func NewRouter(cfg *config.Config, store repositories.Store, authSvc *services.A
 	animalH := handlers.NewAnimalHandler(store)
 	reportH := handlers.NewReportHandler(store, cfg)
 	vetH := handlers.NewVetHandler(store)
-	dashH := handlers.NewDashboardHandler(store)
+	dashH := handlers.NewDashboardHandler(store, cfg)
 
 	// Top-level health checks
 	r.GET("/health", healthH.Check)
@@ -98,7 +98,12 @@ func NewRouter(cfg *config.Config, store repositories.Store, authSvc *services.A
 			authed.GET("/dashboard/stats", middleware.RequireRoles("vet", "officer", "admin"), dashH.Summary)
 			authed.GET("/dashboard/timeseries", middleware.RequireRoles("vet", "officer", "admin"), dashH.Timeseries)
 			authed.GET("/dashboard/map-data", middleware.RequireRoles("vet", "officer", "admin"), dashH.MapPins)
+			authed.GET("/dashboard/districts-geojson", middleware.RequireRoles("vet", "officer", "admin"), dashH.DistrictsGeoJSON)
 			authed.GET("/dashboard/clusters", middleware.RequireRoles("vet", "officer", "admin"), dashH.ListOutbreaks)
+
+			// ML Outbreak Risk Proxy & District Risk (ML_INTEGRATION.md §2.3–2.4, Task O-20)
+			authed.POST("/ml/outbreak-risk", middleware.RequireRoles("vet", "officer", "admin"), dashH.OutbreakRiskProxy)
+			authed.GET("/risk/districts", middleware.RequireRoles("vet", "officer", "admin"), dashH.DistrictRisk)
 
 			authed.GET("/map/cases", middleware.RequireRoles("farmer", "vet", "officer", "admin"), dashH.MapCases)
 			authed.GET("/outbreaks", middleware.RequireRoles("farmer", "vet", "officer", "admin"), dashH.ListOutbreaks)

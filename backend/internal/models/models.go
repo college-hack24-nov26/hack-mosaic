@@ -272,20 +272,28 @@ type ReportScreeningEmbed struct {
 	Disclaimer    string           `json:"disclaimer"`
 }
 
+// TfliteImageResult provides image-level TFLite screening fields for the React Dashboard.
+type TfliteImageResult struct {
+	PredictedClass string  `json:"predicted_class"`
+	Confidence     float64 `json:"confidence"`
+}
+
 // ReportImageDTO matches API_CONTRACTS.md §6.2.
 type ReportImageDTO struct {
-	ID         string     `json:"id"`
-	ReportID   string     `json:"report_id"`
-	URL        string     `json:"url"`
-	ImageURL   string     `json:"image_url"`
-	MimeType   string     `json:"mime_type"`
-	ByteSize   int        `json:"byte_size"`
-	WidthPx    *int       `json:"width_px,omitempty"`
-	HeightPx   *int       `json:"height_px,omitempty"`
-	Sha256Hex  string     `json:"sha256_hex"`
-	StorageKey string     `json:"-"`
-	CapturedAt *time.Time `json:"captured_at,omitempty"`
-	UploadedAt time.Time  `json:"uploaded_at"`
+	ID               string             `json:"id"`
+	ReportID         string             `json:"report_id"`
+	URL              string             `json:"url"`
+	ImageURL         string             `json:"image_url"`
+	MimeType         string             `json:"mime_type"`
+	ByteSize         int                `json:"byte_size"`
+	WidthPx          *int               `json:"width_px,omitempty"`
+	HeightPx         *int               `json:"height_px,omitempty"`
+	Sha256Hex        string             `json:"sha256_hex"`
+	StorageKey       string             `json:"-"`
+	CapturedAt       *time.Time         `json:"captured_at,omitempty"`
+	UploadedAt       time.Time          `json:"uploaded_at"`
+	TfliteResult     *TfliteImageResult `json:"tflite_result,omitempty"`
+	TfliteConfidence *float64           `json:"tflite_confidence,omitempty"`
 }
 
 // VerificationVetEmbed identifies the verifying veterinarian.

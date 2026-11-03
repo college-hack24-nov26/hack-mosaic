@@ -17,6 +17,15 @@ services:
       timeout: 5s
       retries: 10
 
+  ml-service:
+    build:
+      context: ../ml
+      dockerfile: ../deploy/ml.Dockerfile
+    container_name: pashuvani-ml
+    restart: unless-stopped
+    ports:
+      - "8001:8001"
+
   backend:
     build:
       context: ../backend
@@ -26,6 +35,8 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+      ml-service:
+        condition: service_started
     environment:
       ENV: ${ENV:-development}
       PORT: "8080"
@@ -39,6 +50,7 @@ services:
       AUTO_MIGRATE: "true"
       AUTO_SEED: "true"
       MIGRATIONS_DIR: /app/migrations
+      ML_SERVICE_URL: http://ml-service:8001
       JWT_SECRET: ${JWT_SECRET:-pashuvani-dev-jwt-secret-key-2026-change-in-production}
       JWT_ACCESS_TTL_SECONDS: ${JWT_ACCESS_TTL_SECONDS:-3600}
       JWT_REFRESH_TTL_SECONDS: ${JWT_REFRESH_TTL_SECONDS:-2592000}
@@ -50,7 +62,19 @@ services:
     volumes:
       - pashuvani_uploads:/app/data/uploads
 
+  dashboard:
+    build:
+      context: ../dashboard
+      dockerfile: ../deploy/dashboard.Dockerfile
+    container_name: pashuvani-dashboard
+    restart: unless-stopped
+    depends_on:
+      - backend
+    environment:
+      VITE_API_BASE_URL: http://localhost:8080/api/v1
+    ports:
+      - "5173:5173"
+
 volumes:
   pashuvani_pgdata:
   pashuvani_uploads:
-
