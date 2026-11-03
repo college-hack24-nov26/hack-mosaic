@@ -3,7 +3,7 @@ import { MapContainer, TileLayer, Marker, Popup, Circle, GeoJSON, useMap } from 
 import L from 'leaflet';
 import { MapCasePin, OutbreakCluster } from '../../types';
 import { Layers, ShieldCheck, AlertCircle, Clock, Eye, Map, Globe, Compass } from 'lucide-react';
-import districtGeoJSON from '/geo/districts.json';
+import districtGeoJSON from '../../data/districts.json';
 
 interface SurveillanceMapProps {
   pins: MapCasePin[];
@@ -44,7 +44,9 @@ const MapResizer: React.FC = () => {
   const map = useMap();
   useEffect(() => {
     const timer = setTimeout(() => {
-      map.invalidateSize();
+      if (map && typeof map.invalidateSize === 'function') {
+        map.invalidateSize();
+      }
     }, 100);
     return () => clearTimeout(timer);
   }, [map]);
@@ -209,8 +211,8 @@ export const SurveillanceMap: React.FC<SurveillanceMapProps> = ({ pins, clusters
             <GeoJSON 
               data={districtGeoJSON as any} 
               style={{ color: '#16a34a', weight: 1, fillOpacity: 0.1 }}
-              onEachFeature={(feature, layer) => {
-                if (feature.properties && feature.properties.name) {
+              onEachFeature={(feature: any, layer: any) => {
+                if (feature && feature.properties && feature.properties.name && typeof layer.bindTooltip === 'function') {
                   layer.bindTooltip(
                     `<div style="font-family: 'Figtree', sans-serif; font-size: 12px; padding: 2px;">
                       <div style="font-weight: 700; color: #16a34a;">${feature.properties.name} District</div>
