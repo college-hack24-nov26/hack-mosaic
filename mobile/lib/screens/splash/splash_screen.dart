@@ -4,6 +4,7 @@ import '../../core/theme/app_typography.dart';
 import '../../core/localization/app_strings.dart';
 import '../../data/local/offline_store.dart';
 import '../../core/auth/session_manager.dart';
+import '../../core/network/api_client.dart';
 import '../auth/auth_gate.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -31,6 +32,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
   }
 
   Future<void> _initializeApp() async {
+    await ApiClient.resolveBestBaseUrl();
     await OfflineStore().initialize();
     await SessionManager.instance.restore();
     await Future.delayed(const Duration(milliseconds: 1600));

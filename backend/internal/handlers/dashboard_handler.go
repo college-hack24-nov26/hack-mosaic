@@ -290,3 +290,4 @@ func (h *DashboardHandler) MarkNotificationRead(c *gin.Context) {
 	}
 	c.Status(http.StatusNoContent)
 }
+

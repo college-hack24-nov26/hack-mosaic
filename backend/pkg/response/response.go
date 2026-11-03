@@ -86,3 +86,4 @@ func Error(c *gin.Context, status int, code, message string, details []FieldErro
 		},
 	})
 }
+

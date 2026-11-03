@@ -121,3 +121,4 @@ func NewRouter(cfg *config.Config, store repositories.Store, authSvc *services.A
 
 	return r
 }
+

@@ -85,3 +85,4 @@ func RunMigrations(ctx context.Context, pool *pgxpool.Pool, migrationsDir string
 	}
 	return nil
 }
+

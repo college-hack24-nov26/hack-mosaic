@@ -197,6 +197,8 @@ class SessionManager extends ChangeNotifier {
             longitude: me.farmLng,
             alertConsent: me.alertConsent,
           ));
+        } else {
+          await store.refreshFromBackend();
         }
         _set(SessionStatus.farmer);
       case 'vet':

@@ -35,3 +35,4 @@ func (h *HealthHandler) Check(c *gin.Context) {
 		"time":    time.Now().UTC().Format(time.RFC3339),
 	})
 }
+

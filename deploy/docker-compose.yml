@@ -53,3 +53,4 @@ services:
 volumes:
   pashuvani_pgdata:
   pashuvani_uploads:
+

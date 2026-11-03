@@ -70,3 +70,4 @@ func DetectAllowedImageMime(header []byte) (mimeType string, ext string, ok bool
 	}
 	return "", "", false
 }
+

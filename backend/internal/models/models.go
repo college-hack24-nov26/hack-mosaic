@@ -437,3 +437,4 @@ type NearbyVetDTO struct {
 	WorkingHours       string  `json:"working_hours"`
 	DistanceKm         float64 `json:"distance_km"`
 }
+

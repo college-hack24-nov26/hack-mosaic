@@ -404,3 +404,4 @@ func (h *ReportHandler) Get(c *gin.Context) {
 
 	response.OK(c, rep)
 }
+

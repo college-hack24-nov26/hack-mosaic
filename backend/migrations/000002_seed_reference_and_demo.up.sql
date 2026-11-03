@@ -308,3 +308,4 @@ INSERT INTO risk_predictions (id, district_id, disease_id, horizon_days, risk_sc
      '[{"factor":"confirmed_cases_14d","impact":0.42},{"factor":"post_monsoon_humidity","impact":0.21},{"factor":"vector_density_index","impact":0.11}]'::jsonb,
      'xgb_outbreak_risk_v1.0.0', TRUE, NOW() - INTERVAL '2 hours')
 ON CONFLICT (id) DO NOTHING;
+

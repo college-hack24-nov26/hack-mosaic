@@ -372,3 +372,4 @@ func TestGoldenThreadFarmerToVetToDashboard(t *testing.T) {
 		t.Fatalf("expected 2 verified vets (and 0 unverified), got %d", len(vets))
 	}
 }
+

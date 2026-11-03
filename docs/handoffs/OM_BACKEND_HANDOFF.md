@@ -179,3 +179,4 @@ go run ./cmd/server
 - **Android Emulator (`mobile/`):** Automatically uses `http://10.0.2.2:8080/api/v1`.
 - **Physical Android Device over USB:** Run `adb reverse tcp:8080 tcp:8080` and pass `--dart-define=API_BASE_URL=http://localhost:8080/api/v1`.
 - **React Government Dashboard (`dashboard/`):** Uses `VITE_API_BASE_URL=http://localhost:8080/api/v1` (CORS is pre-configured for `http://localhost:5173` and `http://localhost:3000`).
+

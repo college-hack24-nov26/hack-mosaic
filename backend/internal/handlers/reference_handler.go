@@ -65,3 +65,4 @@ func (h *ReferenceHandler) Symptoms(c *gin.Context) {
 	}
 	response.OK(c, items)
 }
+

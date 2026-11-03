@@ -136,3 +136,4 @@ func (h *VetHandler) NearbyVeterinarians(c *gin.Context) {
 	}
 	response.OK(c, vets)
 }
+

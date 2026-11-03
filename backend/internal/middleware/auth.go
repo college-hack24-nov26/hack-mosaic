@@ -103,3 +103,4 @@ func GetUserVerified(c *gin.Context) bool {
 	b, _ := v.(bool)
 	return b
 }
+

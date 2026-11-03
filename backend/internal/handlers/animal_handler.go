@@ -466,3 +466,4 @@ func (h *AnimalHandler) AddTreatment(c *gin.Context) {
 	}
 	response.Created(c, trt)
 }
+
