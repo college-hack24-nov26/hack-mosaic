@@ -348,6 +348,28 @@ class OfflineStore extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Begins a fresh authenticated farmer session: wipes any previous user's
+  /// (or demo) data so nothing leaks between accounts, then stores the server
+  /// profile. Animals/reports then come only from this account.
+  Future<void> startSessionFor(UserModel user) async {
+    await clearProtectedData();
+    await saveUser(user);
+  }
+
+  /// Removes personal data cached on the device (logout / session expiry).
+  /// Reference-style data (vets directory, outbreak zones) is kept.
+  Future<void> clearProtectedData() async {
+    final prefs = await SharedPreferences.getInstance();
+    for (final k in ['current_user', 'animals_list', 'reports_list', 'notifications_list']) {
+      await prefs.remove(k);
+    }
+    _currentUser = null;
+    _animals = [];
+    _reports = [];
+    _notifications = [];
+    notifyListeners();
+  }
+
   Future<void> addAnimal(AnimalModel animal) async {
     _animals.insert(0, animal);
     await _persistAnimals();

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_typography.dart';
 import '../../core/localization/app_strings.dart';
+import '../../core/auth/session_manager.dart';
 import '../../data/local/offline_store.dart';
 import 'farmer_home_screen.dart';
 import '../animals/animals_list_screen.dart';
@@ -50,9 +51,31 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
       builder: (context, _) {
         final activeCount = store.reports.where((r) => r.status == 'confirmed').length;
         return Scaffold(
-          body: IndexedStack(
-            index: _currentIndex,
-            children: screens,
+          body: Column(
+            children: [
+              if (SessionManager.instance.status == SessionStatus.demoFarmer)
+                Container(
+                  width: double.infinity,
+                  color: AppColors.cautionAmber,
+                  padding: EdgeInsets.fromLTRB(
+                      12, MediaQuery.of(context).padding.top + 2, 12, 2),
+                  child: Text(
+                    AppStrings.t('demo_banner'),
+                    textAlign: TextAlign.center,
+                    style: AppTypography.badge.copyWith(color: Colors.white, fontSize: 11),
+                  ),
+                ),
+              Expanded(
+                child: MediaQuery.removePadding(
+                  context: context,
+                  removeTop: SessionManager.instance.status == SessionStatus.demoFarmer,
+                  child: IndexedStack(
+                    index: _currentIndex,
+                    children: screens,
+                  ),
+                ),
+              ),
+            ],
           ),
           bottomNavigationBar: Container(
             decoration: BoxDecoration(
