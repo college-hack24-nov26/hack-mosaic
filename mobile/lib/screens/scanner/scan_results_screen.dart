@@ -9,6 +9,7 @@ import '../../core/services/voice_service.dart';
 import '../../core/widgets/app_card.dart';
 import '../../core/widgets/app_button.dart';
 import '../../core/widgets/safety_disclaimer_card.dart';
+import '../../data/models/disease_report_model.dart';
 import '../reports/create_report_screen.dart';
 
 class ScanResultsScreen extends StatefulWidget {
@@ -193,11 +194,27 @@ class _ScanResultsScreenState extends State<ScanResultsScreen> {
             backgroundColor: AppColors.primary,
             onPressed: () {
               _voice.stop();
+              final topCond = g.possibleConditions.isNotEmpty
+                  ? g.possibleConditions.first
+                  : 'preliminary_skin_observation';
+              final conf = g.urgency == 'high'
+                  ? 0.88
+                  : (g.urgency == 'medium' ? 0.74 : 0.55);
               Navigator.of(context).pushReplacement(
                 MaterialPageRoute(
                   builder: (_) => CreateReportScreen(
                     preselectedAnimalId: widget.animalId,
                     initialPhotoPath: widget.imagePath,
+                    initialScreening: ScreeningResult(
+                      modelVersion: 'gemini-2.5-flash-preliminary',
+                      topLabel: topCond,
+                      topConfidence: conf,
+                      inconclusive: g.urgency == 'low',
+                      scores: [
+                        {'label': topCond, 'score': conf},
+                      ],
+                      ranAt: DateTime.now().toUtc(),
+                    ),
                   ),
                 ),
               );

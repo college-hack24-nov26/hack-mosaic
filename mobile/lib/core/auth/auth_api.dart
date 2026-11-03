@@ -16,10 +16,11 @@ class AuthTokens {
 class AuthApi {
   AuthApi({http.Client? client, String? baseUrl})
       : _client = client ?? http.Client(),
-        baseUrl = baseUrl ?? ApiClient.baseUrl;
+        _customBaseUrl = baseUrl;
 
   final http.Client _client;
-  final String baseUrl;
+  final String? _customBaseUrl;
+  String get baseUrl => _customBaseUrl ?? ApiClient.baseUrl;
 
   static const _timeout = Duration(seconds: 15);
 

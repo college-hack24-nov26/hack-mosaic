@@ -1,0 +1,56 @@
+services:
+  postgres:
+    image: postgis/postgis:16-3.4-alpine
+    container_name: pashuvani-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${DB_USER:-pashuvani}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-pashuvani_password}
+      POSTGRES_DB: ${DB_NAME:-pashuvani_db}
+    ports:
+      - "${DB_PORT:-5432}:5432"
+    volumes:
+      - pashuvani_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-pashuvani} -d ${DB_NAME:-pashuvani_db}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
+    container_name: pashuvani-backend
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      ENV: ${ENV:-development}
+      PORT: "8080"
+      DB_DRIVER: postgres
+      DB_HOST: postgres
+      DB_PORT: "5432"
+      DB_USER: ${DB_USER:-pashuvani}
+      DB_PASSWORD: ${DB_PASSWORD:-pashuvani_password}
+      DB_NAME: ${DB_NAME:-pashuvani_db}
+      DB_SSLMODE: disable
+      AUTO_MIGRATE: "true"
+      AUTO_SEED: "true"
+      MIGRATIONS_DIR: /app/migrations
+      JWT_SECRET: ${JWT_SECRET:-pashuvani-dev-jwt-secret-key-2026-change-in-production}
+      JWT_ACCESS_TTL_SECONDS: ${JWT_ACCESS_TTL_SECONDS:-3600}
+      JWT_REFRESH_TTL_SECONDS: ${JWT_REFRESH_TTL_SECONDS:-2592000}
+      CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-http://localhost:3000,http://localhost:5173,http://127.0.0.1:5173,*}
+      STORAGE_LOCAL_DIR: /app/data/uploads
+      STORAGE_MAX_UPLOAD_SIZE_BYTES: "5242880"
+    ports:
+      - "${PORT:-8080}:8080"
+    volumes:
+      - pashuvani_uploads:/app/data/uploads
+
+volumes:
+  pashuvani_pgdata:
+  pashuvani_uploads:
+

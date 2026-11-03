@@ -13,11 +13,12 @@ class AuthedHttp {
   AuthedHttp({SessionManager? session, http.Client? client, String? baseUrl})
       : _session = session,
         _client = client ?? http.Client(),
-        baseUrl = baseUrl ?? ApiClient.baseUrl;
+        _customBaseUrl = baseUrl;
 
   final SessionManager? _session;
   final http.Client _client;
-  final String baseUrl;
+  final String? _customBaseUrl;
+  String get baseUrl => _customBaseUrl ?? ApiClient.baseUrl;
 
   SessionManager get session => _session ?? SessionManager.instance;
 
