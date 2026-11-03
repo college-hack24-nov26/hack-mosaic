@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, Circle, GeoJSON, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import { MapCasePin, OutbreakCluster } from '../../types';
-import { Layers, ShieldCheck, AlertCircle, Clock, Eye, Map, Globe, Sun } from 'lucide-react';
+import { Layers, ShieldCheck, AlertCircle, Clock, Eye, Map, Globe, Compass } from 'lucide-react';
 import districtGeoJSON from '/geo/districts.json';
 
 interface SurveillanceMapProps {
@@ -11,21 +11,31 @@ interface SurveillanceMapProps {
   onSelectCase?: (reportId: string) => void;
 }
 
-// Tile Layer Configuration
-type TileLayerType = 'voyager' | 'satellite' | 'positron';
+// Tile Layer Configuration (MapTiler + OpenStreetMap)
+type TileLayerType = 'maptiler' | 'osm' | 'voyager' | 'satellite';
 
-const TILE_SOURCES: Record<TileLayerType, { url: string; attribution: string }> = {
+const MAPTILER_KEY = import.meta.env.VITE_MAPTILER_KEY || 'cKTaQaghkXlhl6xd2pWw';
+
+const TILE_SOURCES: Record<TileLayerType, { url: string; attribution: string; maxZoom?: number }> = {
+  maptiler: {
+    url: `https://api.maptiler.com/maps/streets-v2/{z}/{x}/{y}.png?key=${MAPTILER_KEY}`,
+    attribution: '&copy; <a href="https://www.maptiler.com/">MapTiler</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+    maxZoom: 19,
+  },
+  osm: {
+    url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+    maxZoom: 19,
+  },
   voyager: {
     url: 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
     attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
+    maxZoom: 19,
   },
   satellite: {
     url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
-    attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP',
-  },
-  positron: {
-    url: 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
-    attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
+    attribution: 'Tiles &copy; Esri &mdash; Source: Esri, USGS, AeroGRID',
+    maxZoom: 18,
   },
 };
 
@@ -65,7 +75,7 @@ const createVetraIcon = (status: string) => {
 };
 
 export const SurveillanceMap: React.FC<SurveillanceMapProps> = ({ pins, clusters, onSelectCase }) => {
-  const [activeTile, setActiveTile] = useState<TileLayerType>('voyager');
+  const [activeTile, setActiveTile] = useState<TileLayerType>('maptiler');
   const [showClusters, setShowClusters] = useState(true);
   const [showDistricts, setShowDistricts] = useState(true);
   const [statusFilter, setStatusFilter] = useState<string>('all');
@@ -87,7 +97,7 @@ export const SurveillanceMap: React.FC<SurveillanceMapProps> = ({ pins, clusters
             Real-Time Outbreak Surveillance Map
           </h3>
           <p className="text-xs text-ink-metadata font-inter">
-            Active geo-referenced veterinary cases across Maharashtra State
+            Active geo-referenced veterinary cases across Maharashtra State • MapTiler &amp; OpenStreetMap
           </p>
         </div>
 
@@ -95,14 +105,24 @@ export const SurveillanceMap: React.FC<SurveillanceMapProps> = ({ pins, clusters
           {/* Map Tile Switcher */}
           <div className="flex items-center gap-1 bg-parchment p-1 rounded-sm border border-black/10 font-inter">
             <button
-              onClick={() => setActiveTile('voyager')}
+              onClick={() => setActiveTile('maptiler')}
               className={`px-2.5 py-1 rounded text-xs font-semibold flex items-center gap-1 transition-all ${
-                activeTile === 'voyager'
+                activeTile === 'maptiler'
                   ? 'bg-white text-ink shadow-sm'
                   : 'text-ink-secondary hover:text-ink'
               }`}
             >
-              <Map className="w-3.5 h-3.5" /> Streets
+              <Map className="w-3.5 h-3.5 text-blue-600" /> MapTiler
+            </button>
+            <button
+              onClick={() => setActiveTile('osm')}
+              className={`px-2.5 py-1 rounded text-xs font-semibold flex items-center gap-1 transition-all ${
+                activeTile === 'osm'
+                  ? 'bg-white text-ink shadow-sm'
+                  : 'text-ink-secondary hover:text-ink'
+              }`}
+            >
+              <Compass className="w-3.5 h-3.5 text-emerald-600" /> OpenStreetMap
             </button>
             <button
               onClick={() => setActiveTile('satellite')}
@@ -112,17 +132,7 @@ export const SurveillanceMap: React.FC<SurveillanceMapProps> = ({ pins, clusters
                   : 'text-ink-secondary hover:text-ink'
               }`}
             >
-              <Globe className="w-3.5 h-3.5" /> Satellite
-            </button>
-            <button
-              onClick={() => setActiveTile('positron')}
-              className={`px-2.5 py-1 rounded text-xs font-semibold flex items-center gap-1 transition-all ${
-                activeTile === 'positron'
-                  ? 'bg-white text-ink shadow-sm'
-                  : 'text-ink-secondary hover:text-ink'
-              }`}
-            >
-              <Sun className="w-3.5 h-3.5" /> Light
+              <Globe className="w-3.5 h-3.5 text-amber-600" /> Satellite
             </button>
           </div>
 
@@ -191,7 +201,7 @@ export const SurveillanceMap: React.FC<SurveillanceMapProps> = ({ pins, clusters
             key={activeTile}
             attribution={TILE_SOURCES[activeTile].attribution}
             url={TILE_SOURCES[activeTile].url}
-            maxZoom={18}
+            maxZoom={TILE_SOURCES[activeTile].maxZoom || 18}
           />
 
           {/* Administrative District GeoJSON Boundaries */}
