@@ -33,7 +33,7 @@ class ApiService {
 
     // Automatically inject JWT Token from localStorage
     this.client.interceptors.request.use((config) => {
-      const token = localStorage.getItem('pashurakshak_token');
+      const token = localStorage.getItem('pashuvani_token');
       if (token) {
         config.headers.Authorization = `Bearer ${token}`;
       }
@@ -46,7 +46,7 @@ class ApiService {
     try {
       const response = await this.client.post('/auth/login', { phone_number, password });
       if (response.data.success) {
-        localStorage.setItem('pashurakshak_token', response.data.data.access_token);
+        localStorage.setItem('pashuvani_token', response.data.data.access_token);
         return response.data.data;
       }
     } catch {
@@ -58,7 +58,7 @@ class ApiService {
       access_token: 'mock_jwt_token_demo_authority_pune_district',
       refresh_token: 'mock_refresh_token_demo'
     };
-    localStorage.setItem('pashurakshak_token', demoResponse.access_token);
+    localStorage.setItem('pashuvani_token', demoResponse.access_token);
     return demoResponse;
   }
 

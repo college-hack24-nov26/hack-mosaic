@@ -19,7 +19,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const token = localStorage.getItem('pashurakshak_token');
+    const token = localStorage.getItem('pashuvani_token');
     if (token) {
       setUser(mockCurrentUser);
     }
@@ -32,12 +32,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const demoLogin = () => {
-    localStorage.setItem('pashurakshak_token', 'demo_authority_token');
+    localStorage.setItem('pashuvani_token', 'demo_authority_token');
     setUser(mockCurrentUser);
   };
 
   const logout = () => {
-    localStorage.removeItem('pashurakshak_token');
+    localStorage.removeItem('pashuvani_token');
     setUser(null);
   };
 

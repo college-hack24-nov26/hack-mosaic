@@ -6,7 +6,7 @@ try {
     $listener = New-Object System.Net.HttpListener
     $listener.Prefixes.Add($prefix)
     $listener.Start()
-    Write-Host "PashuRakshak Surveillance Server is live at $prefix" -ForegroundColor Green
+    Write-Host "Pashuvani Surveillance Server is live at $prefix" -ForegroundColor Green
 
     while ($listener.IsListening) {
         $context = $listener.GetContext()

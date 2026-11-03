@@ -67,7 +67,7 @@ const DashboardContent: React.FC = () => {
       <div className="min-h-screen bg-parchment flex items-center justify-center font-figtree">
         <div className="flex items-center gap-2 text-ink font-semibold">
           <div className="w-4 h-4 border-2 border-ink border-t-transparent rounded-full animate-spin"></div>
-          Loading PashuRakshak Surveillance Network...
+          Loading Pashuvani Surveillance Network...
         </div>
       </div>
     );

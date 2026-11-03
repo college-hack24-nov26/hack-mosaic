@@ -194,7 +194,7 @@ export const ProtocolsPage: React.FC<ProtocolsPageProps> = ({
             </h2>
           </div>
           <p className="text-xs text-ink-metadata font-inter mt-1">
-            PASHURAKSHAK Disease Registry catalog, pathogen surveillance parameters, and departmental protocol reference.
+            PASHUVANI Disease Registry catalog, pathogen surveillance parameters, and departmental protocol reference.
           </p>
         </div>
 

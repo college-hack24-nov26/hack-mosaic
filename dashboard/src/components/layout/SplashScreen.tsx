@@ -92,7 +92,7 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onDismiss }) => {
         {/* Netflix-Style Cinematic Typography */}
         <h1 className="text-4xl sm:text-6xl font-black text-white font-figtree tracking-wider uppercase mb-1">
           <span className="text-white drop-shadow-[0_0_35px_rgba(148,225,48,0.7)]">
-            PASHURAKSHAK
+            PASHUVANI
           </span>
         </h1>
         <p className="text-xs uppercase tracking-[0.35em] font-bold text-[#94e130] font-inter">

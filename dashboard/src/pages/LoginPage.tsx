@@ -27,7 +27,7 @@ export const LoginPage: React.FC = () => {
           <div className="w-12 h-12 bg-brand-primary rounded-sm flex items-center justify-center mx-auto shadow-sm">
             <Activity className="w-7 h-7 text-ink stroke-[2.5]" />
           </div>
-          <h1 className="text-2xl font-bold text-ink">PashuRakshak</h1>
+          <h1 className="text-2xl font-bold text-ink">Pashuvani</h1>
           <p className="text-xs text-ink-secondary font-inter">
             Government Livestock Epidemic & Disease Surveillance Portal
           </p>
