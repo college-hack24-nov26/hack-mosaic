@@ -86,11 +86,11 @@ Out-of-scope resources return `404` (item) or are filtered out (list). Wrong rol
 | 5 | POST | `/auth/logout` | any | Om | P0 |
 | 6 | GET | `/me` | any | Om | P0 |
 | 7 | PATCH | `/me` | any | Om | P0 |
-| 8 | GET | `/reference/locations` | any | Om | P0 |
-| 9 | GET | `/reference/species` | any | Om | P0 |
-| 10 | GET | `/reference/breeds` | any | Om | P0 |
-| 11 | GET | `/reference/diseases` | any | Om | P0 |
-| 12 | GET | `/reference/symptoms` | any | Om | P0 |
+| 8 | GET | `/reference/locations` | public | Om | P0 |
+| 9 | GET | `/reference/species` | public | Om | P0 |
+| 10 | GET | `/reference/breeds` | public | Om | P0 |
+| 11 | GET | `/reference/diseases` | public | Om | P0 |
+| 12 | GET | `/reference/symptoms` | public | Om | P0 |
 | 13 | POST | `/animals` | farmer | Om | P0 |
 | 14 | GET | `/animals` | farmer | Om | P0 |
 | 15 | GET | `/animals/{id}` | farmer(owner), vet, officer, admin | Om | P0 |
@@ -185,9 +185,9 @@ Allowed fields (all optional): `full_name`, `preferred_language`; farmer only: `
 
 ---
 
-## 4. Reference data (read-only, cache-friendly)
+## 4. Reference data (public read-only, cache-friendly)
 
-All return `{ "data": [ ... ] }` with `ETag` support. The Flutter app caches them for offline use.
+All reference endpoints are **public** (unauthenticated) so that unauthenticated users can load administrative hierarchy locations during self-registration. All return `{ "data": [ ... ] }` with `ETag` support. The Flutter app caches them for offline use.
 
 | Endpoint | Query | Item |
 |---|---|---|
@@ -285,6 +285,7 @@ Same validation rules as `DATABASE_SCHEMA.md` §4.14–4.16.
     "disclaimer": "preliminary_screening_not_a_diagnosis"
   },
   "images": [ { "id": "uuid", "url": "/api/v1/reports/<id>/images/<image_id>", "mime_type": "image/jpeg", "width": 1200, "height": 900 } ],
+  "images_pending": false,
   "verification": null,
   "created_at": "…", "updated_at": "…"
 }
@@ -313,6 +314,7 @@ Request:
   "symptom_codes": ["skin_nodules", "loss_of_appetite"],
   "location": { "lat": 17.9856, "lng": 74.4331, "accuracy_m": 12.0 },
   "village_id": null,
+  "expected_image_count": 1,
   "screening": {
     "model_version": "mnv3s-2026.11.0",
     "top_label": "lumpy_skin_disease",
@@ -328,6 +330,7 @@ Validation:
 - `reported_at` ≤ server time + 10 min; not older than 30 days.
 - `description` ≤ 2000 (optional); at least one of `description`, `symptom_codes` (≥ 1), or a later image is expected, but v1 only **requires** `symptom_codes` OR `description` non-empty.
 - `symptom_codes` ≤ 15 items, each an existing active code.
+- `expected_image_count` optional integer (0 to 4, default 0). Used by server to compute `images_pending = (len(images) < expected_image_count)`.
 - `location` optional; if absent `village_id` or the farmer's profile village is used (`source=village_centroid`). If present, `source` is set to `gps` by server. `accuracy_m` ≥ 0.
 - `screening` optional; if present: `model_version` 1–50 chars, `top_label` matches `^[a-z0-9_]{1,64}$`, `top_confidence` 0..1, `scores` ≤ 20 items each 0..1, `ran_at` valid.
 - The server **does not** validate screening labels and never copies them into `confirmed_*` fields.

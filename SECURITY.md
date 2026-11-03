@@ -59,3 +59,4 @@ Access control is enforced at the backend service layer via middleware and scope
 2. **Environment Configuration:** All secrets must be injected via environment variables at runtime.
 3. **Template Provided:** `deploy/.env.example` provides documentation of all required variables with dummy values.
 4. **QR Code Integrity:** The backend holds an Ed25519 private key to cryptographically sign offline animal health snapshots. The Flutter app ships only the corresponding public key to verify signatures offline.
+

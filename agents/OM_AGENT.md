@@ -73,3 +73,4 @@ In all Flutter screening screens and backend error/disclaimer responses, you mus
 
 - To request a change or report a blocker to Soham or Lokesh, create a durable note in `docs/handoffs/om-<date>-<n>.md`.
 - When updating contracts, create a formal Change Request in `docs/change-requests/CR-<nnn>-<slug>.md` and obtain the affected developer's sign-off before modifying `API_CONTRACTS.md` or `DATABASE_SCHEMA.md`.
+

@@ -148,3 +148,4 @@ HOUR 21:00 — 24:00: Gate G3 Code Freeze & Presentation Prep
 ├── Rehearse offline-to-online demo script
 └── Presentation alignment with project PPT
 ```
+

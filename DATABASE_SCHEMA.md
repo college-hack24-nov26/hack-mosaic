@@ -223,7 +223,8 @@ The MobileNetV3 label → disease mapping lives in the ML manifest (`ML_INTEGRAT
 | `location_accuracy_m` | real | `CHECK (>= 0)` |
 | `location_source` | location_source | NN when `location` set |
 | `village_id` | uuid | FK → `locations(id)`; defaults to farmer's village |
-| `taluka_id`, `district_id` | uuid | NN, FK → `locations(id)`; **set by server from `village_id`**, used for filtering |
+| `taluka_id`, `district_id` | uuid | NN, FK → `locations(id)`; **set by server from `village_id` parent hierarchy**, used for filtering |
+| `expected_image_count` | integer | NN, default 0, `CHECK (expected_image_count BETWEEN 0 AND 4)` |
 | `status` | report_status | NN, default `submitted` |
 | `confirmed_disease_id` | uuid | FK → `diseases(id)`; set only while `status='confirmed'`; `CHECK ((status='confirmed') = (confirmed_disease_id IS NOT NULL))` |
 | `confirmed_at` | timestamptz | when current verification was `confirmed` |

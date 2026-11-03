@@ -102,3 +102,4 @@
 | **Timestamps** | All API timestamps must be ISO 8601 / RFC 3339 UTC strings ending in `Z` (`2026-11-03T14:00:00Z`). |
 | **Coordinates** | API JSON coordinates are `{ "lat": 17.9856, "lng": 74.4331 }`. GeoJSON uses `[lng, lat]`. |
 | **UUIDs** | UUIDs must be lowercase canonical string format (`550e8400-e29b-41d4-a716-446655440000`). |
+

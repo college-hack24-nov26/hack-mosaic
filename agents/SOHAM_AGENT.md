@@ -72,3 +72,4 @@ You must render the exact product-safety strings in the UI without alteration:
 - Never commit or push directly to `main`.
 - Commit messages must reference task IDs (e.g. `feat(dashboard): integrate Leaflet case map with taluka filters [S-05]`).
 - Open PRs against `main` including screenshots or terminal build/test output in the PR description.
+

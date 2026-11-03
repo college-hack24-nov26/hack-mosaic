@@ -100,3 +100,4 @@ cp deploy/.env.example deploy/.env
 # 3. Start PostgreSQL with PostGIS, Go API, and ML Service
 docker compose -f deploy/docker-compose.yml up -d
 ```
+
