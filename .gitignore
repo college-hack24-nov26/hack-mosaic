@@ -1,0 +1,44 @@
+# Environment and secrets
+.env
+.env.local
+*.pem
+*.key
+*.keystore
+
+# Operating System files
+.DS_Store
+Thumbs.db
+
+# Go
+backend/bin/
+backend/dist/
+backend/tmp/
+
+# Flutter / Dart
+mobile/.dart_tool/
+mobile/.flutter-plugins
+mobile/.flutter-plugins-dependencies
+mobile/.packages
+mobile/build/
+mobile/.pub-cache/
+mobile/.pub/
+
+# Node / React
+dashboard/node_modules/
+dashboard/dist/
+dashboard/.next/
+dashboard/coverage/
+
+# Python / Machine Learning
+ml/__pycache__/
+ml/*/__pycache__/
+ml/*.pyc
+ml/.pytest_cache/
+ml/.venv/
+ml/venv/
+ml/datasets/raw/
+ml/datasets/images/
+
+# Local data & upload directories
+data/uploads/
+data/postgres/
