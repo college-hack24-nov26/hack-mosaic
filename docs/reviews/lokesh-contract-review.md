@@ -44,3 +44,4 @@
   - Golden test file structure in `ml/artifacts/mobilenetv3/<version>/golden/` with `expected.json` is confirmed.
 - **Unnecessary Fields:**
   - Real-time weather API integration in P0/P1 is unnecessary and should remain deferred; use static seasonal indicators (`month_of_year`, `season`).
+

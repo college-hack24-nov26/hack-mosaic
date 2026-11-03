@@ -7,12 +7,12 @@
 ## 0. CURRENT PHASE (edited only by Om)
 
 ```
-PHASE:            0 — INITIALIZATION
-CODING:           LOCKED  (no feature code, no migrations, no scaffolding in the repo)
-CONTRACTS:        API_CONTRACTS.md v0.1-draft   — NOT FROZEN
-                  DATABASE_SCHEMA.md v0.1-draft — NOT FROZEN
-                  ML_INTEGRATION.md v0.1-draft  — NOT FROZEN
-NEXT GATE:        G0 (Om approves initialization) → G1 (contract freeze, 3 sign-offs)
+PHASE:            1 — IMPLEMENTATION (P0)
+CODING:           UNLOCKED (post-G1)
+CONTRACTS:        API_CONTRACTS.md v1.0 — FROZEN
+                  DATABASE_SCHEMA.md v1.0 — FROZEN
+                  ML_INTEGRATION.md v1.0 — FROZEN
+NEXT GATE:        G2 (Core Golden Thread Demo Verification)
 ```
 
 **While `CODING: LOCKED`, you may only:** read the docs, write a contract review (see §6), set up your own local tooling, and do dataset discovery notes (Lokesh). You may **not** create Flutter screens, Go handlers, React components, ML training code, SQL migrations, or any other production code, and you may not "start early" against an assumption.

@@ -96,3 +96,4 @@ Before updating `AGENTS.md` to `CODING: UNLOCKED`, Om must formally approve:
 3. **Approval 3 (Decision D-03):** P0 Vet Review Inbox is hosted on the React Dashboard; mobile vet mode is deferred to P1.
 4. **Approval 4 (Contract Adjustments):** Approval of the 5 contract adjustments listed in §4 above.
 5. **Approval 5 (Gate G1 Transition):** Authorization to update `AGENTS.md` status to `PHASE: 1 — IMPLEMENTATION`, `CODING: UNLOCKED`, and begin parallel execution on feature branches.
+

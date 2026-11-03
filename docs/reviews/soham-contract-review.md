@@ -51,3 +51,4 @@
   - Standardized error envelope `{ "error": { "code", "message", "details" } }` is fully integrated into the TypeScript API client.
 - **Unnecessary Fields:**
   - WebSocket / SSE streaming is unnecessary for the 24-hour hackathon. HTTP polling on a 30-second interval or manual refresh buttons provide full demonstration utility without connection dropouts.
+
