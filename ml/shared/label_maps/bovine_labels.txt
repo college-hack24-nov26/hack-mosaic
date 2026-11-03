@@ -1,0 +1,2 @@
+0 Healthy Cow
+1 Sick Cow
