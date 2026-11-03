@@ -180,21 +180,24 @@ class _LoginScreenState extends State<LoginScreen> {
                   SizedBox(
                     width: double.infinity,
                     child: OutlinedButton.icon(
-                      onPressed: () {
-                        setState(() {
-                          _phone.text = vet ? '9890112233' : '9876543210';
-                          _password.text = 'Password@123';
-                          _error = null;
-                        });
-                      },
+                      onPressed: _busy
+                          ? null
+                          : () {
+                              setState(() {
+                                _phone.text = vet ? '9890112233' : '9876543210';
+                                _password.text = 'Pashu@2026';
+                                _error = null;
+                              });
+                              _submit();
+                            },
                       icon: Icon(
                         vet ? Icons.medical_services_outlined : Icons.agriculture,
                         size: 16,
                       ),
                       label: Text(
                         vet
-                            ? 'Dr. Rajesh Kulkarni (9890112233)'
-                            : 'Ramesh Jadhav (9876543210)',
+                            ? 'Dr. Rajesh Kulkarni (9890112233 • Pashu@2026)'
+                            : 'Ramesh Jadhav (9876543210 • Pashu@2026)',
                         style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
                       ),
                     ),

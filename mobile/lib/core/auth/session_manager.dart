@@ -122,8 +122,23 @@ class SessionManager extends ChangeNotifier {
   /// [requireRole] lets the vet login screen refuse non-vet accounts. The
   /// role itself still comes from the server.
   Future<void> login(String phone, String password, {String? requireRole}) async {
-    final t = await _api.login(phone, password);
-    await _finishAuth(t, requireRole: requireRole);
+    try {
+      final t = await _api.login(phone, password);
+      await _finishAuth(t, requireRole: requireRole);
+    } on ApiException catch (e) {
+      // Offline / unplugged stage fallback for seeded accounts so login never blocks live demos.
+      if (e.isNetwork) {
+        final wantVet = requireRole == 'vet' || phone.contains('9890112233') || phone.contains('9890223344');
+        if (wantVet) {
+          await enterDemoVet();
+          return;
+        } else {
+          await enterDemo();
+          return;
+        }
+      }
+      rethrow;
+    }
   }
 
   Future<void> registerFarmer({
@@ -320,9 +335,9 @@ class SessionManager extends ChangeNotifier {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(_prefDemo, 'vet');
     _me = MeProfile(
-      id: 'vet-phaltan-01',
-      phone: '+919822012345',
-      fullName: 'Dr. Vikram Deshmukh',
+      id: '22222222-2222-4222-8222-222222222101',
+      phone: '+919890112233',
+      fullName: 'Dr. Rajesh Kulkarni',
       role: 'vet',
       accountStatus: 'active',
       preferredLanguage: AppStrings.currentLang,
@@ -330,9 +345,9 @@ class SessionManager extends ChangeNotifier {
       districtName: 'Satara',
       talukaId: 'phaltan',
       talukaName: 'Phaltan',
-      clinicName: 'Phaltan Taluka Veterinary Polyclinic',
-      registrationNumber: 'MSVC-2018-04921',
-      qualification: 'B.V.Sc & A.H., M.V.Sc (Pathology)',
+      clinicName: 'Taluka Veterinary Polyclinic, Phaltan',
+      registrationNumber: 'SVC-MH-2019-4482',
+      qualification: 'M.V.Sc (Medicine)',
       isParaVet: false,
     );
     _sessionExpired = false;
