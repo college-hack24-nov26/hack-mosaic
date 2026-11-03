@@ -1,0 +1,15 @@
+ROC-AUC Score: 0.9914
+Accuracy: 0.9627
+Brier Score: 0.0277
+
+              precision    recall  f1-score   support
+
+           0       0.99      0.96      0.98      4353
+           1       0.79      0.95      0.86       608
+
+    accuracy                           0.96      4961
+   macro avg       0.89      0.96      0.92      4961
+weighted avg       0.97      0.96      0.96      4961
+
+Confusion Matrix:
+[[4200, 153], [32, 576]]

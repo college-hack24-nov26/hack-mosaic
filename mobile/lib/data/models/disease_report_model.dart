@@ -106,26 +106,32 @@ class DiseaseReportModel {
     'is_synced': isSynced,
   };
 
-  factory DiseaseReportModel.fromJson(Map<String, dynamic> json) => DiseaseReportModel(
-    id: json['id'] as String,
-    animalId: json['animal_id'] as String,
-    animalName: json['animal_name'] as String?,
-    reportedAt: json['reported_at'] != null ? DateTime.parse(json['reported_at'] as String) : DateTime.now(),
-    description: json['description'] as String?,
-    descriptionLanguage: json['description_language'] as String? ?? 'mr',
-    symptomCodes: (json['symptom_codes'] as List<dynamic>?)?.map((e) => e.toString()).toList() ?? [],
-    latitude: (json['latitude'] as num?)?.toDouble(),
-    longitude: (json['longitude'] as num?)?.toDouble(),
-    villageId: json['village_id'] as String?,
-    status: json['status'] as String? ?? 'submitted',
-    confirmedDiseaseCode: json['confirmed_disease_code'] as String?,
-    vetNotes: json['vet_notes'] as String?,
-    photoPath: json['photo_path'] as String?,
-    screening: json['screening'] != null
-        ? ScreeningResult.fromJson(Map<String, dynamic>.from(json['screening'] as Map))
-        : null,
-    isSynced: json['is_synced'] as bool? ?? false,
-  );
+  factory DiseaseReportModel.fromJson(Map<String, dynamic> json) {
+    final animalMap = json['animal'] is Map ? Map<String, dynamic>.from(json['animal'] as Map) : null;
+    final locationMap = json['location'] is Map ? Map<String, dynamic>.from(json['location'] as Map) : null;
+    final verificationMap = json['verification'] is Map ? Map<String, dynamic>.from(json['verification'] as Map) : null;
+
+    return DiseaseReportModel(
+      id: json['id'] as String,
+      animalId: (json['animal_id'] ?? animalMap?['id'] ?? '') as String,
+      animalName: (json['animal_name'] ?? animalMap?['name']) as String?,
+      reportedAt: json['reported_at'] != null ? DateTime.parse(json['reported_at'] as String) : DateTime.now(),
+      description: json['description'] as String?,
+      descriptionLanguage: json['description_language'] as String? ?? 'mr',
+      symptomCodes: (json['symptom_codes'] as List<dynamic>?)?.map((e) => e.toString()).toList() ?? [],
+      latitude: ((json['latitude'] ?? locationMap?['lat']) as num?)?.toDouble(),
+      longitude: ((json['longitude'] ?? locationMap?['lng']) as num?)?.toDouble(),
+      villageId: json['village_id'] as String?,
+      status: json['status'] as String? ?? 'submitted',
+      confirmedDiseaseCode: (json['confirmed_disease_code'] ?? verificationMap?['disease_code']) as String?,
+      vetNotes: (json['vet_notes'] ?? verificationMap?['notes']) as String?,
+      photoPath: json['photo_path'] as String?,
+      screening: json['screening'] != null
+          ? ScreeningResult.fromJson(Map<String, dynamic>.from(json['screening'] as Map))
+          : null,
+      isSynced: json['is_synced'] as bool? ?? (animalMap != null),
+    );
+  }
 
   DiseaseReportModel copyWith({
     String? status,

@@ -10,12 +10,39 @@ class ApiClient {
   factory ApiClient() => _instance;
   ApiClient._internal();
 
-  // Android emulator: 10.0.2.2, iOS simulator/desktop: localhost
+  // Android emulator: 10.0.2.2, USB adb-reverse: localhost, Wi-Fi LAN: 192.168.1.231
+  static const String _envBaseUrl = String.fromEnvironment('API_BASE_URL');
+  static String? _resolvedBaseUrl;
+
   static String get baseUrl {
+    if (_resolvedBaseUrl != null) return _resolvedBaseUrl!;
+    if (_envBaseUrl.isNotEmpty) return _envBaseUrl;
     if (Platform.isAndroid) {
-      return 'http://10.0.2.2:8080/api/v1';
+      return 'http://192.168.1.231:8080/api/v1';
     }
     return 'http://localhost:8080/api/v1';
+  }
+
+  /// Probes candidate local endpoints in parallel (USB adb-reverse, Wi-Fi LAN,
+  /// Android emulator loopback) and locks onto the first healthy Go backend.
+  static Future<void> resolveBestBaseUrl() async {
+    final candidates = <String>[
+      if (_envBaseUrl.isNotEmpty) _envBaseUrl,
+      'http://localhost:8080/api/v1',
+      'http://192.168.1.231:8080/api/v1',
+      'http://10.0.2.2:8080/api/v1',
+    ];
+    for (final url in candidates) {
+      try {
+        final res = await http
+            .get(Uri.parse('$url/healthz'))
+            .timeout(const Duration(milliseconds: 900));
+        if (res.statusCode == 200) {
+          _resolvedBaseUrl = url;
+          return;
+        }
+      } catch (_) {}
+    }
   }
 
   String? authToken;
@@ -31,6 +58,42 @@ class ApiClient {
       return res.statusCode == 200;
     } catch (_) {
       return false;
+    }
+  }
+
+  Future<List<AnimalModel>?> fetchAnimals() async {
+    if (authToken == null) return null;
+    try {
+      final res = await http
+          .get(Uri.parse('$baseUrl/animals?page=1&page_size=100'), headers: _headers)
+          .timeout(const Duration(seconds: 5));
+      if (res.statusCode != 200) return null;
+      final body = jsonDecode(utf8.decode(res.bodyBytes)) as Map<String, dynamic>;
+      final list = (body['data'] as List? ?? const []);
+      return list
+          .whereType<Map>()
+          .map((e) => AnimalModel.fromJson(Map<String, dynamic>.from(e)).copyWith(isSynced: true))
+          .toList();
+    } catch (_) {
+      return null;
+    }
+  }
+
+  Future<List<DiseaseReportModel>?> fetchReports() async {
+    if (authToken == null) return null;
+    try {
+      final res = await http
+          .get(Uri.parse('$baseUrl/reports?page=1&page_size=100'), headers: _headers)
+          .timeout(const Duration(seconds: 5));
+      if (res.statusCode != 200) return null;
+      final body = jsonDecode(utf8.decode(res.bodyBytes)) as Map<String, dynamic>;
+      final list = (body['data'] as List? ?? const []);
+      return list
+          .whereType<Map>()
+          .map((e) => DiseaseReportModel.fromJson(Map<String, dynamic>.from(e)).copyWith(isSynced: true))
+          .toList();
+    } catch (_) {
+      return null;
     }
   }
 
@@ -103,6 +166,28 @@ class ApiClient {
       return streamedRes.statusCode == 200 || streamedRes.statusCode == 201;
     } catch (_) {
       return false;
+    }
+  }
+
+  /// Fetches the live stream of officer-approved outbreak alerts (`GET /api/v1/alerts/live`).
+  Future<List<Map<String, dynamic>>> fetchLiveAlerts() async {
+    try {
+      final res = await http
+          .get(Uri.parse('$baseUrl/alerts/live'))
+          .timeout(const Duration(seconds: 2));
+      if (res.statusCode != 200) {
+        await resolveBestBaseUrl();
+        return const [];
+      }
+      final body = jsonDecode(utf8.decode(res.bodyBytes)) as Map<String, dynamic>;
+      final list = (body['data'] as List? ?? const []);
+      return list
+          .whereType<Map>()
+          .map((e) => Map<String, dynamic>.from(e))
+          .toList();
+    } catch (_) {
+      await resolveBestBaseUrl();
+      return const [];
     }
   }
 }

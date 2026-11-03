@@ -1,3 +1,5 @@
+import 'vet_strings.dart';
+
 class AppStrings {
   AppStrings._();
 
@@ -10,7 +12,15 @@ class AppStrings {
   }
 
   static String t(String key) {
-    return _translations[key]?[currentLang] ?? _translations[key]?['en'] ?? key;
+    final m = _translations[key] ?? vetStrings[key];
+    return m?[currentLang] ?? m?['en'] ?? key;
+  }
+
+  /// `t` with `{placeholder}` substitution.
+  static String tf(String key, Map<String, String> args) {
+    var out = t(key);
+    args.forEach((k, v) => out = out.replaceAll('{$k}', v));
+    return out;
   }
 
   static String formatSymptom(String code) {
@@ -295,6 +305,80 @@ class AppStrings {
     'file_report': {'en': 'Send to Veterinarian', 'mr': 'पशुवैद्यकास पाठवा', 'hi': 'पशु चिकित्सक को भेजें'},
     'decision_support_banner': {'en': 'AI Preliminary Observation (Decision Support)', 'mr': 'एआय प्राथमिक निरीक्षण (निर्णय साहाय्य)', 'hi': 'एआई प्रारंभिक अवलोकन (निर्णय सहायता)'},
     'model_version_notice': {'en': 'Model: MobileNetV3 • Preliminary screening, not a diagnosis.', 'mr': 'मॉडेल आवृत्ती: मोबाईलनेट • हे वैद्यकीय निदान नाही.', 'hi': 'मॉडल: मोबाइलनेट • यह चिकित्सीय निदान नहीं है।'},
+
+    // Online AI guidance (Gemini) & voice
+    'scan_need_photo': {'en': 'Please attach or capture an animal photo first', 'mr': 'कृपया आधी जनावराचा फोटो काढा', 'hi': 'कृपया पहले पशु का फोटो लें'},
+    'scan_offline': {
+      'en': 'No internet connection. AI guidance needs data. You can still send a report to the veterinarian.',
+      'mr': 'इंटरनेट उपलब्ध नाही. एआय मार्गदर्शनासाठी डेटा आवश्यक आहे. तरीही तुम्ही पशुवैद्यकाला अहवाल पाठवू शकता.',
+      'hi': 'इंटरनेट उपलब्ध नहीं है। एआई मार्गदर्शन के लिए डेटा चाहिए। फिर भी आप पशु चिकित्सक को रिपोर्ट भेज सकते हैं।',
+    },
+    'scan_no_key': {'en': 'AI guidance is not set up in this app build.', 'mr': 'या अ‍ॅपमध्ये एआय मार्गदर्शन सुरू केलेले नाही.', 'hi': 'इस ऐप में एआई मार्गदर्शन सक्रिय नहीं है।'},
+    'scan_failed': {
+      'en': 'AI guidance could not be completed. Please try again or send a report to the veterinarian.',
+      'mr': 'एआय मार्गदर्शन पूर्ण होऊ शकले नाही. कृपया पुन्हा प्रयत्न करा किंवा पशुवैद्यकाला अहवाल पाठवा.',
+      'hi': 'एआई मार्गदर्शन पूरा नहीं हो सका। कृपया पुनः प्रयास करें या पशु चिकित्सक को रिपोर्ट भेजें।',
+    },
+    'scan_analyzing': {'en': 'Analysing photo…', 'mr': 'फोटो तपासत आहे…', 'hi': 'फोटो जांच रहे हैं…'},
+    'scan_tap_capture': {'en': 'Tap to capture a photo of the problem area', 'mr': 'समस्या असलेल्या भागाचा फोटो काढण्यासाठी टॅप करा', 'hi': 'समस्या वाले हिस्से का फोटो लेने के लिए टैप करें'},
+    'scan_tap_hint': {'en': 'Keep nodules, wounds or mouth sores clearly visible', 'mr': 'गाठी, जखम किंवा तोंडातील फोड स्पष्ट दिसू द्या', 'hi': 'गांठें, घाव या मुंह के छाले साफ दिखें'},
+    'scan_tips_title': {'en': 'Screening Tips', 'mr': 'तपासणी मार्गदर्शन', 'hi': 'जांच सुझाव'},
+    'scan_tips_body': {
+      'en': '• Take the photo in good light\n• Hold the camera steady on the affected area\n• Works offline with On-Device TFLite + online Gemini AI',
+      'mr': '• चांगल्या प्रकाशात फोटो काढा\n• कॅमेरा बाधित भागावर स्थिर ठेवा\n• इंटरनेट नसतानाही ऑन-डिव्हाइस टीएफलाईट मॉडेलने तपासणी होते',
+      'hi': '• अच्छी रोशनी में फोटो लें\n• कैमरा प्रभावित हिस्से पर स्थिर रखें\n• बिना इंटरनेट के भी ऑन-डिवाइस टीएफलाइट मॉडल से जांच होती है',
+    },
+    'tflite_card_title': {
+      'en': 'On-Device TFLite Screening (Offline Model)',
+      'mr': 'ऑन-डिव्हाइस टीएफलाईट प्राथमिक तपासणी (ऑफलाइन मॉडेल)',
+      'hi': 'ऑन-डिवाइस टीएफलाइट प्रारंभिक जांच (ऑफलाइन मॉडल)',
+    },
+    'tflite_healthy': {
+      'en': 'No Obvious External Lesion Detected (Healthy Pattern)',
+      'mr': 'बाह्य जखम किंवा गाठी आढळल्या नाहीत (निरोगी नमुना)',
+      'hi': 'बाहरी घाव या गांठ के स्पष्ट संकेत नहीं मिले (स्वस्थ पैटर्न)',
+    },
+    'tflite_suspected_disease': {
+      'en': 'Possible Bovine Lesion / FMD-LSD Signs Detected',
+      'mr': 'संभाव्य जनावरांतील जखम / लाळ्या-लंपी सदृश लक्षणे आढळली',
+      'hi': 'संभावित पशु घाव / खुरपका-लम्पी जैसे संकेत मिले',
+    },
+    'tflite_inconclusive': {
+      'en': 'Inconclusive (<65% confidence) — Retake in clearer light or consult vet',
+      'mr': 'अनिर्णित (<६५% विश्वासार्हता) — स्पष्ट प्रकाशात फोटो घ्या किंवा पशुवैद्यकास दाखवा',
+      'hi': 'अनिर्णायक (<६५% विश्वसनीयता) — साफ रोशनी में फोटो लें या पशु चिकित्सक को दिखाएं',
+    },
+    'tflite_offline_badge': {
+      'en': 'Offline TFLite Mode (No Internet Needed)',
+      'mr': 'ऑफलाइन टीएफलाईट मोड (इंटरनेट विना कार्यरत)',
+      'hi': 'ऑफलाइन टीएफलाइट मोड (बिना इंटरनेट के सक्रिय)',
+    },
+    'tflite_hybrid_badge': {
+      'en': 'Hybrid: On-Device TFLite + Online Gemini AI',
+      'mr': 'हायब्रिड: ऑन-डिव्हाइस टीएफलाईट + ऑनलाइन जेमिनी एआय',
+      'hi': 'हाइब्रिड: ऑन-डिवाइस टीएफलाइट + ऑनलाइन जेमिनी एआई',
+    },
+    'camera': {'en': 'Camera', 'mr': 'कॅमेरा', 'hi': 'कैमरा'},
+    'gallery': {'en': 'Gallery', 'mr': 'गॅलरी', 'hi': 'गैलरी'},
+    'ai_guidance_title': {'en': 'AI First-Aid Guidance (Preliminary)', 'mr': 'एआय प्राथमिक मार्गदर्शन (प्राथमिक)', 'hi': 'एआई प्राथमिक मार्गदर्शन (प्रारंभिक)'},
+    'possible_signs': {'en': 'Possible signs (not a diagnosis)', 'mr': 'संभाव्य लक्षणे (निदान नाही)', 'hi': 'संभावित संकेत (निदान नहीं)'},
+    'interim_care': {'en': 'What to do until the vet arrives', 'mr': 'पशुवैद्य येईपर्यंत काय करावे', 'hi': 'पशु चिकित्सक के आने तक क्या करें'},
+    'warning_signs': {'en': 'Call the vet immediately if', 'mr': 'यापैकी काही दिसल्यास लगेच पशुवैद्यकाला बोलवा', 'hi': 'इनमें से कुछ दिखे तो तुरंत पशु चिकित्सक को बुलाएं'},
+    'urgency_low': {'en': 'Urgency: Low', 'mr': 'तातडी: कमी', 'hi': 'तात्कालिकता: कम'},
+    'urgency_medium': {'en': 'Urgency: Medium', 'mr': 'तातडी: मध्यम', 'hi': 'तात्कालिकता: मध्यम'},
+    'urgency_high': {'en': 'Urgency: High', 'mr': 'तातडी: जास्त', 'hi': 'तात्कालिकता: अधिक'},
+    'listen_guidance': {'en': 'Listen in voice', 'mr': 'आवाजात ऐका', 'hi': 'आवाज़ में सुनें'},
+    'stop_listening': {'en': 'Stop', 'mr': 'थांबवा', 'hi': 'रोकें'},
+    'voice_unavailable': {
+      'en': 'Voice for this language is not installed on this phone.',
+      'mr': 'या फोनमध्ये या भाषेचा आवाज उपलब्ध नाही.',
+      'hi': 'इस फोन में इस भाषा की आवाज़ उपलब्ध नहीं है।',
+    },
+    'generated_by_ai': {
+      'en': 'Generated by Gemini AI. Preliminary guidance only, not a diagnosis.',
+      'mr': 'जेमिनी एआयने तयार केले. केवळ प्राथमिक मार्गदर्शन, निदान नव्हे.',
+      'hi': 'जेमिनी एआई द्वारा तैयार। केवल प्रारंभिक मार्गदर्शन, निदान नहीं।',
+    },
 
     // Profile & Settings
     'alert_consent': {'en': 'Outbreak Alert Consent', 'mr': 'रोग सूचना संमती', 'hi': 'रोग चेतावनी सहमति'},

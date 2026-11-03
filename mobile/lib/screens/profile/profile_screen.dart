@@ -5,6 +5,7 @@ import '../../core/theme/app_spacing.dart';
 import '../../core/localization/app_strings.dart';
 import '../../core/widgets/app_card.dart';
 import '../../core/widgets/app_button.dart';
+import '../../core/auth/session_manager.dart';
 import '../../data/local/offline_store.dart';
 import '../../data/models/user_model.dart';
 import 'language_screen.dart';
@@ -223,11 +224,42 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ],
                 ),
               ),
+              const SizedBox(height: AppSpacing.lg),
+              AppButton(
+                label: AppStrings.t(
+                    SessionManager.instance.status == SessionStatus.demoFarmer ? 'demo_exit' : 'logout'),
+                icon: Icons.logout,
+                isSecondary: true,
+                backgroundColor: AppColors.alertCritical,
+                onPressed: _confirmLogout,
+              ),
               const SizedBox(height: AppSpacing.xxl),
             ],
           ),
         );
       },
     );
+  }
+
+  Future<void> _confirmLogout() async {
+    final unsynced = _store.pendingSyncCount;
+    final isDemo = SessionManager.instance.status == SessionStatus.demoFarmer;
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(AppStrings.t('logout_title')),
+        content: Text([
+          AppStrings.t('logout_body'),
+          if (!isDemo && unsynced > 0) AppStrings.tf('logout_unsynced', {'n': '$unsynced'}),
+        ].join('\n\n')),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(AppStrings.t('cancel'))),
+          TextButton(onPressed: () => Navigator.pop(ctx, true), child: Text(AppStrings.t('logout'))),
+        ],
+      ),
+    );
+    if (ok != true || !mounted) return;
+    Navigator.of(context).popUntil((r) => r.isFirst);
+    await SessionManager.instance.logout();
   }
 }

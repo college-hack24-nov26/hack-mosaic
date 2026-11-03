@@ -3,7 +3,9 @@ import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_typography.dart';
 import '../../core/localization/app_strings.dart';
 import '../../data/local/offline_store.dart';
-import '../home/main_navigation_screen.dart';
+import '../../core/auth/session_manager.dart';
+import '../../core/network/api_client.dart';
+import '../auth/auth_gate.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -30,13 +32,15 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
   }
 
   Future<void> _initializeApp() async {
+    await ApiClient.resolveBestBaseUrl();
     await OfflineStore().initialize();
+    await SessionManager.instance.restore();
     await Future.delayed(const Duration(milliseconds: 1600));
 
     if (mounted) {
       Navigator.of(context).pushReplacement(
         PageRouteBuilder(
-          pageBuilder: (_, __, ___) => const MainNavigationScreen(),
+          pageBuilder: (_, __, ___) => const AuthGate(),
           transitionsBuilder: (_, animation, __, child) =>
               FadeTransition(opacity: animation, child: child),
           transitionDuration: const Duration(milliseconds: 500),

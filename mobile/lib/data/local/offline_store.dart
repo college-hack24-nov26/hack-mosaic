@@ -79,11 +79,11 @@ class OfflineStore extends ChangeNotifier {
     } else {
       // Default demo farmer profile in Phaltan, Satara
       _currentUser = UserModel(
-        id: 'farmer-phaltan-01',
+        id: '11111111-1111-4111-8111-111111111301',
         phone: '+919876543210',
         fullName: 'Ramesh Jadhav',
         role: 'farmer',
-        villageId: 'v-phaltan-center',
+        villageId: '11111111-1111-4111-8111-111111111104',
         villageName: 'Phaltan Rural',
         farmName: 'Jadhav Dairy Farm',
         latitude: 17.9856,
@@ -102,7 +102,7 @@ class OfflineStore extends ChangeNotifier {
       // Seed initial realistic cattle for Phaltan
       _animals = [
         AnimalModel(
-          id: 'cattle-01',
+          id: '11111111-1111-4111-8111-111111111401',
           farmerId: _currentUser!.id,
           speciesCode: 'cattle',
           breedCode: 'gir',
@@ -114,7 +114,7 @@ class OfflineStore extends ChangeNotifier {
           isSynced: true,
         ),
         AnimalModel(
-          id: 'cattle-02',
+          id: '11111111-1111-4111-8111-111111111402',
           farmerId: _currentUser!.id,
           speciesCode: 'cattle',
           breedCode: 'khillar',
@@ -126,7 +126,7 @@ class OfflineStore extends ChangeNotifier {
           isSynced: true,
         ),
         AnimalModel(
-          id: 'buffalo-01',
+          id: '11111111-1111-4111-8111-111111111403',
           farmerId: _currentUser!.id,
           speciesCode: 'buffalo',
           breedCode: 'murrah',
@@ -150,9 +150,9 @@ class OfflineStore extends ChangeNotifier {
       // Seed one confirmed past record & one recent submitted report
       _reports = [
         DiseaseReportModel(
-          id: 'rep-01',
-          animalId: 'cattle-01',
-          animalName: 'Gauri',
+          id: '11111111-1111-4111-8111-111111111502',
+          animalId: '11111111-1111-4111-8111-111111111402',
+          animalName: 'Kapila',
           reportedAt: DateTime.now().subtract(const Duration(days: 3)),
           description: 'High fever and circular nodules observed along the neck and back.',
           symptomCodes: ['skin_nodules', 'fever', 'reduced_milk'],
@@ -348,6 +348,52 @@ class OfflineStore extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Begins a fresh authenticated farmer session: wipes any previous user's
+  /// (or demo) data so nothing leaks between accounts, stores the server
+  /// profile, and pulls the farmer's animals and reports from the backend.
+  Future<void> startSessionFor(UserModel user) async {
+    await clearProtectedData();
+    await saveUser(user);
+    await refreshFromBackend();
+  }
+
+  /// Pulls the authenticated farmer's animals and reports from the Go backend,
+  /// preserving any local unsynced records.
+  Future<void> refreshFromBackend() async {
+    final api = ApiClient();
+    if (api.authToken == null) return;
+
+    final remoteAnimals = await api.fetchAnimals();
+    if (remoteAnimals != null) {
+      final unsyncedLocal = _animals.where((a) => !a.isSynced && !remoteAnimals.any((r) => r.id == a.id)).toList();
+      _animals = [...unsyncedLocal, ...remoteAnimals];
+      await _persistAnimals();
+    }
+
+    final remoteReports = await api.fetchReports();
+    if (remoteReports != null) {
+      final unsyncedLocal = _reports.where((l) => !l.isSynced && !remoteReports.any((r) => r.id == l.id)).toList();
+      _reports = [...unsyncedLocal, ...remoteReports];
+      await _persistReports();
+    }
+
+    notifyListeners();
+  }
+
+  /// Removes personal data cached on the device (logout / session expiry).
+  /// Reference-style data (vets directory, outbreak zones) is kept.
+  Future<void> clearProtectedData() async {
+    final prefs = await SharedPreferences.getInstance();
+    for (final k in ['current_user', 'animals_list', 'reports_list', 'notifications_list']) {
+      await prefs.remove(k);
+    }
+    _currentUser = null;
+    _animals = [];
+    _reports = [];
+    _notifications = [];
+    notifyListeners();
+  }
+
   Future<void> addAnimal(AnimalModel animal) async {
     _animals.insert(0, animal);
     await _persistAnimals();
@@ -423,6 +469,7 @@ class OfflineStore extends ChangeNotifier {
       if (reportsSynced > 0) {
         await _persistReports();
       }
+      await refreshFromBackend();
     } finally {
       _isSyncing = false;
       notifyListeners();
