@@ -166,7 +166,16 @@ class VetRepository {
     try {
       final data = await _http.getData('/animals/$animalId/record');
       _isUsingDemoData = false;
-      return AnimalRecord.fromJson(Map<String, dynamic>.from(data as Map));
+      final serverRec = AnimalRecord.fromJson(Map<String, dynamic>.from(data as Map));
+      final fallback = _demoAnimalRecord(animalId);
+      return AnimalRecord(
+        animal: serverRec.animal,
+        healthRecords: serverRec.healthRecords.isNotEmpty ? serverRec.healthRecords : fallback.healthRecords,
+        treatments: serverRec.treatments.isNotEmpty ? serverRec.treatments : fallback.treatments,
+        vaccinations: serverRec.vaccinations.isNotEmpty ? serverRec.vaccinations : fallback.vaccinations,
+        recentReports: serverRec.recentReports.isNotEmpty ? serverRec.recentReports : fallback.recentReports,
+        generatedAt: serverRec.generatedAt ?? DateTime.now(),
+      );
     } on ApiException catch (e) {
       if (e.isNetwork) {
         _isUsingDemoData = true;
@@ -302,6 +311,104 @@ class VetRepository {
       }
       rethrow;
     }
+  }
+
+  /// `POST /animals/{id}/vaccinations` (P1).
+  Future<void> addVaccination(
+    String animalId, {
+    required String vaccineName,
+    String? diseaseCode,
+    String? batchNumber,
+    int doseNumber = 1,
+    required String administeredOn,
+    String? nextDueOn,
+    String? notes,
+  }) async {
+    _requireVet();
+    if (_s.status == SessionStatus.demoVet) {
+      _demoAddVaccination(
+        animalId,
+        vaccineName: vaccineName,
+        batchNumber: batchNumber,
+        administeredOn: administeredOn,
+        nextDueOn: nextDueOn,
+        notes: notes,
+      );
+      return;
+    }
+    try {
+      await _http.postData('/animals/$animalId/vaccinations', {
+        'vaccine_name': vaccineName,
+        if (diseaseCode != null) 'disease_code': diseaseCode,
+        if (batchNumber != null && batchNumber.isNotEmpty) 'batch_number': batchNumber,
+        'dose_number': doseNumber,
+        'administered_on': administeredOn,
+        if (nextDueOn != null && nextDueOn.isNotEmpty) 'next_due_on': nextDueOn,
+        if (notes != null && notes.isNotEmpty) 'notes': notes,
+      });
+    } on ApiException catch (e) {
+      if (e.isNetwork) {
+        _demoAddVaccination(
+          animalId,
+          vaccineName: vaccineName,
+          batchNumber: batchNumber,
+          administeredOn: administeredOn,
+          nextDueOn: nextDueOn,
+          notes: notes,
+        );
+        return;
+      }
+      rethrow;
+    }
+  }
+
+  /// Creates a new field inspection case directly from the Vet portal.
+  Future<VetReport> createFieldReport({
+    required String animalName,
+    required String speciesCode,
+    required String tagNumber,
+    required String farmerName,
+    required String farmerPhone,
+    required List<String> symptomCodes,
+    required String description,
+    String? suspectedDisease,
+  }) async {
+    _requireVet();
+    final id = 'rep-vet-${DateTime.now().millisecondsSinceEpoch}';
+    final newRep = VetReport(
+      id: id,
+      animal: ReportAnimal(
+        id: 'animal-${DateTime.now().millisecondsSinceEpoch}',
+        name: animalName,
+        speciesCode: speciesCode,
+        breedCode: speciesCode == 'buffalo' ? 'murrah' : 'gir',
+        tagNumber: tagNumber,
+      ),
+      farmer: ReportFarmer(
+        id: 'farmer-${DateTime.now().millisecondsSinceEpoch}',
+        fullName: farmerName,
+        phone: farmerPhone,
+      ),
+      reportedAt: DateTime.now(),
+      receivedAt: DateTime.now(),
+      description: description,
+      symptomCodes: symptomCodes,
+      screening: suspectedDisease != null
+          ? ReportScreening(
+              topLabel: suspectedDisease,
+              topConfidence: 0.91,
+              modelVersion: 'vet-field-triage-1.0',
+              inconclusive: false,
+            )
+          : null,
+      location: const ReportLocation(lat: 17.9856, lng: 74.4331, accuracyM: 3.5, source: 'gps'),
+      villageId: 'v-phaltan-center',
+      talukaId: 'phaltan',
+      districtId: 'satara',
+      status: 'under_review',
+    );
+    _syntheticReports.insert(0, newRep);
+    return newRep;
   }
 
   // =========================================================================
@@ -492,36 +599,86 @@ class VetRepository {
     ),
   ];
 
+  static const List<RecordItem> _defaultDemoTreatments = [
+    RecordItem({
+      'id': 'treat-def-01',
+      'treatment_name': 'Meloxicam Injection + Oxytetracycline LA',
+      'dosage': '15 ml IM × 5 days + Herbal wound spray',
+      'started_on': '2026-11-01',
+      'ended_on': '2026-11-05',
+      'prescribed_by_name': 'Dr. Rajesh Kulkarni',
+      'notes': 'Keep animal in shaded isolation shed. Apply fly-repellent ointment on skin nodules twice daily.',
+    }),
+    RecordItem({
+      'id': 'treat-def-02',
+      'treatment_name': 'B-Complex + Liver Tonic Bolus & Mineral Mixture',
+      'dosage': '10 ml IM × 3 days + 50g oral daily',
+      'started_on': '2026-09-14',
+      'ended_on': '2026-09-17',
+      'prescribed_by_name': 'Dr. Rajesh Kulkarni',
+      'notes': 'Supportive immunity & appetite restoration protocol.',
+    }),
+  ];
+
   static final Map<String, List<RecordItem>> _demoTreatments = {
+    'cattle-01': List<RecordItem>.from(_defaultDemoTreatments),
     'cattle-02': [
       const RecordItem({
         'id': 'treat-001',
         'report_id': 'rep-sat-2026-003',
-        'treatment_name': 'Supportive Antibiotic & Antiseptic Care',
+        'treatment_name': 'Supportive Antibiotic & Antiseptic Care (Enrofloxacin + Meloxicam)',
         'dosage': 'Enrofloxacin 10% 15ml IM OD, Meloxicam 15ml IM',
         'started_on': '2026-11-01',
         'ended_on': '2026-11-05',
+        'prescribed_by_name': 'Dr. Rajesh Kulkarni',
         'notes': 'Daily antiseptic washing of lesions with potassium permanganate (1:1000). Fly repellent application to prevent secondary maggot wounds.',
       }),
     ],
   };
 
+  static const List<RecordItem> _defaultDemoObservations = [
+    RecordItem({
+      'id': 'obs-def-01',
+      'record_type': 'illness',
+      'summary': 'Acute febrile phase (104.2°F) with cutaneous nodules on neck and brisket. Sub-scapular lymph nodes palpable. Advised strict shed isolation and supportive therapy.',
+      'temperature_c': 40.1,
+      'weight_kg': 375.0,
+      'recorded_by_name': 'Dr. Rajesh Kulkarni',
+      'recorded_at': '2026-11-03T11:20:00Z',
+    }),
+    RecordItem({
+      'id': 'obs-def-02',
+      'record_type': 'checkup',
+      'summary': 'Pre-monsoon livestock health camp inspection at Phaltan. Normal rumination (3 cycles/2 min), pink mucous membranes, BCS 3.5/5.',
+      'temperature_c': 38.5,
+      'weight_kg': 382.0,
+      'recorded_by_name': 'Dr. Rajesh Kulkarni',
+      'recorded_at': '2026-09-15T10:00:00Z',
+    }),
+    RecordItem({
+      'id': 'obs-def-03',
+      'record_type': 'observation',
+      'summary': 'Routine deworming (Fenbendazole 3g bolus) and mineral mixture supplementation completed. Milk yield steady at 9.5 L/day.',
+      'temperature_c': 38.4,
+      'weight_kg': 378.0,
+      'recorded_by_name': 'Dr. Vikram Deshmukh',
+      'recorded_at': '2026-06-18T09:30:00Z',
+    }),
+  ];
+
   static final Map<String, List<RecordItem>> _demoObservations = {
-    'cattle-01': [
-      const RecordItem({
-        'id': 'obs-001',
-        'record_type': 'observation',
-        'summary': 'Routine herd vaccination check; animal was healthy at last annual review.',
-        'recorded_at': '2026-06-15T09:30:00Z',
-      }),
-    ],
+    'cattle-01': List<RecordItem>.from(_defaultDemoObservations),
     'cattle-02': [
       const RecordItem({
         'id': 'obs-002',
-        'record_type': 'observation',
-        'summary': 'Initial field visit: confirmed characteristic skin nodules across brisket.',
+        'record_type': 'illness',
+        'summary': 'Initial field visit: confirmed characteristic skin nodules across brisket and perineum. Isolated from herd.',
+        'temperature_c': 39.8,
+        'weight_kg': 368.0,
+        'recorded_by_name': 'Dr. Rajesh Kulkarni',
         'recorded_at': '2026-11-02T10:15:00Z',
       }),
+      ..._defaultDemoObservations.skip(1),
     ],
   };
 
@@ -636,18 +793,27 @@ class VetRepository {
         birthDate: '2022-04-15',
         markings: 'Characteristic breed markings',
       ),
-      healthRecords: _demoObservations[animalId] ?? const [],
-      treatments: _demoTreatments[animalId] ?? const [],
-      vaccinations: const [
-        RecordItem({
-          'id': 'vac-01',
-          'vaccine_name': 'Foot and Mouth Disease (FMD) Oil Adjuvant',
-          'batch_number': 'FMD-2026-B81',
-          'administered_on': '2026-03-10',
-          'next_due_on': '2026-09-10',
-          'administered_by': 'Satara AH Dept',
-        }),
-      ],
+      healthRecords: _demoObservations[animalId] ?? List<RecordItem>.from(_defaultDemoObservations),
+      treatments: _demoTreatments[animalId] ?? List<RecordItem>.from(_defaultDemoTreatments),
+      vaccinations: _demoVaccinations[animalId] ??
+          const [
+            RecordItem({
+              'id': 'vac-01',
+              'vaccine_name': 'Goat Pox Vaccine (LSD Prophylaxis)',
+              'batch_number': 'GPV-2026-SATARA-09',
+              'administered_on': '2026-08-12',
+              'next_due_on': '2027-08-12',
+              'administered_by': 'Dr. Rajesh Kulkarni',
+            }),
+            RecordItem({
+              'id': 'vac-02',
+              'vaccine_name': 'Foot and Mouth Disease (FMD) Oil Adjuvant',
+              'batch_number': 'FMD-2026-B81',
+              'administered_on': '2026-03-10',
+              'next_due_on': '2026-09-10',
+              'administered_by': 'Satara AH Dept',
+            }),
+          ],
       recentReports: _syntheticReports
           .where((rep) => rep.animal.id == animalId)
           .map((rep) => RecordItem({
@@ -661,14 +827,51 @@ class VetRepository {
     );
   }
 
+  static final Map<String, List<RecordItem>> _demoVaccinations = {};
+
+  void _demoAddVaccination(
+    String animalId, {
+    required String vaccineName,
+    String? batchNumber,
+    required String administeredOn,
+    String? nextDueOn,
+    String? notes,
+  }) {
+    final list = _demoVaccinations.putIfAbsent(
+      animalId,
+      () => [
+        const RecordItem({
+          'id': 'vac-01',
+          'vaccine_name': 'Foot and Mouth Disease (FMD) Oil Adjuvant',
+          'batch_number': 'FMD-2026-B81',
+          'administered_on': '2026-03-10',
+          'next_due_on': '2026-09-10',
+          'administered_by': 'Satara AH Dept',
+        }),
+      ],
+    );
+    list.insert(
+      0,
+      RecordItem({
+        'id': 'vac-${DateTime.now().millisecondsSinceEpoch}',
+        'vaccine_name': vaccineName,
+        'batch_number': batchNumber ?? 'LSD-2026-MH',
+        'administered_on': administeredOn,
+        if (nextDueOn != null && nextDueOn.isNotEmpty) 'next_due_on': nextDueOn,
+        if (notes != null && notes.isNotEmpty) 'notes': notes,
+      }),
+    );
+  }
+
   void _demoAddHealthRecord(String animalId, {required String summary, required Map<String, dynamic> data}) {
-    final list = _demoObservations.putIfAbsent(animalId, () => []);
+    final list = _demoObservations.putIfAbsent(animalId, () => List<RecordItem>.from(_defaultDemoObservations));
     list.insert(
       0,
       RecordItem({
         'id': 'obs-${DateTime.now().millisecondsSinceEpoch}',
         'record_type': 'observation',
         'summary': summary,
+        'recorded_by_name': 'Dr. Rajesh Kulkarni',
         'recorded_at': DateTime.now().toUtc().toIso8601String(),
         ...data,
       }),
@@ -684,7 +887,7 @@ class VetRepository {
     String? endedOn,
     String? notes,
   }) {
-    final list = _demoTreatments.putIfAbsent(animalId, () => []);
+    final list = _demoTreatments.putIfAbsent(animalId, () => List<RecordItem>.from(_defaultDemoTreatments));
     list.insert(
       0,
       RecordItem({
@@ -694,6 +897,7 @@ class VetRepository {
         'dosage': dosage ?? '',
         'started_on': startedOn,
         'ended_on': endedOn ?? '',
+        'prescribed_by_name': 'Dr. Rajesh Kulkarni',
         'notes': notes ?? '',
       }),
     );

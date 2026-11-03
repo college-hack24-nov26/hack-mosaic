@@ -12,6 +12,8 @@ import '../../core/widgets/safety_disclaimer_card.dart';
 import '../../data/local/offline_store.dart';
 import '../../data/models/disease_report_model.dart';
 import '../../core/network/api_client.dart';
+import 'report_details_screen.dart';
+import 'reports_history_screen.dart';
 
 class CreateReportScreen extends StatefulWidget {
   final String? preselectedAnimalId;
@@ -41,6 +43,7 @@ class _CreateReportScreenState extends State<CreateReportScreen> {
   String? _photoPath;
   ScreeningResult? _screeningResult;
   bool _isSubmitting = false;
+  int _activeTab = 0; // 0 = File New Report, 1 = My Submitted Reports & Vet Status
 
   // Real coordinates for Phaltan / Satara demonstration
   final double _currentLat = 17.9856;
@@ -167,25 +170,144 @@ class _CreateReportScreenState extends State<CreateReportScreen> {
       );
 
       if (widget.onReportSubmitted != null) {
-        widget.onReportSubmitted!();
+        setState(() {
+          _descriptionController.clear();
+          _photoPath = null;
+          _activeTab = 1;
+        });
+        await Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (_) => ReportDetailsScreen(report: newReport),
+          ),
+        );
       } else {
-        Navigator.of(context).pop();
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(
+            builder: (_) => ReportDetailsScreen(report: newReport),
+          ),
+        );
       }
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final animals = _store.animals;
+    return ListenableBuilder(
+      listenable: _store,
+      builder: (context, _) {
+        final animals = _store.animals;
+        final reportCount = _store.reports.length;
 
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      appBar: AppBar(
-        title: Text(AppStrings.t('nav_report')),
-      ),
-      body: ListView(
-        padding: const EdgeInsets.all(AppSpacing.lg),
-        children: [
+        return Scaffold(
+          backgroundColor: AppColors.background,
+          appBar: AppBar(
+            title: Text(AppStrings.t('nav_report')),
+            actions: [
+              TextButton.icon(
+                onPressed: () {
+                  setState(() => _activeTab = _activeTab == 0 ? 1 : 0);
+                },
+                icon: Icon(
+                  _activeTab == 0 ? Icons.history : Icons.add_circle_outline,
+                  size: 18,
+                  color: AppColors.primary,
+                ),
+                label: Text(
+                  _activeTab == 0
+                      ? '${AppStrings.t('case_history')} ($reportCount)'
+                      : AppStrings.t('action_report'),
+                  style: AppTypography.badge.copyWith(color: AppColors.primary, fontSize: 12),
+                ),
+              ),
+            ],
+            bottom: PreferredSize(
+              preferredSize: const Size.fromHeight(48),
+              child: Container(
+                margin: const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: 6),
+                padding: const EdgeInsets.all(4),
+                decoration: BoxDecoration(
+                  color: AppColors.surfaceContainer,
+                  borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+                  border: Border.all(color: AppColors.border),
+                ),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: () => setState(() => _activeTab = 0),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(vertical: 8),
+                          decoration: BoxDecoration(
+                            color: _activeTab == 0 ? AppColors.primary : Colors.transparent,
+                            borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.add_alert_outlined,
+                                size: 16,
+                                color: _activeTab == 0 ? Colors.white : AppColors.textSecondary,
+                              ),
+                              const SizedBox(width: 6),
+                              Flexible(
+                                child: Text(
+                                  '➕ नवीन अहवाल (New Report)',
+                                  overflow: TextOverflow.ellipsis,
+                                  style: AppTypography.badge.copyWith(
+                                    color: _activeTab == 0 ? Colors.white : AppColors.textSecondary,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: () => setState(() => _activeTab = 1),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(vertical: 8),
+                          decoration: BoxDecoration(
+                            color: _activeTab == 1 ? AppColors.primary : Colors.transparent,
+                            borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.assignment_turned_in_outlined,
+                                size: 16,
+                                color: _activeTab == 1 ? Colors.white : AppColors.textSecondary,
+                              ),
+                              const SizedBox(width: 6),
+                              Flexible(
+                                child: Text(
+                                  '📋 माझे अहवाल ($reportCount)',
+                                  overflow: TextOverflow.ellipsis,
+                                  style: AppTypography.badge.copyWith(
+                                    color: _activeTab == 1 ? Colors.white : AppColors.textSecondary,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          body: _activeTab == 1
+              ? const ReportsHistoryScreen(embedded: true)
+              : ListView(
+                  padding: const EdgeInsets.all(AppSpacing.lg),
+                  children: [
           // Step 1: Select Animal
           Text(AppStrings.t('select_animal'), style: AppTypography.sectionHeading),
           const SizedBox(height: AppSpacing.sm),
@@ -386,6 +508,8 @@ class _CreateReportScreenState extends State<CreateReportScreen> {
           const SizedBox(height: AppSpacing.xxl),
         ],
       ),
+        );
+      },
     );
   }
 

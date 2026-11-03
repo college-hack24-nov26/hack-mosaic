@@ -12,6 +12,8 @@ import '../animals/add_animal_screen.dart';
 import '../animals/animal_details_screen.dart';
 import '../scanner/disease_scanner_screen.dart';
 import '../profile/language_screen.dart';
+import '../nearby/nearby_screen.dart';
+import '../reports/report_details_screen.dart';
 import '../reports/reports_history_screen.dart';
 
 class FarmerHomeScreen extends StatefulWidget {
@@ -261,7 +263,13 @@ class _FarmerHomeScreenState extends State<FarmerHomeScreen> {
         const SizedBox(width: AppSpacing.sm),
         Expanded(
           child: AppCard(
-            onTap: () => widget.onNavigateTab(3),
+            onTap: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (_) => const ReportsHistoryScreen(initialFilter: 'pending'),
+                ),
+              );
+            },
             padding: const EdgeInsets.all(AppSpacing.md),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -282,7 +290,13 @@ class _FarmerHomeScreenState extends State<FarmerHomeScreen> {
         const SizedBox(width: AppSpacing.sm),
         Expanded(
           child: AppCard(
-            onTap: () => widget.onNavigateTab(3),
+            onTap: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (_) => const ReportsHistoryScreen(initialFilter: 'confirmed'),
+                ),
+              );
+            },
             padding: const EdgeInsets.all(AppSpacing.md),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -306,7 +320,13 @@ class _FarmerHomeScreenState extends State<FarmerHomeScreen> {
 
   Widget _buildSurveillanceAlertBanner() {
     return InkWell(
-      onTap: () => widget.onNavigateTab(3),
+      onTap: () {
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (_) => const NearbyScreen(initialTabIndex: 1),
+          ),
+        );
+      },
       borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
       child: Container(
         margin: const EdgeInsets.only(bottom: AppSpacing.lg),
@@ -483,7 +503,13 @@ class _FarmerHomeScreenState extends State<FarmerHomeScreen> {
         return Container(
           margin: const EdgeInsets.only(bottom: AppSpacing.sm),
           child: AppCard(
-            onTap: () => widget.onNavigateTab(3),
+            onTap: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (_) => ReportDetailsScreen(report: r),
+                ),
+              );
+            },
             padding: const EdgeInsets.all(AppSpacing.md),
             child: Row(
               children: [

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../core/localization/app_strings.dart';
+import '../../core/services/voice_service.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_spacing.dart';
 import '../../core/theme/app_typography.dart';
@@ -145,6 +146,19 @@ class _VetReportDetailsScreenState extends State<VetReportDetailsScreen> {
         elevation: 0,
         actions: [
           IconButton(
+            tooltip: 'आवाजात ऐका / Speak Case Summary',
+            icon: const Icon(Icons.volume_up_outlined, color: AppColors.primary),
+            onPressed: () {
+              final animalLabel = r.animal.name ?? r.animal.speciesCode;
+              final diseaseLabel = r.verification?.diseaseCode != null
+                  ? ReferenceApi.shared.diseaseName(r.verification!.diseaseCode!)
+                  : (r.screening != null ? ReferenceApi.shared.diseaseName(r.screening!.topLabel) : 'Unknown');
+              VoiceService().speakEmergencyMarathi(
+                'पशुवैद्यकीय अहवाल. जनावर: $animalLabel. शेतकरी: ${r.farmer?.fullName ?? "अज्ञात"}. स्थिती: ${r.status}. प्राथमिक निरीक्षण: $diseaseLabel. हे प्राथमिक तपासणी निरीक्षण आहे, अंतिम निदान पशुवैद्यकाचे आहे.',
+              );
+            },
+          ),
+          IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: _load,
           ),
@@ -237,6 +251,7 @@ class _VetReportDetailsScreenState extends State<VetReportDetailsScreen> {
   }
 
   Widget _buildStatusHeaderCard(VetReport r, Color statusColor) {
+    final shortId = r.id.length > 12 ? '${r.id.substring(0, 8)}…${r.id.substring(r.id.length - 4)}' : r.id;
     return Container(
       padding: const EdgeInsets.all(AppSpacing.md),
       decoration: BoxDecoration(
@@ -247,20 +262,24 @@ class _VetReportDetailsScreenState extends State<VetReportDetailsScreen> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                '${AppStrings.t('submitted_label')}: ${r.reportedAt.day}/${r.reportedAt.month}/${r.reportedAt.year} ${r.reportedAt.hour.toString().padLeft(2, '0')}:${r.reportedAt.minute.toString().padLeft(2, '0')}',
-                style: AppTypography.caption,
-              ),
-              const SizedBox(height: 4),
-              Text(
-                'ID: ${r.id}',
-                style: AppTypography.caption.copyWith(fontWeight: FontWeight.bold),
-              ),
-            ],
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '${AppStrings.t('submitted_label')}: ${r.reportedAt.day}/${r.reportedAt.month}/${r.reportedAt.year} ${r.reportedAt.hour.toString().padLeft(2, '0')}:${r.reportedAt.minute.toString().padLeft(2, '0')}',
+                  style: AppTypography.caption,
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  'ID: #$shortId',
+                  style: AppTypography.caption.copyWith(fontWeight: FontWeight.bold),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ),
           ),
+          const SizedBox(width: AppSpacing.sm),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             decoration: BoxDecoration(
@@ -292,12 +311,21 @@ class _VetReportDetailsScreenState extends State<VetReportDetailsScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Row(
-                children: [
-                  const Icon(Icons.pets, color: AppColors.primary, size: 20),
-                  const SizedBox(width: 8),
-                  Text(AppStrings.t('animal_section'), style: AppTypography.sectionHeading),
-                ],
+              Flexible(
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.pets, color: AppColors.primary, size: 20),
+                    const SizedBox(width: 8),
+                    Flexible(
+                      child: Text(
+                        AppStrings.t('animal_section'),
+                        style: AppTypography.sectionHeading,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                ),
               ),
               TextButton.icon(
                 onPressed: () => Navigator.of(context).push(
@@ -346,17 +374,24 @@ class _VetReportDetailsScreenState extends State<VetReportDetailsScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(farmer.fullName, style: AppTypography.cardTitle),
-                  if (farmer.phone != null) ...[
-                    const SizedBox(height: 2),
-                    Text(farmer.phone!, style: AppTypography.bodySecondary),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      farmer.fullName,
+                      style: AppTypography.cardTitle,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    if (farmer.phone != null) ...[
+                      const SizedBox(height: 2),
+                      Text(farmer.phone!, style: AppTypography.bodySecondary),
+                    ],
                   ],
-                ],
+                ),
               ),
-              if (farmer.phone != null)
+              if (farmer.phone != null) ...[
+                const SizedBox(width: AppSpacing.sm),
                 ElevatedButton.icon(
                   onPressed: () => _makePhoneCall(farmer.phone!),
                   icon: const Icon(Icons.phone, size: 16, color: Colors.white),
@@ -364,10 +399,12 @@ class _VetReportDetailsScreenState extends State<VetReportDetailsScreen> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primary,
                     foregroundColor: Colors.white,
+                    minimumSize: const Size(0, 38),
                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                     textStyle: AppTypography.button.copyWith(fontSize: 12),
                   ),
                 ),
+              ],
             ],
           ),
         ],
@@ -389,18 +426,29 @@ class _VetReportDetailsScreenState extends State<VetReportDetailsScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Row(
-                children: [
-                  const Icon(Icons.location_on, color: AppColors.primary, size: 20),
-                  const SizedBox(width: 8),
-                  Text(AppStrings.t('gps_location'), style: AppTypography.sectionHeading),
-                ],
+              Flexible(
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.location_on, color: AppColors.primary, size: 20),
+                    const SizedBox(width: 8),
+                    Flexible(
+                      child: Text(
+                        AppStrings.t('gps_location'),
+                        style: AppTypography.sectionHeading,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                ),
               ),
+              const SizedBox(width: AppSpacing.sm),
               OutlinedButton.icon(
                 onPressed: () => _openCoordinates(loc.lat, loc.lng),
                 icon: const Icon(Icons.map, size: 16),
                 label: Text(AppStrings.t('open_maps')),
                 style: OutlinedButton.styleFrom(
+                  minimumSize: const Size(0, 36),
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                 ),
               ),
@@ -659,7 +707,7 @@ class _VetReportDetailsScreenState extends State<VetReportDetailsScreen> {
     );
   }
 
-  Widget? _buildBottomActionBar(VetReport r) {
+  Widget _buildBottomActionBar(VetReport r) {
     return SafeArea(
       child: Container(
         padding: const EdgeInsets.all(AppSpacing.md),
@@ -686,6 +734,26 @@ class _VetReportDetailsScreenState extends State<VetReportDetailsScreen> {
                 ),
               ),
               const SizedBox(width: AppSpacing.sm),
+            ] else if (r.status == 'under_review') ...[
+              Expanded(
+                child: AppButton(
+                  label: AppStrings.t('animal_history'),
+                  icon: Icons.history,
+                  isSecondary: true,
+                  onPressed: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) => VetAnimalHistoryScreen(
+                          animalId: r.animal.id,
+                          animalName: r.animal.name,
+                          speciesCode: r.animal.speciesCode,
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+              const SizedBox(width: AppSpacing.sm),
             ],
             if (r.isPending) ...[
               Expanded(
@@ -704,7 +772,25 @@ class _VetReportDetailsScreenState extends State<VetReportDetailsScreen> {
                   },
                 ),
               ),
-            ] else if (r.status == 'confirmed') ...[
+            ] else ...[
+              Expanded(
+                child: AppButton(
+                  label: 'निर्णय बदला / Update',
+                  icon: Icons.edit_note,
+                  isSecondary: true,
+                  onPressed: () async {
+                    final res = await Navigator.of(context).push<VetReport>(
+                      MaterialPageRoute(
+                        builder: (_) => VetVerificationScreen(report: r),
+                      ),
+                    );
+                    if (res != null && mounted) {
+                      setState(() => _report = res);
+                    }
+                  },
+                ),
+              ),
+              const SizedBox(width: AppSpacing.sm),
               Expanded(
                 child: AppButton(
                   label: AppStrings.t('document_treatment'),
@@ -715,6 +801,7 @@ class _VetReportDetailsScreenState extends State<VetReportDetailsScreen> {
                         builder: (_) => VetTreatmentScreen(report: r),
                       ),
                     );
+                    _load();
                   },
                 ),
               ),

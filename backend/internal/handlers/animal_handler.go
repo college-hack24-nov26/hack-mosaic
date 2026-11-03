@@ -314,6 +314,10 @@ func (h *AnimalHandler) AddHealthRecord(c *gin.Context) {
 		}
 	}
 
+	if req.SourceReportID != nil && !validators.ValidateUUID(*req.SourceReportID) {
+		req.SourceReportID = nil
+	}
+
 	hr, err := h.store.AddHealthRecord(c.Request.Context(), repositories.CreateHealthRecordParams{
 		AnimalID:         animalID,
 		RecordedByUserID: userID,
@@ -445,6 +449,10 @@ func (h *AnimalHandler) AddTreatment(c *gin.Context) {
 	startedOn := strings.TrimSpace(req.StartedOn)
 	if startedOn == "" {
 		startedOn = time.Now().UTC().Format("2006-01-02")
+	}
+
+	if req.ReportID != nil && !validators.ValidateUUID(*req.ReportID) {
+		req.ReportID = nil
 	}
 
 	userID := middleware.GetUserID(c)

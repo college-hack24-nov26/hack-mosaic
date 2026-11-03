@@ -10,16 +10,13 @@ class ApiClient {
   factory ApiClient() => _instance;
   ApiClient._internal();
 
-  // Android emulator: 10.0.2.2, USB adb-reverse: localhost, Wi-Fi LAN: 192.168.1.231
+  // USB adb-reverse: localhost, Wi-Fi LAN: 192.168.7.178, Android emulator: 10.0.2.2
   static const String _envBaseUrl = String.fromEnvironment('API_BASE_URL');
   static String? _resolvedBaseUrl;
 
   static String get baseUrl {
     if (_resolvedBaseUrl != null) return _resolvedBaseUrl!;
     if (_envBaseUrl.isNotEmpty) return _envBaseUrl;
-    if (Platform.isAndroid) {
-      return 'http://192.168.1.231:8080/api/v1';
-    }
     return 'http://localhost:8080/api/v1';
   }
 
@@ -29,6 +26,8 @@ class ApiClient {
     final candidates = <String>[
       if (_envBaseUrl.isNotEmpty) _envBaseUrl,
       'http://localhost:8080/api/v1',
+      'http://127.0.0.1:8080/api/v1',
+      'http://192.168.7.178:8080/api/v1',
       'http://192.168.1.231:8080/api/v1',
       'http://10.0.2.2:8080/api/v1',
     ];
@@ -36,7 +35,7 @@ class ApiClient {
       try {
         final res = await http
             .get(Uri.parse('$url/healthz'))
-            .timeout(const Duration(milliseconds: 900));
+            .timeout(const Duration(milliseconds: 700));
         if (res.statusCode == 200) {
           _resolvedBaseUrl = url;
           return;

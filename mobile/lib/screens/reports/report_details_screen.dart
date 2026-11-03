@@ -5,21 +5,51 @@ import '../../core/theme/app_typography.dart';
 import '../../core/theme/app_spacing.dart';
 import '../../core/localization/app_strings.dart';
 import '../../core/widgets/app_card.dart';
+import '../../core/widgets/app_button.dart';
 import '../../core/widgets/status_badge.dart';
 import '../../core/widgets/safety_disclaimer_card.dart';
+import '../../core/services/voice_service.dart';
+import '../../data/local/offline_store.dart';
 import '../../data/models/disease_report_model.dart';
+import '../animals/animal_details_screen.dart';
+import '../nearby/nearby_screen.dart';
+import '../nearby/vet_consultation_screen.dart';
 
 class ReportDetailsScreen extends StatelessWidget {
   final DiseaseReportModel report;
 
   const ReportDetailsScreen({super.key, required this.report});
 
+  void _speakReportSummary(BuildContext context) {
+    final statusMr = report.status == 'confirmed'
+        ? 'पशुवैद्यकांनी पुष्टी केलेला अहवाल'
+        : 'पशुवैद्यकांच्या तपासणीसाठी प्रलंबित अहवाल';
+    final text = '${report.animalName ?? "जनावर"} चा रोग अहवाल. स्थिती: $statusMr. '
+        '${report.vetNotes ?? report.description ?? ""} '
+        '${AppStrings.t('safety_disclaimer')}';
+    VoiceService().speakEmergencyMarathi(text);
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('🔊 मराठी आवाज सुरू आहे... (Speaking report summary in Marathi)'),
+        duration: Duration(seconds: 2),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    final store = OfflineStore();
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
         title: Text(report.animalName ?? AppStrings.t('case_history')),
+        actions: [
+          IconButton(
+            tooltip: 'अहवाल ऐका (Voice)',
+            icon: const Icon(Icons.volume_up_rounded, color: AppColors.primary),
+            onPressed: () => _speakReportSummary(context),
+          ),
+        ],
       ),
       body: ListView(
         padding: const EdgeInsets.all(AppSpacing.lg),
@@ -122,6 +152,17 @@ class ReportDetailsScreen extends StatelessWidget {
           // Geospatial Coordinates Card
           if (report.latitude != null && report.longitude != null) ...[
             AppCard(
+              onTap: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => NearbyScreen(
+                      initialTabIndex: 1,
+                      targetLat: report.latitude,
+                      targetLng: report.longitude,
+                    ),
+                  ),
+                );
+              },
               padding: const EdgeInsets.all(AppSpacing.md),
               color: AppColors.surfaceContainer,
               child: Row(
@@ -134,11 +175,91 @@ class ReportDetailsScreen extends StatelessWidget {
                       style: AppTypography.caption.copyWith(fontWeight: FontWeight.w600),
                     ),
                   ),
+                  const Icon(Icons.open_in_new, size: 16, color: AppColors.primary),
                 ],
               ),
             ),
             const SizedBox(height: AppSpacing.lg),
           ],
+
+          // Interactive Follow-up Actions
+          Text('पुढील कृती (Follow-Up Actions)', style: AppTypography.sectionHeading),
+          const SizedBox(height: AppSpacing.sm),
+          AppButton(
+            label: '👨‍⚕️ पशुवैद्यक भेट / सल्ला बुक करा (Consult Veterinarian)',
+            icon: Icons.event_available,
+            onPressed: () {
+              final vets = store.getNearbyVeterinarians(
+                report.latitude ?? 17.9856,
+                report.longitude ?? 74.4331,
+              );
+              if (vets.isNotEmpty) {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => VetConsultationScreen(
+                      vet: vets.first,
+                      attachedReport: report,
+                    ),
+                  ),
+                );
+              } else {
+                Navigator.of(context).push(
+                  MaterialPageRoute(builder: (_) => const NearbyScreen(initialTabIndex: 0)),
+                );
+              }
+            },
+          ),
+          const SizedBox(height: AppSpacing.sm),
+          Row(
+            children: [
+              Expanded(
+                child: OutlinedButton.icon(
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: AppColors.primary,
+                    side: const BorderSide(color: AppColors.primary),
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                  ),
+                  icon: const Icon(Icons.qr_code_2, size: 18),
+                  label: const Text('डिजिटल पासपोर्ट'),
+                  onPressed: () {
+                    final match = store.animals.where((a) => a.id == report.animalId).toList();
+                    final animal = match.isNotEmpty
+                        ? match.first
+                        : (store.animals.isNotEmpty ? store.animals.first : null);
+                    if (animal != null) {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(builder: (_) => AnimalDetailsScreen(animal: animal)),
+                      );
+                    }
+                  },
+                ),
+              ),
+              const SizedBox(width: AppSpacing.sm),
+              Expanded(
+                child: OutlinedButton.icon(
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: AppColors.primary,
+                    side: const BorderSide(color: AppColors.primary),
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                  ),
+                  icon: const Icon(Icons.map_outlined, size: 18),
+                  label: const Text('उद्रेक नकाशा'),
+                  onPressed: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) => NearbyScreen(
+                          initialTabIndex: 1,
+                          targetLat: report.latitude,
+                          targetLng: report.longitude,
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: AppSpacing.lg),
 
           // Regulatory Safety Disclaimer
           const SafetyDisclaimerCard(),
