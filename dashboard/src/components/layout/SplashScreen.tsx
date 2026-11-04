@@ -80,13 +80,10 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onDismiss }) => {
 
       {/* Main Brand Stage */}
       <div className="relative z-10 flex flex-col items-center text-center px-6 max-w-xl animate-fadeIn">
-        {/* Animated Brand Emblem */}
+        {/* Animated Official PashuVani Brand Emblem */}
         <div className="relative mb-6">
-          <div className="w-24 h-24 rounded-2xl bg-gradient-to-tr from-[#94e130] to-[#b6f756] flex items-center justify-center shadow-[0_0_50px_rgba(148,225,48,0.65)] transform hover:scale-105 transition-transform duration-300">
-            <ShieldAlert className="w-14 h-14 text-[#141414] stroke-[2.4]" />
-          </div>
-          <div className="absolute -bottom-2 -right-2 w-8 h-8 rounded-full bg-[#2F6FDE] flex items-center justify-center text-white border-2 border-[#060708] shadow-md">
-            <Activity className="w-4 h-4 stroke-[2.5]" />
+          <div className="w-28 h-28 rounded-full bg-white flex items-center justify-center shadow-[0_0_50px_rgba(148,225,48,0.55)] transform hover:scale-105 transition-transform duration-300 overflow-hidden p-1">
+            <img src="/pashuvani-logo.jpg" alt="PashuVani Official Logo" className="w-full h-full object-contain rounded-full" />
           </div>
         </div>
 
