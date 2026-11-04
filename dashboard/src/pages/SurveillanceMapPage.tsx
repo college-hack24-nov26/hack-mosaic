@@ -35,7 +35,7 @@ export const SurveillanceMapPage: React.FC<SurveillanceMapPageProps> = ({
     <div className="space-y-3 animate-fadeIn font-figtree">
       {/* Subheader & Action Bar from Reference Screenshot 1 */}
       <div className="bg-surface-card p-4 rounded-xl border border-black/10 shadow-sm space-y-3">
-        <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="flex items-start justify-between gap-4">
           <div>
             <div className="flex items-center gap-2">
               {onNavigateOverview && (
@@ -87,14 +87,14 @@ export const SurveillanceMapPage: React.FC<SurveillanceMapPageProps> = ({
             </button>
             <button
               onClick={exportCSV}
-              className="px-3 py-1.5 rounded-lg bg-parchment/60 border border-black/10 text-ink-secondary hover:text-ink flex items-center gap-1.5"
+              className="px-3 py-1.5 rounded-lg bg-[#107c41] hover:bg-[#158b4a] text-white font-bold shadow-sm flex items-center gap-1.5 cursor-pointer"
             >
               <Download className="w-3.5 h-3.5" />
               <span>Export GIS (CSV)</span>
             </button>
             <button
               onClick={() => alert('PostGIS spatial stream synced.')}
-              className="px-3 py-1.5 rounded-lg bg-parchment/60 border border-black/10 text-ink-secondary hover:text-ink flex items-center gap-1.5"
+              className="px-3 py-1.5 rounded-lg bg-[#107c41] hover:bg-[#158b4a] text-white font-bold shadow-sm flex items-center gap-1.5 cursor-pointer"
             >
               <RefreshCw className="w-3.5 h-3.5" />
               <span>Sync</span>
