@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Pashuvani — Government Animal Health & Disease Surveillance</title>
+  <title>Pashuvani &mdash; Government Animal Health &amp; Disease Surveillance</title>
   
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -827,29 +827,29 @@
   </div>
 
   <!-- ========================================================================= -->
-  <!-- 2. TOP TELEMETRY BAR (Directly from User Reference Image 1)               -->
+  <!-- 2. TOP TELEMETRY BAR (Single-Row Non-Wrapping Government Header)          -->
   <!-- ========================================================================= -->
-  <header class="w-full bg-white border-b border-black/10 px-5 py-2 flex flex-wrap items-center justify-between text-xs font-inter z-30 shadow-sm sticky top-0">
-    <div class="flex items-center gap-4">
+  <header class="w-full h-14 bg-white border-b border-black/10 px-4 flex items-center justify-between gap-3 text-xs font-inter z-30 shadow-sm sticky top-0 whitespace-nowrap">
+    <div class="flex items-center gap-3 min-w-0">
       <!-- Brand & GOV badge -->
-      <div class="flex items-center gap-2.5">
-        <div class="w-8 h-8 rounded-lg bg-[#94e130] flex items-center justify-center shadow-sm">
+      <div class="flex items-center gap-2.5 shrink-0">
+        <div class="w-8 h-8 rounded-lg bg-[#94e130] flex items-center justify-center shadow-sm shrink-0">
           <i data-lucide="shield-alert" class="w-5 h-5 text-[#141414] stroke-[2.5]"></i>
         </div>
         <div>
-          <div class="flex items-center gap-1.5">
+          <div class="flex items-center gap-1.5 leading-tight">
             <span class="font-extrabold text-sm text-[#141414] tracking-tight font-figtree">PASHUVANI</span>
             <span class="text-[9px] uppercase font-bold px-1.5 py-0.2 bg-black/5 rounded text-zinc-700">GOV</span>
           </div>
-          <div class="text-[9px] text-zinc-500 -mt-0.5 font-medium">Government Animal Health & Disease Surveillance</div>
+          <div class="text-[9px] text-zinc-500 font-medium leading-tight">Government Animal Health &amp; Disease Surveillance</div>
         </div>
       </div>
 
       <!-- Location Scope Selector Dropdown (State / District / Taluka) -->
-      <div class="hidden sm:flex items-center gap-1.5 bg-parchment/80 border border-black/10 px-2.5 py-1 rounded text-xs">
+      <div class="hidden sm:flex items-center gap-1.5 bg-parchment/80 border border-black/10 px-2.5 py-1 rounded text-xs shrink-0">
         <i data-lucide="map-pin" class="w-3.5 h-3.5 text-emerald-700 shrink-0"></i>
         <span class="text-zinc-600">Scope:</span>
-        <select id="global-scope-select" onchange="onGlobalScopeChange(this.value)" class="bg-transparent font-bold text-ink focus:outline-none cursor-pointer text-xs">
+        <select id="global-scope-select" onchange="onGlobalScopeChange(this.value)" class="bg-transparent font-bold text-ink focus:outline-none cursor-pointer text-xs max-w-[175px] truncate">
           <option value="state:Maharashtra">Maharashtra (Statewide)</option>
           <optgroup label="Districts (Administrative)">
             <option value="district:Pune">Pune District</option>
@@ -878,55 +878,55 @@
       </div>
 
       <!-- Live Telemetry Status Badge -->
-      <div class="hidden md:flex items-center gap-1.5 px-2.5 py-0.5 rounded bg-emerald-50 text-emerald-800 border border-emerald-200 text-[11px] font-semibold">
-        <span class="w-2 h-2 rounded-full bg-emerald-500 live-dot"></span>
-        <span id="header-telemetry-label" class="tracking-wide">GO API :8080 + FASTAPI ML :8001</span>
+      <div class="hidden md:flex items-center gap-1.5 px-2.5 py-1 rounded bg-emerald-50 text-emerald-800 border border-emerald-200 text-[11px] font-semibold shrink-0" title="Connected: Go PostGIS API (:8080) + FastAPI XGBoost (:8001)">
+        <span class="w-2 h-2 rounded-full bg-emerald-500 live-dot shrink-0"></span>
+        <span id="header-telemetry-label" class="tracking-wide">LIVE TELEMETRY</span>
       </div>
 
       <!-- Live IST Clock -->
-      <div class="hidden lg:flex items-center gap-1.5 text-zinc-600 font-mono text-[11px]" id="live-ist-clock">
+      <div class="hidden xl:flex items-center gap-1.5 text-zinc-600 font-mono text-[11px] shrink-0" id="live-ist-clock">
         14:28:52 IST
       </div>
     </div>
 
-    <!-- Right Controls: Live Sync + Theme + Export + Threat Warning + User Officer + Replay Intro -->
-    <div class="flex items-center gap-2">
+    <!-- Right Controls: Single-Row Aligned Actions & Officer Profile -->
+    <div class="flex items-center gap-2 shrink-0">
       <!-- Live DB & ML Sync Button (DESIGN.md button-secondary) -->
-      <button onclick="syncWithLiveBackend(true)" class="btn-secondary-vetra px-2.5 py-1 text-xs cursor-pointer" title="Synchronize Live PostGIS Reports (:8080) & FastAPI XGBoost (:8001)">
+      <button onclick="syncWithLiveBackend(true)" class="btn-secondary-vetra px-2.5 py-1 text-[11px] cursor-pointer" title="Synchronize Live PostGIS Reports (:8080) & FastAPI XGBoost (:8001)">
         <i data-lucide="refresh-cw" class="w-3.5 h-3.5 text-ink"></i>
-        <span class="hidden sm:inline">Live DB Sync</span>
+        <span class="hidden lg:inline">Sync DB</span>
       </button>
 
       <!-- Vetra Daylight / Night Vet Mode Toggle (DESIGN.md §Dark Mode) -->
-      <button id="vetra-theme-toggle" onclick="toggleVetraTheme()" class="btn-secondary-vetra px-2.5 py-1 text-xs cursor-pointer" title="Toggle Vetra Daylight Parchment / Night Vet Emergency Theme (DESIGN.md)">
+      <button id="vetra-theme-toggle" onclick="toggleVetraTheme()" class="btn-secondary-vetra px-2.5 py-1 text-[11px] cursor-pointer" title="Toggle Vetra Daylight Parchment / Night Vet Emergency Theme (DESIGN.md)">
         <span id="vetra-theme-label">☀️ Daylight</span>
       </button>
 
       <!-- Export Dossier Button -->
-      <button onclick="exportData()" class="aero-btn aero-btn-excel text-xs flex items-center gap-1.5 cursor-pointer shadow-sm" title="Export Surveillance Dossier (.xls)">
-        <i data-lucide="file-spreadsheet" class="w-4 h-4 text-emerald-200"></i>
+      <button onclick="exportData()" class="aero-btn aero-btn-excel px-2.5 py-1 text-[11px] flex items-center gap-1.5 cursor-pointer shadow-sm" title="Export Surveillance Dossier (.xls)">
+        <i data-lucide="file-spreadsheet" class="w-3.5 h-3.5 text-emerald-200"></i>
         <span>Export</span>
       </button>
 
       <!-- 3 High/Crit Threats Badge (DESIGN.md alert-critical) -->
-      <button onclick="switchTab('map')" class="flex items-center gap-1.5 bg-[#C62828] text-white px-3 py-1 rounded-sm font-bold text-xs cursor-pointer hover:opacity-95 transition-opacity shadow-2xs">
+      <button onclick="switchTab('map')" class="flex items-center gap-1.5 bg-[#C62828] text-white px-2.5 py-1 rounded-md font-bold text-[11px] cursor-pointer hover:opacity-95 transition-opacity shadow-2xs">
         <i data-lucide="alert-triangle" class="w-3.5 h-3.5 text-white"></i>
         <span>3 HIGH/CRIT THREATS</span>
       </button>
 
-      <!-- User Profile Badge (Dr. Vikram Deshmukh + DESIGN.md vet-role-badge) -->
-      <div class="flex items-center gap-2 pl-3 border-l border-black/10">
-        <div class="text-right">
+      <!-- User Profile Badge (Dr. Vikram Deshmukh) -->
+      <div class="flex items-center gap-2 pl-2.5 border-l border-black/10">
+        <div class="text-right leading-tight">
           <div class="font-bold text-xs text-ink">Dr. Vikram Deshmukh</div>
-          <div class="mt-0.5"><span class="vet-role-badge">VET OFFICER</span></div>
+          <div class="text-[9px] text-[#2F6FDE] font-bold uppercase tracking-wider">GOVERNMENT OFFICER</div>
         </div>
-        <div class="w-8 h-8 rounded-full bg-parchment border border-[#a1a1a1] flex items-center justify-center text-[#2F6FDE]">
+        <div class="w-8 h-8 rounded-full bg-parchment border border-[#a1a1a1] flex items-center justify-center text-[#2F6FDE] shrink-0">
           <i data-lucide="user" class="w-4 h-4"></i>
         </div>
       </div>
 
       <!-- Replay Intro Button -->
-      <button onclick="replayGovSplash()" class="p-1.5 rounded-lg hover:bg-parchment text-zinc-500 hover:text-ink transition-colors cursor-pointer" title="Replay Official Portal Intro">
+      <button onclick="replayGovSplash()" class="p-1.5 rounded-lg hover:bg-parchment text-zinc-500 hover:text-ink transition-colors cursor-pointer shrink-0" title="Replay Official Portal Intro">
         <i data-lucide="shield-check" class="w-4 h-4 text-emerald-700"></i>
       </button>
     </div>
@@ -6329,7 +6329,7 @@
             }
           }
           if (headerBadge && (backendOk || mlOk)) {
-            headerBadge.innerText = 'LIVE: GO POSTGIS :8080 + FASTAPI ML :8001';
+            headerBadge.innerText = 'LIVE TELEMETRY';
           }
 
           if (reportsRes.status === 'fulfilled' && reportsRes.value.ok) {
