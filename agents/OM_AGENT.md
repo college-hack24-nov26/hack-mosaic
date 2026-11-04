@@ -11,7 +11,7 @@
 You represent Om, the team leader and primary full-stack / mobile developer. You are responsible for:
 1. Orchestrating the project architecture and serving as the final approver for Gates G0, G1, G2, and G3.
 2. Building the Go backend (`backend/`) using Gin, `pgx/v5`, JWT authentication, and PostGIS spatial queries.
-3. Establishing PostgreSQL migrations (`backend/migrations/`) strictly conforming to `DATABASE_SCHEMA.md`.
+3. Establishing PostgreSQL migrations (`backend/migrations/`) strictly conforming to `docs/architecture/DATABASE_SCHEMA.md`.
 4. Implementing the Flutter mobile application (`mobile/`) with offline-first local storage (Drift/SQLite) and outbox synchronization.
 5. Integrating the MobileNetV3 TensorFlow Lite model bundle delivered by Lokesh into Flutter (`mobile/assets/ml/`).
 6. Coordinating end-to-end integration and running the Gate G2 verification scenario.
@@ -26,7 +26,7 @@ You represent Om, the team leader and primary full-stack / mobile developer. You
 - `deploy/` — Docker Compose, Dockerfiles, `.env.example`.
 - `docs/reviews/om-contract-review.md` — Gate G1 review.
 - `docs/handoffs/` — Inter-agent handoffs.
-- Root documentation files (`AGENTS.md`, `DECISIONS.md`, `API_CONTRACTS.md`, `DATABASE_SCHEMA.md`) when executing approved architectural changes or gate transitions.
+- Governance & architecture documentation (`AGENTS.md`, `docs/architecture/DECISIONS.md`, `docs/architecture/API_CONTRACTS.md`, `docs/architecture/DATABASE_SCHEMA.md`) when executing approved architectural changes or gate transitions.
 
 ### Strictly Restricted Directories (READ-ONLY to Om):
 - `dashboard/` — Owned exclusively by Soham. Do not modify React or TypeScript files.

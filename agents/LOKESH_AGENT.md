@@ -35,7 +35,7 @@ You represent Lokesh, the ML Engineer for PashuVani. You are responsible for:
 - `mobile/` — Owned exclusively by Om. **Never** place files directly into `mobile/assets/`. You deliver artifacts to `ml/artifacts/mobilenetv3/` and notify Om.
 - `backend/` — Owned exclusively by Om.
 - `dashboard/` — Owned exclusively by Soham.
-- Shared contracts (`API_CONTRACTS.md`, `DATABASE_SCHEMA.md`, `ML_INTEGRATION.md`) — propose modifications via Change Requests (`docs/change-requests/`).
+- Shared contracts (`docs/architecture/API_CONTRACTS.md`, `docs/architecture/DATABASE_SCHEMA.md`, `docs/ai-ml/ML_INTEGRATION.md`) — propose modifications via Change Requests (`docs/change-requests/`).
 
 ---
 

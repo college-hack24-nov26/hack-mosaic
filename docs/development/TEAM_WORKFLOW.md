@@ -10,53 +10,65 @@ The project is developed as a modular monorepo. Each developer owns their assign
 
 | Module | Primary Owner | Secondary / Supporting | Permitted Write Directories |
 |---|---|---|---|
-| **System Architecture & Governance** | Om | All | Root docs (`AGENTS.md`, `PROJECT_CONTEXT.md`, etc.), `docs/` |
-| **Go Backend API & Data Layer** | Om | Soham (contract input) | `backend/`, `migrations/`, `deploy/docker-compose.yml` |
+| **System Architecture & Governance** | Om | All | `AGENTS.md`, `README.md`, `docs/` |
+| **Go Backend API & Data Layer** | Om | Soham (contract input) | `backend/`, `deploy/docker-compose.yml` |
 | **Flutter Mobile Application** | Om | Lokesh (TFLite assets) | `mobile/` |
-| **API & Database Contracts** | Om | Soham, Lokesh | `API_CONTRACTS.md`, `DATABASE_SCHEMA.md` (via G1 / CR) |
-| **MobileNetV3 Model & Export** | Lokesh | Om (integration) | `ml/mobilenet/`, `ml/artifacts/mobilenetv3/`, `ml/datasets/` |
-| **XGBoost Risk Model & Data** | Lokesh | — | `ml/xgboost/`, `ml/artifacts/xgboost/` |
-| **FastAPI ML Inference Service** | Lokesh | Om (client integration) | `ml/service/`, `ml/Dockerfile`, `ml/requirements.txt` |
+| **API & Database Contracts** | Om | Soham, Lokesh | `docs/architecture/API_CONTRACTS.md`, `docs/architecture/DATABASE_SCHEMA.md` (via G1 / CR) |
+| **MobileNetV3 Model & Export** | Lokesh | Om (integration) | `ml/mobilenetv3/`, `ml/image_classifier/`, `ml/datasets/` |
+| **XGBoost Risk Model & Data** | Lokesh | — | `ml/xgboost/`, `ml/outbreak_predictor/`, `ml/models/` |
+| **FastAPI ML Inference Service** | Lokesh | Om (client integration) | `ml/ml-service/`, `ml/fastapi/`, `deploy/ml.Dockerfile`, `ml/requirements.txt` |
 | **React Government Dashboard** | Soham | — | `dashboard/` |
 | **Dashboard API Integration** | Soham | Om (API endpoints) | `dashboard/src/api/` |
-| **DevOps & Packaging** | Om | Khushi (support if active) | `deploy/`, `docker-compose.yml`, root scripts |
+| **DevOps & Packaging** | Om | Khushi (support if active) | `deploy/`, `deploy/docker-compose.yml`, root scripts |
 | **Final System Integration** | Om | All | Coordination across all services |
 
 ### 1.1 Strict Boundary Rules
-1. **Lokesh** writes model training code, export pipelines, evaluation logs, and the FastAPI inference server in `ml/`. Lokesh outputs the `.tflite` model, `labels.json`, and `manifest.json` into `ml/artifacts/mobilenetv3/`. Lokesh **never** writes directly into `mobile/`.
-2. **Om** integrates the TFLite bundle by copying verified artifacts from `ml/artifacts/mobilenetv3/` into `mobile/assets/ml/`.
-3. **Soham** writes the React/TypeScript dashboard in `dashboard/`. Soham consumes the Go REST API according to `API_CONTRACTS.md`. Soham **never** connects directly to PostgreSQL or the ML FastAPI service.
-4. **Shared Contracts:** `API_CONTRACTS.md`, `DATABASE_SCHEMA.md`, and `ML_INTEGRATION.md` can only be updated through the Change Request (CR) process (§6) and approved by Om + affected consumers.
+1. **Lokesh** writes model training code, export pipelines, evaluation logs, and the FastAPI inference server in `ml/`. Lokesh outputs the `.tflite` model, labels, and metadata into `ml/models/` and `ml/image_classifier/artifacts/`. Lokesh **never** writes directly into `mobile/`.
+2. **Om** integrates the TFLite bundle by copying verified artifacts from `ml/` into `mobile/assets/ml/`.
+3. **Soham** writes the React/TypeScript dashboard in `dashboard/`. Soham consumes the Go REST API according to `docs/architecture/API_CONTRACTS.md`. Soham **never** connects directly to PostgreSQL or the ML FastAPI service.
+4. **Shared Contracts:** `docs/architecture/API_CONTRACTS.md`, `docs/architecture/DATABASE_SCHEMA.md`, and `docs/ai-ml/ML_INTEGRATION.md` can only be updated through the Change Request (CR) process (§6) and approved by Om + affected consumers.
 
 ---
 
-## 2. Proposed Monorepo Structure
+## 2. Monorepo Structure
 
 ```
 ha022/
+├── README.md                   # Main entry point, architecture, setup & status
 ├── AGENTS.md                   # Global AI agent instructions & current phase
-├── PROJECT_CONTEXT.md          # Domain context, PPT requirements & traceability
-├── ARCHITECTURE.md             # System design & component interactions
-├── DATABASE_SCHEMA.md          # PostgreSQL & PostGIS table designs & constraints
-├── API_CONTRACTS.md            # HTTP REST & internal API specifications
-├── TEAM_WORKFLOW.md            # This file: ownership, gates & git workflow
-├── ML_INTEGRATION.md           # TFLite & XGBoost integration specifications
-├── DEVELOPMENT_PLAN.md         # Prioritised P0/P1/P2 task breakdown
-├── CODING_STANDARDS.md         # Language-specific conventions & style rules
-├── TESTING_STRATEGY.md         # Test pyramids, test plans, mock standards
-├── SECURITY.md                 # Auth, PII protection, network & secret policies
-├── DECISIONS.md                # Architecture decision records (ADRs)
-├── README.md                   # Setup guide & project overview
 │
 ├── agents/                     # Agent-specific prompt instructions
 │   ├── OM_AGENT.md
 │   ├── LOKESH_AGENT.md
 │   └── SOHAM_AGENT.md
 │
-├── docs/                       # Durable project communications
-│   ├── reviews/                # G1 contract reviews (<name>-contract-review.md)
-│   ├── handoffs/               # Inter-agent handoff notes (<name>-<date>-<n>.md)
-│   └── change-requests/        # Formal contract changes (CR-<nnn>-<slug>.md)
+├── docs/                       # Organised technical documentation & assets
+│   ├── README.md               # Documentation index
+│   ├── architecture/           # System design, API contracts, DB schema, ADRs
+│   │   ├── ARCHITECTURE.md
+│   │   ├── API_CONTRACTS.md
+│   │   ├── DATABASE_SCHEMA.md
+│   │   └── DECISIONS.md
+│   ├── ai-ml/                  # TFLite & XGBoost integration, datasets, evaluation
+│   │   ├── ML_INTEGRATION.md
+│   │   ├── DATASETS.md
+│   │   └── MODEL_EVALUATION.md
+│   ├── development/            # Roadmap, coding standards, testing, workflow
+│   │   ├── DEVELOPMENT_PLAN.md
+│   │   ├── CODING_STANDARDS.md
+│   │   ├── TESTING_STRATEGY.md
+│   │   └── TEAM_WORKFLOW.md
+│   ├── security/               # Auth, RBAC, PII protection & secret policies
+│   │   └── SECURITY.md
+│   ├── project/                # Domain context, PPT requirements & traceability
+│   │   └── PROJECT_CONTEXT.md
+│   ├── assets/                 # Application screenshots, diagrams & demo assets
+│   │   ├── screenshots/
+│   │   ├── diagrams/
+│   │   └── demo/
+│   ├── reviews/                # G1 contract & quality reviews
+│   ├── handoffs/               # Inter-agent handoff notes
+│   └── change-requests/        # Formal contract changes
 │
 ├── backend/                    # Go REST API backend (Om)
 │   ├── cmd/api/                # Main entrypoint
@@ -66,8 +78,8 @@ ha022/
 │   └── go.sum
 │
 ├── mobile/                     # Flutter mobile application (Om)
-│   ├── lib/                    # Dart source code (offline db, outbox, ui, tflite)
-│   ├── assets/ml/              # Bundled TFLite model, labels.json, manifest.json
+│   ├── lib/                    # Dart source code (offline store, ui, tflite, qr)
+│   ├── assets/ml/              # Bundled TFLite model, labels & manifest
 │   └── pubspec.yaml
 │
 ├── dashboard/                  # React + TypeScript government dashboard (Soham)
@@ -76,17 +88,20 @@ ha022/
 │   └── tsconfig.json
 │
 ├── ml/                         # Machine learning workspace (Lokesh)
-│   ├── mobilenet/              # Training, eval, and TFLite export scripts
-│   ├── xgboost/                # Feature engineering, training, and validation
-│   ├── service/                # FastAPI application exposing /v1/risk/predict
-│   ├── artifacts/              # Versioned export bundles (mobilenetv3, xgboost)
-│   ├── datasets/               # Dataset documentation, fetch scripts (data gitignored)
-│   ├── requirements.txt
-│   └── Dockerfile
+│   ├── mobilenetv3/            # MobileNetV3 training & evaluation scripts
+│   ├── image_classifier/       # TFLite image classifier artifacts & test scripts
+│   ├── xgboost/                # XGBoost outbreak risk training scripts
+│   ├── outbreak_predictor/     # Outbreak risk schema & serialized models
+│   ├── ml-service/             # FastAPI microservice exposing /api/v1/ml/outbreak-risk
+│   ├── models/                 # Exported .tflite, .keras, and .json model bundles
+│   ├── datasets/               # Dataset discovery & raw training data
+│   ├── reports/                # Model evaluation logs
+│   └── requirements.txt
 │
 └── deploy/                     # Infrastructure & orchestration (Om)
     ├── docker-compose.yml      # Local dev and demo compose orchestration
-    ├── nginx.conf              # Reverse proxy (optional)
+    ├── dashboard.Dockerfile    # React Vite container build
+    ├── ml.Dockerfile           # FastAPI ML container build
     └── .env.example            # Environment template with placeholders
 ```
 

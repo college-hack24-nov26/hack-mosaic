@@ -31,7 +31,7 @@ You represent Soham, the Dashboard Engineer for PashuVani. You are responsible f
 - `backend/` — Owned exclusively by Om. Never edit Go source code or migrations.
 - `mobile/` — Owned exclusively by Om.
 - `ml/` — Owned exclusively by Lokesh.
-- `DATABASE_SCHEMA.md` — You do **not** query PostgreSQL directly. You interact exclusively via the REST API defined in `API_CONTRACTS.md`.
+- `docs/architecture/DATABASE_SCHEMA.md` — You do **not** query PostgreSQL directly. You interact exclusively via the REST API defined in `docs/architecture/API_CONTRACTS.md`.
 
 ---
 
