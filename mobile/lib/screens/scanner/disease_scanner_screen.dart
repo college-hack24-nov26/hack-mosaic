@@ -50,10 +50,9 @@ class _DiseaseScannerScreenState extends State<DiseaseScannerScreen> {
     }
   }
 
-  /// Hybrid Offline-First Screening:
-  /// 1. Runs on-device TensorFlow Lite (`bovine_disease_classifier.tflite`) with zero internet required.
-  /// 2. When online and Gemini is configured, augments with Gemini 2.5 Flash visual observations.
-  /// 3. When offline, uses localized TFLite interim care guidance + offline voice readout.
+  /// Online-First with Offline TFLite Fallback:
+  /// 1. When internet is available and Gemini is configured, uses Gemini 2.5 Flash Vision (`usedOnlineAi = true`).
+  /// 2. When offline (or if Gemini cannot be reached), runs on-device TensorFlow Lite (`bovine_disease_classifier.tflite`).
   Future<void> _runScreening() async {
     if (_imagePath == null) {
       _snack(AppStrings.t('scan_need_photo'));
@@ -65,20 +64,11 @@ class _DiseaseScannerScreenState extends State<DiseaseScannerScreen> {
         ? null
         : _store.animals.where((a) => a.id == _selectedAnimalId).firstOrNull;
 
-    OfflineTfliteResult? tfliteResult;
-    try {
-      tfliteResult = await OfflineTfliteService.classify(
-        imagePath: _imagePath!,
-        species: animal?.speciesCode ?? 'bovine',
-      );
-    } catch (_) {
-      // Non-Android desktop/web test environment fallback
-      tfliteResult = null;
-    }
-
     GeminiGuidance? guidance;
+    OfflineTfliteResult? tfliteResult;
     bool usedOnlineAi = false;
-    if (_store.isOnline && GeminiService.isConfigured) {
+
+    if (GeminiService.isConfigured) {
       try {
         guidance = await GeminiService.analyze(
           image: File(_imagePath!),
@@ -86,10 +76,22 @@ class _DiseaseScannerScreenState extends State<DiseaseScannerScreen> {
         );
         usedOnlineAi = true;
       } on GeminiException {
-        guidance = tfliteResult?.toOfflineGuidance();
+        usedOnlineAi = false;
+      } catch (_) {
+        usedOnlineAi = false;
       }
-    } else {
-      guidance = tfliteResult?.toOfflineGuidance();
+    }
+
+    if (!usedOnlineAi) {
+      try {
+        tfliteResult = await OfflineTfliteService.classify(
+          imagePath: _imagePath!,
+          species: animal?.speciesCode ?? 'bovine',
+        );
+        guidance = tfliteResult.toOfflineGuidance();
+      } catch (_) {
+        tfliteResult = null;
+      }
     }
 
     if (!mounted) return;
@@ -183,7 +185,7 @@ class _DiseaseScannerScreenState extends State<DiseaseScannerScreen> {
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
-                    _store.isOnline && GeminiService.isConfigured
+                    GeminiService.isConfigured
                         ? AppStrings.t('tflite_hybrid_badge')
                         : AppStrings.t('tflite_offline_badge'),
                     style: AppTypography.caption.copyWith(

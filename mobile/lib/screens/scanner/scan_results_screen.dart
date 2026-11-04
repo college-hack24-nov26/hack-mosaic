@@ -90,6 +90,95 @@ class _ScanResultsScreenState extends State<ScanResultsScreen> {
     }
   }
 
+  Widget _buildOnlineGeminiCard(GeminiGuidance g) {
+    final pct = (g.confidence * 100).toStringAsFixed(1);
+    final badgeColor = g.isHealthy
+        ? AppColors.successGreen
+        : (g.urgency == 'high' ? AppColors.alertCritical : AppColors.cautionAmber);
+    final label = g.screeningLabel.isNotEmpty
+        ? g.screeningLabel
+        : (g.isHealthy
+            ? AppStrings.t('tflite_healthy')
+            : AppStrings.t('tflite_suspected_disease'));
+
+    return AppCard(
+      padding: const EdgeInsets.all(AppSpacing.lg),
+      color: Colors.white,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(Icons.auto_awesome, size: 20, color: AppColors.primary),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  'Gemini Vision AI Screening (Online)',
+                  style: AppTypography.cardTitle.copyWith(fontSize: 14),
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                decoration: BoxDecoration(
+                  color: AppColors.primary.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
+                ),
+                child: Text(
+                  'ONLINE AI',
+                  style: AppTypography.caption.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.primary,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+            decoration: BoxDecoration(
+              color: badgeColor.withValues(alpha: 0.12),
+              borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
+            ),
+            child: Text(
+              label,
+              style: AppTypography.badge.copyWith(
+                color: badgeColor,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+          const SizedBox(height: 12),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(AppStrings.t('statistical_prob'), style: AppTypography.caption),
+              Text(
+                '$pct%',
+                style: AppTypography.cardTitle.copyWith(fontSize: 14, color: badgeColor),
+              ),
+            ],
+          ),
+          const SizedBox(height: 6),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(6),
+            child: LinearProgressIndicator(
+              value: g.confidence.clamp(0.0, 1.0),
+              minHeight: 8,
+              backgroundColor: AppColors.surfaceContainer,
+              valueColor: AlwaysStoppedAnimation<Color>(badgeColor),
+            ),
+          ),
+          const SizedBox(height: 10),
+          Text(
+            '${AppStrings.t('generated_by_ai')} (gemini-2.5-flash)',
+            style: AppTypography.caption.copyWith(fontSize: 11),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildTfliteCard(OfflineTfliteResult tflite) {
     final s = tflite.screening;
     final pct = (s.topConfidence * 100).toStringAsFixed(1);
@@ -216,7 +305,10 @@ class _ScanResultsScreenState extends State<ScanResultsScreen> {
           ),
           const SizedBox(height: AppSpacing.lg),
 
-          if (tflite != null) ...[
+          if (widget.usedOnlineAi) ...[
+            _buildOnlineGeminiCard(g),
+            const SizedBox(height: AppSpacing.lg),
+          ] else if (tflite != null) ...[
             _buildTfliteCard(tflite),
             const SizedBox(height: AppSpacing.lg),
           ],
@@ -295,23 +387,24 @@ class _ScanResultsScreenState extends State<ScanResultsScreen> {
             backgroundColor: AppColors.primary,
             onPressed: () {
               _voice.stop();
-              final topCond = g.possibleConditions.isNotEmpty
-                  ? g.possibleConditions.first
-                  : 'preliminary_skin_observation';
-              final conf = g.urgency == 'high'
-                  ? 0.88
-                  : (g.urgency == 'medium' ? 0.74 : 0.55);
-              final screening = tflite?.screening ??
-                  ScreeningResult(
-                    modelVersion: 'gemini-2.5-flash-preliminary',
-                    topLabel: topCond,
-                    topConfidence: conf,
-                    inconclusive: g.urgency == 'low',
-                    scores: [
-                      {'label': topCond, 'score': conf},
-                    ],
-                    ranAt: DateTime.now().toUtc(),
-                  );
+              final topCond = g.screeningLabel.isNotEmpty
+                  ? g.screeningLabel
+                  : (g.possibleConditions.isNotEmpty
+                      ? g.possibleConditions.first
+                      : 'preliminary_skin_observation');
+              final conf = g.confidence;
+              final screening = (!widget.usedOnlineAi && tflite != null)
+                  ? tflite.screening
+                  : ScreeningResult(
+                      modelVersion: 'gemini-2.5-flash-preliminary',
+                      topLabel: topCond,
+                      topConfidence: conf,
+                      inconclusive: false,
+                      scores: [
+                        {'label': topCond, 'score': conf},
+                      ],
+                      ranAt: DateTime.now().toUtc(),
+                    );
               Navigator.of(context).pushReplacement(
                 MaterialPageRoute(
                   builder: (_) => CreateReportScreen(

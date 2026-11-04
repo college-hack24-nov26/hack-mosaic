@@ -112,16 +112,16 @@ class MainActivity : FlutterActivity() {
         val prob0 = outputBuffer[0][0].toDouble()
         val prob1 = outputBuffer[0][1].toDouble()
 
-        val class0Code = if (usedBovineModel) "healthy_cattle" else "coccidiosis"
-        val class1Code = if (usedBovineModel) "suspected_bovine_disease" else "healthy_poultry"
-        val class0Raw = if (usedBovineModel) "0 Healthy Cow" else "Coccidiosis"
-        val class1Raw = if (usedBovineModel) "1 Sick Cow" else "Healthy"
+        val class0Code = if (usedBovineModel) "suspected_bovine_disease" else "coccidiosis"
+        val class1Code = if (usedBovineModel) "healthy_cattle" else "healthy_poultry"
+        val class0Raw = if (usedBovineModel) "Suspected Bovine Lesion (LSD/FMD)" else "Coccidiosis"
+        val class1Raw = if (usedBovineModel) "Healthy Cow" else "Healthy"
 
         val topIsClass1 = prob1 >= prob0
         val topLabel = if (topIsClass1) class1Code else class0Code
         val topRawLabel = if (topIsClass1) class1Raw else class0Raw
         val topConfidence = if (topIsClass1) prob1 else prob0
-        val isHealthy = (usedBovineModel && !topIsClass1) || (!usedBovineModel && topIsClass1)
+        val isHealthy = topIsClass1
 
         return mapOf(
             "model_version" to if (usedBovineModel) "bovine_tflite_v1.0.0" else "mobilenetv3_small_v1.0.0",
