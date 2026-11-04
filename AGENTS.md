@@ -7,34 +7,34 @@
 ## 0. CURRENT PHASE (edited only by Om)
 
 ```
-PHASE:            1 — IMPLEMENTATION (P0)
+PHASE:            1 — IMPLEMENTATION (P0/P1/P2)
 CODING:           UNLOCKED (post-G1)
-CONTRACTS:        API_CONTRACTS.md v1.0 — FROZEN
-                  DATABASE_SCHEMA.md v1.0 — FROZEN
-                  ML_INTEGRATION.md v1.0 — FROZEN
-NEXT GATE:        G2 (Core Golden Thread Demo Verification)
+CONTRACTS:        docs/architecture/API_CONTRACTS.md v1.0 — FROZEN
+                  docs/architecture/DATABASE_SCHEMA.md v1.0 — FROZEN
+                  docs/ai-ml/ML_INTEGRATION.md v1.0 — FROZEN
+NEXT GATE:        G3 (System Integration & Final Demo Verification)
 ```
 
 **While `CODING: LOCKED`, you may only:** read the docs, write a contract review (see §6), set up your own local tooling, and do dataset discovery notes (Lokesh). You may **not** create Flutter screens, Go handlers, React components, ML training code, SQL migrations, or any other production code, and you may not "start early" against an assumption.
 
-When Om changes the block above to `CODING: UNLOCKED (post-G1)`, you may start work on your assigned P0 tasks in `DEVELOPMENT_PLAN.md`.
+When Om changes the block above to `CODING: UNLOCKED (post-G1)`, you may start work on your assigned P0 tasks in `docs/development/DEVELOPMENT_PLAN.md`.
 
 ---
 
 ## 1. Mandatory reading order (before you touch anything)
 
 1. `AGENTS.md` (this file)
-2. `PROJECT_CONTEXT.md` — what we are building, confirmed requirements vs assumptions
+2. `docs/project/PROJECT_CONTEXT.md` — what we are building, confirmed requirements vs assumptions
 3. Your agent file: `agents/OM_AGENT.md`, `agents/LOKESH_AGENT.md` or `agents/SOHAM_AGENT.md`
-4. `TEAM_WORKFLOW.md` — ownership, gates, Git rules
-5. Contracts relevant to you: `API_CONTRACTS.md`, `DATABASE_SCHEMA.md`, `ML_INTEGRATION.md`, `ARCHITECTURE.md`
-6. `DEVELOPMENT_PLAN.md` (your tasks), `CODING_STANDARDS.md`, `TESTING_STRATEGY.md`, `SECURITY.md`, `DECISIONS.md`
+4. `docs/development/TEAM_WORKFLOW.md` — ownership, gates, Git rules
+5. Contracts relevant to you: `docs/architecture/API_CONTRACTS.md`, `docs/architecture/DATABASE_SCHEMA.md`, `docs/ai-ml/ML_INTEGRATION.md`, `docs/architecture/ARCHITECTURE.md`
+6. `docs/development/DEVELOPMENT_PLAN.md` (your tasks), `docs/development/CODING_STANDARDS.md`, `docs/development/TESTING_STRATEGY.md`, `docs/security/SECURITY.md`, `docs/architecture/DECISIONS.md`
 
 If you have not read these, you must not write code. State in your first message which files you read.
 
 ## 2. Source-of-truth hierarchy
 
-1. The team's explicit written approvals (`DECISIONS.md`, approved change requests).
+1. The team's explicit written approvals (`docs/architecture/DECISIONS.md`, approved change requests).
 2. The attached project PPT (`coepphaltan.pdf`, "PashuVani", Hackathon 2K26) for **what** the product is.
 3. The frozen contracts for **how** modules talk to each other.
 4. Everything else (including your own preferences) is lowest priority.
