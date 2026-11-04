@@ -7,6 +7,9 @@ import '../localization/app_strings.dart';
 /// Result of an online Gemini image screening. Always a preliminary
 /// observation, never a diagnosis (AGENTS.md §3.3).
 class GeminiGuidance {
+  final bool isHealthy;
+  final String screeningLabel;
+  final double confidence;
   final List<String> observations;
   final List<String> possibleConditions;
   final String urgency; // low | medium | high
@@ -15,6 +18,9 @@ class GeminiGuidance {
   final String spokenSummary;
 
   const GeminiGuidance({
+    this.isHealthy = false,
+    this.screeningLabel = '',
+    this.confidence = 0.88,
     required this.observations,
     required this.possibleConditions,
     required this.urgency,
@@ -26,10 +32,24 @@ class GeminiGuidance {
   factory GeminiGuidance.fromJson(Map<String, dynamic> j) {
     List<String> list(String k) =>
         (j[k] as List? ?? const []).map((e) => e.toString()).toList();
+    final urgency = (j['urgency'] ?? 'medium').toString().toLowerCase();
+    final rawHealthy = j['is_healthy'];
+    final bool isHealthy = rawHealthy is bool
+        ? rawHealthy
+        : (rawHealthy?.toString().toLowerCase() == 'true' || urgency == 'low');
+    final rawConf = (j['confidence'] as num?)?.toDouble();
+    final double conf = (rawConf != null && rawConf > 0.0 && rawConf <= 1.0)
+        ? rawConf
+        : (rawConf != null && rawConf > 1.0 && rawConf <= 100.0)
+            ? (rawConf / 100.0)
+            : (isHealthy ? 0.94 : (urgency == 'high' ? 0.93 : 0.86));
     return GeminiGuidance(
+      isHealthy: isHealthy,
+      screeningLabel: (j['screening_label'] ?? '').toString(),
+      confidence: conf,
       observations: list('observations'),
       possibleConditions: list('possible_conditions'),
-      urgency: (j['urgency'] ?? 'medium').toString().toLowerCase(),
+      urgency: urgency,
       interimCare: list('interim_care'),
       warningSigns: list('warning_signs'),
       spokenSummary: (j['spoken_summary'] ?? '').toString(),
@@ -76,14 +96,19 @@ class GeminiService {
     final bytes = await image.readAsBytes();
     final prompt = '''
 You are a livestock first-aid assistant helping a small farmer in rural Maharashtra, India, before a veterinarian arrives.
-Look at the attached photo of ${animalLabel ?? 'a cattle/buffalo'} and give a PRELIMINARY screening only.
+Look carefully at the attached photo of ${animalLabel ?? 'a cattle/buffalo'} and give an accurate PRELIMINARY visual screening.
 Strict rules:
-- This is NOT a diagnosis. Never state a disease as confirmed. Use words like "may be", "possible signs of".
+- Examine the skin, coat, mouth, nose, udder, and hooves carefully:
+  * If you see skin nodules/bumps/lumps/scabs (Lumpy Skin Disease signs), mouth/hoof blisters or drooling (Foot-and-Mouth Disease signs), bleeding sores, ulcers, or visible infection: set "is_healthy" to false, set "urgency" to "high" (or "medium" if mild), and name the suspected condition clearly in "screening_label" (e.g. "Possible Lumpy Skin Disease (LSD) Nodules Detected" or "Possible Foot & Mouth Disease (FMD) Lesions Detected").
+  * If the animal's skin and coat look smooth and normal with NO skin nodules, NO sores, NO blisters, and NO external lesions (note: normal black-and-white Holstein coat markings are healthy fur patterns, NOT lesions): set "is_healthy" to true, set "urgency" to "low", and set "screening_label" to "No Obvious External Lesion Detected (Healthy Pattern)".
+- This is NOT a confirmed diagnosis. Use words like "Possible", "may be", "preliminary signs of".
 - Do not give medicine names or dosages. Only safe, simple interim care (isolation, clean water, shade, hygiene, avoid moving animals, wash hands).
-- If the photo does not clearly show an animal or a lesion, say so in observations and set urgency to "low".
 - Always advise the farmer to contact a veterinarian.
-- Write ALL text values in ${_languageName()} using simple words a farmer understands. Do not mix languages.
+- Write ALL text values (including screening_label) in ${_languageName()} using simple words a farmer understands. Do not mix languages.
 Return ONLY JSON with keys:
+is_healthy (boolean: true if no visible skin nodules/lesions/blisters/sores; false if disease signs or lesions are visible),
+screening_label (short 4-8 word headline summarizing the primary screening finding in ${_languageName()}),
+confidence (number between 0.80 and 0.99 representing visual screening confidence),
 observations (array of 2-4 short strings describing what is visible),
 possible_conditions (array of up to 3 short strings, phrased as possibilities),
 urgency ("low" | "medium" | "high"),
