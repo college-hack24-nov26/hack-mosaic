@@ -11,6 +11,8 @@ import '../../core/widgets/app_button.dart';
 import '../../core/widgets/safety_disclaimer_card.dart';
 import '../../data/local/offline_store.dart';
 import '../../data/models/disease_report_model.dart';
+import '../../data/models/veterinarian_model.dart';
+import '../../data/vet_repository.dart';
 import '../../core/network/api_client.dart';
 import 'report_details_screen.dart';
 import 'reports_history_screen.dart';
@@ -38,6 +40,8 @@ class _CreateReportScreenState extends State<CreateReportScreen> {
   final _descriptionController = TextEditingController();
 
   String? _selectedAnimalId;
+  String? _selectedVetId;
+  String _selectedVisitType = 'urgent_farm_visit';
   String _selectedCondition = 'lumpy_skin_disease';
   final Set<String> _selectedSymptoms = {'skin_nodules', 'fever'};
   String? _photoPath;
@@ -76,6 +80,10 @@ class _CreateReportScreenState extends State<CreateReportScreen> {
       _selectedAnimalId = widget.preselectedAnimalId;
     } else if (animals.isNotEmpty) {
       _selectedAnimalId = animals.first.id;
+    }
+    final vets = _store.getNearbyVeterinarians(_currentLat, _currentLng);
+    if (vets.isNotEmpty) {
+      _selectedVetId = vets.first.id;
     }
     _photoPath = widget.initialPhotoPath;
     _screeningResult = widget.initialScreening;
@@ -120,6 +128,27 @@ class _CreateReportScreenState extends State<CreateReportScreen> {
     setState(() => _isSubmitting = true);
 
     final selectedAnimal = _store.animals.firstWhere((a) => a.id == _selectedAnimalId);
+    final vets = _store.getNearbyVeterinarians(_currentLat, _currentLng);
+    VeterinarianModel? chosenVet;
+    if (vets.isNotEmpty) {
+      chosenVet = vets.firstWhere(
+        (v) => v.id == _selectedVetId,
+        orElse: () => vets.first,
+      );
+    }
+    final visitTypeLabel = _selectedVisitType == 'urgent_farm_visit'
+        ? 'तातडीची प्रत्यक्ष फार्म भेट (Urgent Farm Visit)'
+        : (_selectedVisitType == 'clinic_visit'
+            ? 'पॉलीक्लिनिक ओपीडी भेट (Polyclinic OPD)'
+            : 'फोन / व्हिडिओ सल्ला (Tele-Consultation)');
+    final userNote = _descriptionController.text.trim();
+    final vetHeader = chosenVet != null
+        ? '[पशुवैद्यक विनंती: ${chosenVet.name} • ${chosenVet.clinicName}] प्रकार: $visitTypeLabel'
+        : 'प्रकार: $visitTypeLabel';
+    final fullDesc = userNote.isNotEmpty
+        ? '$vetHeader | शेतकरी टिपणी: $userNote'
+        : '$vetHeader | लक्षणे: ${_selectedSymptoms.join(", ")}';
+
     final reportId = const Uuid().v4();
 
     final newReport = DiseaseReportModel(
@@ -127,9 +156,7 @@ class _CreateReportScreenState extends State<CreateReportScreen> {
       animalId: _selectedAnimalId!,
       animalName: selectedAnimal.displayName,
       reportedAt: DateTime.now().toUtc(),
-      description: _descriptionController.text.trim().isNotEmpty
-          ? _descriptionController.text.trim()
-          : 'Reported with symptoms: ${_selectedSymptoms.join(", ")}',
+      description: fullDesc,
       descriptionLanguage: AppStrings.currentLang,
       symptomCodes: _selectedSymptoms.toList(),
       latitude: _hasGps ? _currentLat : null,
@@ -142,10 +169,16 @@ class _CreateReportScreenState extends State<CreateReportScreen> {
     );
 
     await _store.addReport(newReport);
+    await VetRepository.shared.ingestFarmerSubmission(
+      newReport,
+      animal: selectedAnimal,
+      farmerName: _store.currentUser?.fullName,
+      farmerPhone: _store.currentUser?.phone,
+    );
 
     // Attempt background sync if online
     if (_store.isOnline) {
-      ApiClient().syncReport(newReport).then((synced) async {
+      ApiClient().syncReport(newReport, animal: selectedAnimal).then((synced) async {
         if (synced) {
           if (newReport.photoPath != null) {
             await ApiClient().uploadReportImage(newReport.id, newReport.photoPath!);
@@ -332,6 +365,79 @@ class _CreateReportScreenState extends State<CreateReportScreen> {
               }).toList(),
               onChanged: (val) => setState(() => _selectedAnimalId = val),
             ),
+          const SizedBox(height: AppSpacing.lg),
+
+          // Step 1B: Choose Veterinarian to Receive Report / Appointment Request
+          Text('👨‍⚕️ पशुवैद्यक निवडा (Choose Veterinarian for Request)', style: AppTypography.sectionHeading),
+          const SizedBox(height: AppSpacing.sm),
+          Builder(
+            builder: (context) {
+              final vets = _store.getNearbyVeterinarians(_currentLat, _currentLng);
+              if (_selectedVetId == null && vets.isNotEmpty) {
+                _selectedVetId = vets.first.id;
+              }
+              return Container(
+                padding: const EdgeInsets.all(AppSpacing.md),
+                decoration: BoxDecoration(
+                  color: AppColors.surface,
+                  borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+                  border: Border.all(color: AppColors.primary.withValues(alpha: 0.4), width: 1.5),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    DropdownButtonFormField<String>(
+                      key: ValueKey(_selectedVetId),
+                      initialValue: _selectedVetId,
+                      isExpanded: true,
+                      decoration: const InputDecoration(
+                        labelText: 'जवळचे पशुवैद्यक अधिकारी (Select Nearby Vet)',
+                        prefixIcon: Icon(Icons.medical_services_outlined, color: AppColors.primary),
+                        isDense: true,
+                      ),
+                      items: vets.map((v) {
+                        final dist = v.distanceKm != null ? '${v.distanceKm!.toStringAsFixed(1)} km' : '0.1 km';
+                        return DropdownMenuItem<String>(
+                          value: v.id,
+                          child: Text(
+                            '${v.name} • ${v.clinicName} ($dist)',
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+                          ),
+                        );
+                      }).toList(),
+                      onChanged: (val) => setState(() => _selectedVetId = val),
+                    ),
+                    const SizedBox(height: AppSpacing.sm),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 6,
+                      children: [
+                        ChoiceChip(
+                          label: const Text('🚑 प्रत्यक्ष फार्म भेट (Farm Visit)', style: TextStyle(fontSize: 11)),
+                          selected: _selectedVisitType == 'urgent_farm_visit',
+                          selectedColor: AppColors.primary.withValues(alpha: 0.18),
+                          onSelected: (_) => setState(() => _selectedVisitType = 'urgent_farm_visit'),
+                        ),
+                        ChoiceChip(
+                          label: const Text('🏥 पॉलीक्लिनिक ओपीडी (Clinic OPD)', style: TextStyle(fontSize: 11)),
+                          selected: _selectedVisitType == 'clinic_visit',
+                          selectedColor: AppColors.primary.withValues(alpha: 0.18),
+                          onSelected: (_) => setState(() => _selectedVisitType = 'clinic_visit'),
+                        ),
+                        ChoiceChip(
+                          label: const Text('📞 फोन सल्ला (Tele-Consult)', style: TextStyle(fontSize: 11)),
+                          selected: _selectedVisitType == 'tele_triage',
+                          selectedColor: AppColors.primary.withValues(alpha: 0.18),
+                          onSelected: (_) => setState(() => _selectedVisitType = 'tele_triage'),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
           const SizedBox(height: AppSpacing.lg),
 
           // Step 2: Suspected Disease Category

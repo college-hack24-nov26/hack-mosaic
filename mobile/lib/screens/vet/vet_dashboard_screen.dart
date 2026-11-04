@@ -8,6 +8,7 @@ import '../../core/widgets/async_states.dart';
 import '../../data/models/vet_models.dart';
 import '../../data/vet_repository.dart';
 import 'vet_inbox_screen.dart';
+import 'vet_passport_scanner_screen.dart';
 import 'vet_report_details_screen.dart';
 
 class VetDashboardScreen extends StatefulWidget {
@@ -97,6 +98,15 @@ class _VetDashboardScreenState extends State<VetDashboardScreen> {
         elevation: 0,
         actions: [
           IconButton(
+            icon: const Icon(Icons.qr_code_scanner, color: AppColors.primary),
+            tooltip: 'डिजिटल पासपोर्ट स्कॅनर (Scan QR Passport)',
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => const VetPassportScannerScreen()),
+              );
+            },
+          ),
+          IconButton(
             icon: const Icon(Icons.refresh, color: AppColors.primary),
             tooltip: AppStrings.t('try_again'),
             onPressed: _load,
@@ -127,6 +137,9 @@ class _VetDashboardScreenState extends State<VetDashboardScreen> {
                       _buildQuickActionsSection(),
 
                       const SizedBox(height: AppSpacing.xl),
+
+                      // 2c. Incoming Farmer Appointment Requests
+                      _buildAppointmentsSection(),
 
                       // 3. Waiting Longest (Priority Queue)
                       _buildWaitingLongestSection(),
@@ -333,6 +346,64 @@ class _VetDashboardScreenState extends State<VetDashboardScreen> {
       children: [
         Text('⚡ जलद कृती (Quick Actions)', style: AppTypography.sectionHeading),
         const SizedBox(height: AppSpacing.sm),
+        // Primary Digital Health Passport QR Scanner Banner
+        InkWell(
+          onTap: () {
+            Navigator.of(context).push(
+              MaterialPageRoute(builder: (_) => const VetPassportScannerScreen()),
+            );
+          },
+          borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+          child: Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(AppSpacing.md),
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(
+                colors: [Color(0xFF1B4208), AppColors.primary],
+                begin: Alignment.centerLeft,
+                end: Alignment.centerRight,
+              ),
+              borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+              boxShadow: [
+                BoxShadow(
+                  color: AppColors.primary.withValues(alpha: 0.2),
+                  blurRadius: 8,
+                  offset: const Offset(0, 3),
+                ),
+              ],
+            ),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.18),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: const Icon(Icons.qr_code_scanner, color: Colors.white, size: 26),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        '📷 डिजिटल पशु पासपोर्ट स्कॅन करा',
+                        style: AppTypography.cardTitle.copyWith(color: Colors.white, fontSize: 15),
+                      ),
+                      Text(
+                        'Scan Farmer Animal QR Passport (Ed25519 Verified)',
+                        style: AppTypography.caption.copyWith(color: Colors.white70, fontSize: 11),
+                      ),
+                    ],
+                  ),
+                ),
+                const Icon(Icons.arrow_forward_ios, color: Colors.white70, size: 16),
+              ],
+            ),
+          ),
+        ),
+        const SizedBox(height: AppSpacing.sm),
         Row(
           children: [
             Expanded(
@@ -396,6 +467,106 @@ class _VetDashboardScreenState extends State<VetDashboardScreen> {
           ],
         ),
       ],
+    );
+  }
+
+  Widget _buildAppointmentsSection() {
+    final all = <String, VetReport>{};
+    for (final r in [..._pending, ..._recent]) {
+      if ((r.description ?? '').contains('पशुवैद्यक विनंती:') ||
+          (r.description ?? '').contains('प्रकार:')) {
+        all[r.id] = r;
+      }
+    }
+    final appointments = all.values.toList();
+    if (appointments.isEmpty) return const SizedBox.shrink();
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: AppSpacing.xl),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(Icons.event_available, color: AppColors.infoBlue, size: 20),
+              const SizedBox(width: 6),
+              Expanded(
+                child: Text(
+                  '📅 शेतकरी अपॉइंटमेंट विनंत्या (${appointments.length})',
+                  style: AppTypography.sectionHeading.copyWith(color: AppColors.infoBlue),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 6),
+          ...appointments.map((rep) {
+            return Container(
+              margin: const EdgeInsets.only(bottom: AppSpacing.sm),
+              padding: const EdgeInsets.all(AppSpacing.md),
+              decoration: BoxDecoration(
+                color: AppColors.surface,
+                borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+                border: Border.all(color: AppColors.infoBlue.withValues(alpha: 0.45), width: 1.5),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                        decoration: BoxDecoration(
+                          color: AppColors.infoBlue.withValues(alpha: 0.12),
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: Text(
+                          'NEW APPOINTMENT REQUEST',
+                          style: AppTypography.badge.copyWith(color: AppColors.infoBlue, fontSize: 10),
+                        ),
+                      ),
+                      const Spacer(),
+                      Text(_formatAgo(rep.reportedAt), style: AppTypography.caption),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'शेतकरी: ${rep.farmer?.fullName ?? "Ramesh Jadhav"} • जनावर: ${rep.animal.name ?? rep.animal.speciesCode.toUpperCase()} (${rep.animal.tagNumber ?? "No Tag"})',
+                    style: AppTypography.cardTitle.copyWith(fontSize: 14),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    rep.description ?? '',
+                    style: AppTypography.caption.copyWith(color: AppColors.textPrimary),
+                  ),
+                  const SizedBox(height: 10),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton.icon(
+                      onPressed: () async {
+                        await Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) => VetReportDetailsScreen(reportId: rep.id),
+                          ),
+                        );
+                        _load();
+                      },
+                      icon: const Icon(Icons.fact_check_outlined, size: 16, color: Colors.white),
+                      label: const Text(
+                        'अपॉइंटमेंट स्वीकारा व केस उघडा (Accept & Review Request)',
+                        style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.white),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.infoBlue,
+                        minimumSize: const Size(0, 38),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }),
+        ],
+      ),
     );
   }
 

@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_typography.dart';
@@ -43,10 +44,16 @@ class AnimalDetailsScreen extends StatelessWidget {
         title: Text(animal.displayName),
         actions: [
           IconButton(
-            icon: const Icon(Icons.share_outlined),
-            onPressed: () {
+            icon: const Icon(Icons.qr_code_scanner),
+            tooltip: 'पशुवैद्यक स्कॅनसाठी कॉपी करा (Copy QR Passport)',
+            onPressed: () async {
+              await Clipboard.setData(ClipboardData(text: _buildQrPayload()));
+              if (!context.mounted) return;
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Digital Passport ready for field vet inspection.')),
+                const SnackBar(
+                  content: Text('डिजिटल QR पासपोर्ट कॉपी झाला! पशुवैद्यक पोर्टलवरील स्कॅनरमध्ये थेट तपासा.'),
+                  backgroundColor: AppColors.successGreen,
+                ),
               );
             },
           ),

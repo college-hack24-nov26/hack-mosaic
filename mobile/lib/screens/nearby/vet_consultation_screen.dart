@@ -12,6 +12,7 @@ import '../../core/widgets/safety_disclaimer_card.dart';
 import '../../data/local/offline_store.dart';
 import '../../data/models/disease_report_model.dart';
 import '../../data/models/veterinarian_model.dart';
+import '../../data/vet_repository.dart';
 import '../reports/create_report_screen.dart';
 import '../reports/report_details_screen.dart';
 
@@ -168,9 +169,15 @@ class _VetConsultationScreenState extends State<VetConsultationScreen> {
     );
 
     await _store.addReport(newReport);
+    await VetRepository.shared.ingestFarmerSubmission(
+      newReport,
+      animal: animal,
+      farmerName: _store.currentUser?.fullName,
+      farmerPhone: _store.currentUser?.phone,
+    );
 
     if (_store.isOnline) {
-      ApiClient().syncReport(newReport).then((synced) async {
+      ApiClient().syncReport(newReport, animal: animal).then((synced) async {
         if (synced) {
           await _store.markReportSynced(newReport.id);
         }

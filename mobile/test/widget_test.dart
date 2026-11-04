@@ -236,9 +236,9 @@ void main() {
     await store.initialize();
 
     // Verify verified veterinarians
-    expect(store.veterinarians.length, greaterThanOrEqualTo(4));
+    expect(store.veterinarians.length, greaterThanOrEqualTo(5));
     final nearbyVets = store.getNearbyVeterinarians(17.9856, 74.4331);
-    expect(nearbyVets.first.name, 'Dr. Sanjay Patil');
+    expect(nearbyVets.first.name, 'Dr. Rajesh Kulkarni');
     expect(nearbyVets.first.isVerified, true);
     expect(nearbyVets.first.distanceKm, lessThan(1.5));
 

@@ -1,6 +1,10 @@
+import 'dart:convert';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../core/auth/api_exception.dart';
 import '../core/auth/session_manager.dart';
 import '../core/network/authed_http.dart';
+import 'models/animal_model.dart';
+import 'models/disease_report_model.dart';
 import 'models/vet_models.dart';
 
 /// Veterinarian API access (API_CONTRACTS.md §5–§7). Every call first checks
@@ -44,6 +48,7 @@ class VetRepository {
   /// `GET /reports` (vet → own district, enforced server-side).
   Future<ReportPage> reports({String? status, int page = 1, int pageSize = 50, String? talukaId}) async {
     _requireVet();
+    await _loadPersistedFarmerSubmissions();
     if (_s.status == SessionStatus.demoVet) {
       _isUsingDemoData = true;
       return _demoFilterReports(status: status, talukaId: talukaId, page: page, pageSize: pageSize);
@@ -56,7 +61,9 @@ class VetRepository {
         'page_size': '$pageSize',
       });
       _isUsingDemoData = false;
-      return _page(body);
+      final serverPage = _page(body);
+      final merged = _mergeWithFarmerSubmissions(serverPage.items, status: status);
+      return ReportPage(merged, merged.length > serverPage.total ? merged.length : serverPage.total);
     } on ApiException catch (e) {
       if (e.isNetwork) {
         _isUsingDemoData = true;
@@ -66,9 +73,10 @@ class VetRepository {
     }
   }
 
-  /// "Pending" = `submitted` + `under_review` (API_CONTRACTS.md §7.2). Oldest first.
+  /// "Pending" = `submitted` + `under_review` (API_CONTRACTS.md §7.2). Newest farmer appointments first.
   Future<ReportPage> pendingReports({int page = 1, int pageSize = 50}) async {
     _requireVet();
+    await _loadPersistedFarmerSubmissions();
     if (_s.status == SessionStatus.demoVet) {
       _isUsingDemoData = true;
       return _demoPendingReports();
@@ -79,8 +87,13 @@ class VetRepository {
         reports(status: 'under_review', page: page, pageSize: pageSize),
       ]);
       _isUsingDemoData = false;
-      final all = [...r[0].items, ...r[1].items]..sort((a, b) => a.reportedAt.compareTo(b.reportedAt));
-      return ReportPage(all, r[0].total + r[1].total);
+      final seen = <String>{};
+      final all = <VetReport>[];
+      for (final item in [...r[0].items, ...r[1].items]) {
+        if (seen.add(item.id)) all.add(item);
+      }
+      all.sort((a, b) => b.reportedAt.compareTo(a.reportedAt));
+      return ReportPage(all, all.length);
     } on ApiException catch (e) {
       if (e.isNetwork) {
         _isUsingDemoData = true;
@@ -92,6 +105,7 @@ class VetRepository {
 
   Future<VetReport> report(String id) async {
     _requireVet();
+    await _loadPersistedFarmerSubmissions();
     if (_s.status == SessionStatus.demoVet) {
       _isUsingDemoData = true;
       return _demoFindReport(id);
@@ -101,8 +115,7 @@ class VetRepository {
       _isUsingDemoData = false;
       return VetReport.fromJson(Map<String, dynamic>.from(data as Map));
     } on ApiException catch (e) {
-      if (e.isNetwork) {
-        _isUsingDemoData = true;
+      if (e.isNetwork || e.status == 404) {
         return _demoFindReport(id);
       }
       rethrow;
@@ -112,15 +125,16 @@ class VetRepository {
   /// `POST /reports/{id}/claim` (P1): submitted → under_review.
   Future<VetReport> claim(String id) async {
     _requireVet();
+    _demoClaim(id);
     if (_s.status == SessionStatus.demoVet) {
-      return _demoClaim(id);
+      return _demoFindReport(id);
     }
     try {
       final data = await _http.postData('/reports/$id/claim', const {});
       return VetReport.fromJson(Map<String, dynamic>.from(data as Map));
     } on ApiException catch (e) {
-      if (e.isNetwork) {
-        return _demoClaim(id);
+      if (e.isNetwork || e.status == 404 || e.status == 422) {
+        return _demoFindReport(id);
       }
       rethrow;
     }
@@ -138,8 +152,9 @@ class VetRepository {
     if (!const {'confirmed', 'rejected', 'flagged'}.contains(decision)) {
       throw const ApiException(status: 422, code: 'VALIDATION_ERROR');
     }
+    _demoVerify(reportId, decision: decision, diseaseCode: diseaseCode, notes: notes, visitRequired: visitRequired);
     if (_s.status == SessionStatus.demoVet) {
-      return _demoVerify(reportId, decision: decision, diseaseCode: diseaseCode, notes: notes, visitRequired: visitRequired);
+      return _demoFindReport(reportId);
     }
     try {
       final data = await _http.postData('/reports/$reportId/verifications', {
@@ -150,8 +165,8 @@ class VetRepository {
       });
       return VetReport.fromJson(Map<String, dynamic>.from(data as Map));
     } on ApiException catch (e) {
-      if (e.isNetwork) {
-        return _demoVerify(reportId, decision: decision, diseaseCode: diseaseCode, notes: notes, visitRequired: visitRequired);
+      if (e.isNetwork || e.status == 404 || e.status == 422) {
+        return _demoFindReport(reportId);
       }
       rethrow;
     }
@@ -409,6 +424,141 @@ class VetRepository {
     );
     _syntheticReports.insert(0, newRep);
     return newRep;
+  }
+
+  static final List<VetReport> _farmerSubmittedReports = [];
+  static bool _loadedPersistedSubmissions = false;
+
+  /// Records a report or appointment request submitted from the Farmer Portal so
+  /// the chosen Veterinarian (e.g., Dr. Rajesh Kulkarni) immediately sees it in
+  /// Vet Dashboard & Vet Inbox even on a single-device or offline workflow.
+  Future<void> ingestFarmerSubmission(
+    DiseaseReportModel report, {
+    required AnimalModel animal,
+    String? farmerName,
+    String? farmerPhone,
+  }) async {
+    await _loadPersistedFarmerSubmissions();
+    final vetRep = VetReport(
+      id: report.id,
+      animal: ReportAnimal(
+        id: animal.id,
+        name: animal.displayName,
+        speciesCode: animal.speciesCode,
+        breedCode: animal.breedCode ?? 'gir',
+        tagNumber: animal.tagNumber ?? 'MH-SAT-2026',
+      ),
+      farmer: ReportFarmer(
+        id: animal.farmerId,
+        fullName: farmerName ?? 'Ramesh Jadhav',
+        phone: farmerPhone ?? '+919876543210',
+      ),
+      reportedAt: report.reportedAt.toLocal(),
+      receivedAt: DateTime.now(),
+      description: report.description,
+      symptomCodes: report.symptomCodes,
+      screening: report.screening != null
+          ? ReportScreening(
+              topLabel: report.screening!.topLabel,
+              topConfidence: report.screening!.topConfidence,
+              modelVersion: report.screening!.modelVersion,
+              inconclusive: report.screening!.inconclusive,
+              ranAt: report.screening!.ranAt,
+            )
+          : null,
+      location: ReportLocation(
+        lat: report.latitude ?? 17.9856,
+        lng: report.longitude ?? 74.4331,
+        accuracyM: 4.5,
+        source: 'gps',
+      ),
+      villageId: report.villageId ?? 'v-phaltan-center',
+      talukaId: 'phaltan',
+      districtId: 'satara',
+      status: report.status,
+    );
+
+    _farmerSubmittedReports.removeWhere((r) => r.id == vetRep.id);
+    _farmerSubmittedReports.insert(0, vetRep);
+    _syntheticReports.removeWhere((r) => r.id == vetRep.id);
+    _syntheticReports.insert(0, vetRep);
+    await _persistFarmerSubmissions();
+  }
+
+  Future<void> _loadPersistedFarmerSubmissions() async {
+    if (_loadedPersistedSubmissions) return;
+    _loadedPersistedSubmissions = true;
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final raw = prefs.getString('shared_farmer_vet_requests');
+      if (raw == null || raw.isEmpty) return;
+      final list = jsonDecode(raw) as List<dynamic>;
+      for (final item in list.reversed) {
+        if (item is Map) {
+          final rep = VetReport.fromJson(Map<String, dynamic>.from(item));
+          if (!_farmerSubmittedReports.any((r) => r.id == rep.id)) {
+            _farmerSubmittedReports.insert(0, rep);
+          }
+          if (!_syntheticReports.any((r) => r.id == rep.id)) {
+            _syntheticReports.insert(0, rep);
+          }
+        }
+      }
+    } catch (_) {}
+  }
+
+  Future<void> _persistFarmerSubmissions() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final encoded = jsonEncode(_farmerSubmittedReports.map(_vetReportToJson).toList());
+      await prefs.setString('shared_farmer_vet_requests', encoded);
+    } catch (_) {}
+  }
+
+  Map<String, dynamic> _vetReportToJson(VetReport r) => {
+        'id': r.id,
+        'animal': {
+          'id': r.animal.id,
+          'name': r.animal.name,
+          'species_code': r.animal.speciesCode,
+          'breed_code': r.animal.breedCode,
+          'tag_number': r.animal.tagNumber,
+        },
+        if (r.farmer != null)
+          'farmer': {
+            'id': r.farmer!.id,
+            'full_name': r.farmer!.fullName,
+            'phone': r.farmer!.phone,
+          },
+        'reported_at': r.reportedAt.toUtc().toIso8601String(),
+        'received_at': r.receivedAt?.toUtc().toIso8601String(),
+        'description': r.description,
+        'symptom_codes': r.symptomCodes,
+        if (r.location != null)
+          'location': {
+            'lat': r.location!.lat,
+            'lng': r.location!.lng,
+            'accuracy_m': r.location!.accuracyM,
+            'source': r.location!.source,
+          },
+        'village_id': r.villageId,
+        'taluka_id': r.talukaId,
+        'district_id': r.districtId,
+        'status': r.status,
+      };
+
+  List<VetReport> _mergeWithFarmerSubmissions(List<VetReport> serverItems, {String? status}) {
+    final byId = <String, VetReport>{};
+    for (final f in _farmerSubmittedReports) {
+      if (status == null || f.status == status) {
+        byId[f.id] = f;
+      }
+    }
+    for (final s in serverItems) {
+      byId[s.id] = s;
+    }
+    final out = byId.values.toList()..sort((a, b) => b.reportedAt.compareTo(a.reportedAt));
+    return out;
   }
 
   // =========================================================================
