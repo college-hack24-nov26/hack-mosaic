@@ -458,6 +458,11 @@ try {
                     ".js"   { $response.ContentType = "application/javascript; charset=utf-8" }
                     ".css"  { $response.ContentType = "text/css; charset=utf-8" }
                     ".json" { $response.ContentType = "application/json; charset=utf-8" }
+                    ".jpg"  { $response.ContentType = "image/jpeg" }
+                    ".jpeg" { $response.ContentType = "image/jpeg" }
+                    ".png"  { $response.ContentType = "image/png" }
+                    ".svg"  { $response.ContentType = "image/svg+xml" }
+                    ".webp" { $response.ContentType = "image/webp" }
                     default { $response.ContentType = "text/html; charset=utf-8" }
                 }
                 $response.ContentLength64 = $bytes.Length

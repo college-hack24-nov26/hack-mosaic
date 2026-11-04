@@ -79,14 +79,11 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onDismiss }) => {
       <div className="absolute w-[600px] h-[600px] rounded-full bg-[#94e130]/15 blur-[90px] animate-pulse pointer-events-none" />
 
       {/* Main Brand Stage */}
-      <div className="relative z-10 flex flex-col items-center text-center px-6 max-w-xl animate-fadeIn">
-        {/* Animated Brand Emblem */}
+      <div className="relative z-10 flex flex-col items-center text-center px-6 max-w-3xl animate-fadeIn">
+        {/* Animated Official PashuVani Brand Emblem */}
         <div className="relative mb-6">
-          <div className="w-24 h-24 rounded-2xl bg-gradient-to-tr from-[#94e130] to-[#b6f756] flex items-center justify-center shadow-[0_0_50px_rgba(148,225,48,0.65)] transform hover:scale-105 transition-transform duration-300">
-            <ShieldAlert className="w-14 h-14 text-[#141414] stroke-[2.4]" />
-          </div>
-          <div className="absolute -bottom-2 -right-2 w-8 h-8 rounded-full bg-[#2F6FDE] flex items-center justify-center text-white border-2 border-[#060708] shadow-md">
-            <Activity className="w-4 h-4 stroke-[2.5]" />
+          <div className="w-44 h-44 sm:w-48 sm:h-48 rounded-full bg-white flex items-center justify-center shadow-[0_0_50px_rgba(148,225,48,0.55)] transform hover:scale-105 transition-transform duration-300 overflow-hidden p-1">
+            <img src="/pashuvani-logo.jpg" alt="PashuVani Official Logo" className="w-full h-full object-contain rounded-full" />
           </div>
         </div>
 
@@ -101,7 +98,7 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onDismiss }) => {
         </p>
 
         {/* Diagnostic Boot Telemetry Feed */}
-        <div className="mt-8 bg-white/5 border border-white/10 rounded-xl p-4 font-mono text-[11px] text-zinc-400 space-y-1.5 w-full text-left shadow-2xl backdrop-blur-md">
+        <div className="mt-8 bg-white/5 border border-white/10 rounded-xl p-4 font-mono text-xs sm:text-sm text-zinc-400 space-y-1.5 w-full text-left shadow-2xl backdrop-blur-md">
           <div className="flex items-center justify-between pb-1.5 border-b border-white/5 text-[10px] uppercase text-zinc-500 font-bold">
             <span>System Diagnostic Feed</span>
             <span className="text-[#94e130]">v1.0-RC ONLINE</span>

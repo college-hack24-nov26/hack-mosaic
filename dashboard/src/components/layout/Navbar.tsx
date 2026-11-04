@@ -32,8 +32,8 @@ export const Navbar: React.FC<NavbarProps> = ({
       {/* Brand & Telemetry Controls */}
       <div className="flex items-center gap-4">
         <div className="flex items-center gap-2.5">
-          <div className="w-9 h-9 rounded-lg bg-brand-primary flex items-center justify-center shadow-sm">
-            <Activity className="w-5 h-5 text-ink stroke-[2.5]" />
+          <div className="w-10 h-10 rounded-full bg-white border border-[#15803D]/35 flex items-center justify-center shadow-sm overflow-hidden p-0.5">
+            <img src="/pashuvani-logo.jpg" alt="PashuVani Logo" className="w-full h-full object-contain rounded-full" />
           </div>
           <div>
             <div className="flex items-center gap-2">
