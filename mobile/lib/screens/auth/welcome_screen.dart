@@ -71,8 +71,9 @@ class WelcomeScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: AppSpacing.xxl),
                     Container(
-                      width: 92,
-                      height: 92,
+                      width: 104,
+                      height: 104,
+                      padding: const EdgeInsets.all(6),
                       decoration: BoxDecoration(
                         color: Colors.white,
                         shape: BoxShape.circle,
@@ -80,7 +81,13 @@ class WelcomeScreen extends StatelessWidget {
                           BoxShadow(color: Colors.black.withValues(alpha: 0.2), blurRadius: 18, offset: const Offset(0, 8)),
                         ],
                       ),
-                      child: const Icon(Icons.pets, size: 50, color: AppColors.primary),
+                      child: ClipOval(
+                        child: Image.asset(
+                          'assets/images/logo.png',
+                          fit: BoxFit.contain,
+                          errorBuilder: (_, __, ___) => const Icon(Icons.pets, size: 50, color: AppColors.primary),
+                        ),
+                      ),
                     ),
                     const SizedBox(height: AppSpacing.lg),
                     Text(

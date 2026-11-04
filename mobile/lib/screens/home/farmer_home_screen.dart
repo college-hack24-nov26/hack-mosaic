@@ -45,12 +45,21 @@ class _FarmerHomeScreenState extends State<FarmerHomeScreen> {
             title: Row(
               children: [
                 Container(
-                  padding: const EdgeInsets.all(6),
-                  decoration: const BoxDecoration(
-                    color: AppColors.primary,
+                  width: 34,
+                  height: 34,
+                  padding: const EdgeInsets.all(2),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
                     shape: BoxShape.circle,
+                    border: Border.all(color: AppColors.border),
                   ),
-                  child: const Icon(Icons.pets, color: Colors.white, size: 18),
+                  child: ClipOval(
+                    child: Image.asset(
+                      'assets/images/logo.png',
+                      fit: BoxFit.contain,
+                      errorBuilder: (_, __, ___) => const Icon(Icons.pets, color: AppColors.primary, size: 18),
+                    ),
+                  ),
                 ),
                 const SizedBox(width: 10),
                 Column(
