@@ -99,10 +99,22 @@ class OfflineStore extends ChangeNotifier {
       final List<dynamic> decoded = jsonDecode(animalsJson);
       _animals = decoded.map((e) => AnimalModel.fromJson(e)).toList();
     } else {
-      // Seed initial realistic cattle for Phaltan
+      // Seed initial realistic cattle for Phaltan aligned with PostgreSQL seed IDs
       _animals = [
         AnimalModel(
-          id: '11111111-1111-4111-8111-111111111401',
+          id: '33333333-3333-4333-8333-333333333077',
+          farmerId: _currentUser!.id,
+          speciesCode: 'cattle',
+          breedCode: 'gir',
+          name: 'Tulsi',
+          tagNumber: 'MH-SAT-2026-777',
+          sex: 'female',
+          birthDate: '2022-06-12',
+          markings: 'Reddish-brown coat, curved horns',
+          isSynced: true,
+        ),
+        AnimalModel(
+          id: '33333333-3333-4333-8333-333333333001',
           farmerId: _currentUser!.id,
           speciesCode: 'cattle',
           breedCode: 'gir',
@@ -114,7 +126,7 @@ class OfflineStore extends ChangeNotifier {
           isSynced: true,
         ),
         AnimalModel(
-          id: '11111111-1111-4111-8111-111111111402',
+          id: '33333333-3333-4333-8333-333333333003',
           farmerId: _currentUser!.id,
           speciesCode: 'cattle',
           breedCode: 'khillar',
@@ -126,7 +138,7 @@ class OfflineStore extends ChangeNotifier {
           isSynced: true,
         ),
         AnimalModel(
-          id: '11111111-1111-4111-8111-111111111403',
+          id: '33333333-3333-4333-8333-333333333002',
           farmerId: _currentUser!.id,
           speciesCode: 'buffalo',
           breedCode: 'murrah',
@@ -138,6 +150,24 @@ class OfflineStore extends ChangeNotifier {
           isSynced: true,
         ),
       ];
+      await _persistAnimals();
+    }
+    if (!_animals.any((a) => a.name?.toLowerCase() == 'tulsi')) {
+      _animals.insert(
+        0,
+        AnimalModel(
+          id: '33333333-3333-4333-8333-333333333077',
+          farmerId: _currentUser!.id,
+          speciesCode: 'cattle',
+          breedCode: 'gir',
+          name: 'Tulsi',
+          tagNumber: 'MH-SAT-2026-777',
+          sex: 'female',
+          birthDate: '2022-06-12',
+          markings: 'Reddish-brown coat, curved horns',
+          isSynced: true,
+        ),
+      );
       await _persistAnimals();
     }
 
@@ -194,12 +224,31 @@ class OfflineStore extends ChangeNotifier {
     }
 
     // 5. Load Verified Veterinarians (Phaltan / Satara District)
+    const rajeshKulkarniVet = VeterinarianModel(
+      id: '22222222-2222-4222-8222-222222222101',
+      name: 'Dr. Rajesh Kulkarni',
+      qualification: 'M.V.Sc (Veterinary Medicine)',
+      registrationNumber: 'MSVC-2026-SAT-01',
+      clinicName: 'Taluka Veterinary Polyclinic, Phaltan',
+      address: 'Station Road, Phaltan, Dist. Satara',
+      latitude: 17.9860,
+      longitude: 74.4340,
+      phone: '+919890112233',
+      workingHours: '9:00 AM – 6:00 PM (Emergency 24x7)',
+      isVerified: true,
+    );
+
     final vetsJson = prefs.getString('vets_list');
     if (vetsJson != null) {
       final List<dynamic> decoded = jsonDecode(vetsJson);
       _veterinarians = decoded.map((e) => VeterinarianModel.fromJson(e)).toList();
+      if (!_veterinarians.any((v) => v.name.toLowerCase().contains('rajesh kulkarni'))) {
+        _veterinarians.insert(0, rajeshKulkarniVet);
+        await _persistVeterinarians();
+      }
     } else {
       _veterinarians = [
+        rajeshKulkarniVet,
         const VeterinarianModel(
           id: 'vet-phaltan-01',
           name: 'Dr. Sanjay Patil',

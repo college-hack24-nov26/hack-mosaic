@@ -7,6 +7,7 @@ import '../../core/widgets/async_states.dart';
 import '../../data/models/vet_models.dart';
 import '../../data/vet_repository.dart';
 import 'vet_inbox_screen.dart';
+import 'vet_passport_scanner_screen.dart';
 import 'vet_report_details_screen.dart';
 
 /// Full animal health history screen (`GET /animals/{id}/record`).
@@ -781,6 +782,20 @@ class _VetAnimalRecordsSearchScreenState extends State<VetAnimalRecordsSearchScr
         title: Text(AppStrings.t('animals_title')),
         backgroundColor: AppColors.background,
         elevation: 0,
+        actions: [
+          TextButton.icon(
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => const VetPassportScannerScreen()),
+              );
+            },
+            icon: const Icon(Icons.qr_code_scanner, size: 18, color: AppColors.primary),
+            label: const Text(
+              'QR पासपोर्ट स्कॅन',
+              style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold, fontSize: 12),
+            ),
+          ),
+        ],
       ),
       body: Column(
         children: [
